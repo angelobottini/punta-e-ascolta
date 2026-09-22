@@ -32,7 +32,7 @@ Comandi
         Legge la chiave API di ElevenLabs dallo standard input, la cifra (DPAPI, solo questo utente e questo PC)
         e la salva in settings.json. Con --verifica la controlla prima presso ElevenLabs.
         Esempio (PowerShell):  Get-Content chiave.txt | .\PuntaEAscolta.exe --set-key --verifica
-        Chiudere l'app in esecuzione prima di usarlo, poi riavviarla.
+        Con l'app in esecuzione rifiuta (codice 1): chiuderla prima con --exit, poi riaprirla.
   --help
         Questo aiuto.
 

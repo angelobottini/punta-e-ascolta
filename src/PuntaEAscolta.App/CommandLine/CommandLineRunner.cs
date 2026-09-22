@@ -469,8 +469,19 @@ internal static class CommandLineRunner
     // --set-key
     // ---------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// Con l'app aperta il comando rifiuta (codice 1) prima di leggere la chiave: l'app non rilegge settings.json e un suo
+    /// salvataggio successivo (pausa, finestra impostazioni) partirebbe dai valori vecchi in memoria. Scelta voluta al posto
+    /// di "salva e avvisa l'app": più semplice e senza stati a metà.
+    /// </summary>
     private static async Task<int> SetKeyAsync(CommandLineArguments a, string name, AppLog log)
     {
+        if (SingleInstance.IsRunning())
+        {
+            CliJson.Print(CliJson.Error(name,
+                "L'app è in esecuzione. Chiudere prima l'app con --exit, poi ripetere --set-key e riaprire l'app. La chiave non è stata salvata."));
+            return 1;
+        }
         if (!Console.IsInputRedirected)
         {
             CliJson.Print(CliJson.Error(name,
@@ -513,11 +524,11 @@ internal static class CommandLineRunner
             }
         }
 
-        var copy = JsonSettingsStore.Clone(store.Current);
-        copy.Speech.ElevenLabsProtectedApiKey = new DpapiSecretProtector().Protect(key);
-        store.Save(copy);
+        string protectedKey = new DpapiSecretProtector().Protect(key);
+        var copy = store.Update(s => s.Speech.ElevenLabsProtectedApiKey = protectedKey);
         log.Info("Chiave ElevenLabs aggiornata dalla riga di comando");
 
+        // L'app potrebbe essere stata aperta durante la verifica: allora va riavviata per usare la chiave.
         bool running = SingleInstance.IsRunning();
         CliJson.Print(new
         {
@@ -529,7 +540,7 @@ internal static class CommandLineRunner
             settingsFile = store.FilePath,
             voiceConfigured = !string.IsNullOrWhiteSpace(copy.Speech.ElevenLabsVoiceId),
             message = "Chiave salvata, cifrata con DPAPI (vale solo per questo utente su questo PC)." +
-                      (running ? " L'app è in esecuzione: chiuderla e riaprirla per usare la nuova chiave." : ""),
+                      (running ? " L'app è stata aperta nel frattempo: chiuderla con --exit e riaprirla per usare la nuova chiave." : ""),
         });
         return 0;
     }

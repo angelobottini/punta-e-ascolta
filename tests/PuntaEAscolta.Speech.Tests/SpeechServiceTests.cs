@@ -210,18 +210,132 @@ public sealed class SpeechServiceTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task Timeout_counts_until_the_first_pcm_bytes_not_until_the_headers()
+    public async Task Timeout_counts_until_the_first_pcm_bytes_and_the_late_audio_still_reaches_the_cache()
     {
-        var network = new ControlledStream(); // intestazioni subito, byte mai
+        var network = new ControlledStream(); // intestazioni subito, byte solo dopo il tempo massimo
         using var h = Harness.WithElevenLabs((_, _, _) => Task.FromResult(FakeHttpHandler.Streaming(network)),
             s => s.Speech.FirstAudioTimeoutSentenceMs = 250);
+        var request = new SpeechRequest("Una frase lunga.", SpeechKind.Sentence, "it");
 
         var watch = Stopwatch.StartNew();
-        await h.Service.SpeakAsync(new SpeechRequest("Una frase lunga.", SpeechKind.Sentence, "it"), CancellationToken.None).Bounded();
+        await h.Service.SpeakAsync(request, CancellationToken.None).Bounded();
 
         Assert.Equal(["locale:Una frase lunga."], h.PlayedTexts);
         Assert.InRange(watch.ElapsedMilliseconds, 200, 2000);
-        await TestUtil.WaitUntilAsync(() => network.IsDisposed, what: "connessione abbandonata chiusa");
+
+        // L'audio già pagato non si butta: la richiesta finisce in sottofondo, senza suonare, e va in cache.
+        byte[] late = TestUtil.Repeat(3, 6000);
+        network.Push(late);
+        network.Complete();
+        await h.Service.WaitForBackgroundAsync().Bounded();
+        Assert.True(h.Cache.Contains(h.KeyFor(request)));
+        Assert.Single(h.Player.Played);
+        await TestUtil.WaitUntilAsync(() => network.IsDisposed, what: "connessione chiusa dopo il salvataggio");
+
+        await h.Service.SpeakAsync(request, CancellationToken.None).Bounded();
+        Assert.Equal(1, h.Http!.Count);
+        Assert.Equal(late, h.Player.Played[^1].Bytes);
+    }
+
+    [Fact]
+    public async Task Late_cloud_audio_after_a_timeout_does_not_reset_the_circuit_breaker()
+    {
+        var time = new ManualTimeProvider();
+        var networks = new List<ControlledStream>();
+        using var h = Harness.WithElevenLabs((_, _, _) =>
+        {
+            var network = new ControlledStream();
+            lock (networks) networks.Add(network);
+            return Task.FromResult(FakeHttpHandler.Streaming(network));
+        }, s => s.Speech.FirstAudioTimeoutLabelMs = 200, time);
+
+        // Tre letture che scadono: la risposta tardiva in sottofondo non deve far sembrare sano il cloud.
+        for (int i = 0; i < 3; i++)
+        {
+            var speaking = h.Service.SpeakAsync(new SpeechRequest("Etichetta " + i, SpeechKind.Label, "it"), CancellationToken.None);
+            await TestUtil.WaitUntilAsync(() => { lock (networks) return networks.Count == i + 1; }, what: "richiesta inviata");
+            await TestUtil.WaitUntilAsync(() => time.ActiveTimers >= 2, what: "timer del primo audio e dello stream");
+            time.Advance(TimeSpan.FromMilliseconds(200));
+            await speaking.Bounded();
+            ControlledStream last;
+            lock (networks) last = networks[^1];
+            last.Push(TestUtil.Repeat(1, 1000));
+            last.Complete();
+            await h.Service.WaitForBackgroundAsync().Bounded();
+        }
+
+        Assert.NotNull(h.Service.CloudSuspendedUntil);
+        Assert.Equal(3, h.Http!.Count);
+    }
+
+    [Fact]
+    public async Task Stop_before_the_first_bytes_lets_the_paid_request_finish_into_the_cache()
+    {
+        var respond = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var h = Harness.WithElevenLabs(async (request, _, _) =>
+        {
+            await respond.Task; // il server risponde dopo lo Stop
+            return FakeHttpHandler.Audio(TestUtil.Pcm("el:" + BodyText(request)));
+        });
+        var request = new SpeechRequest("Salva con nome", SpeechKind.Label, "it");
+
+        var speaking = h.Service.SpeakWithOutcomeAsync(request, CancellationToken.None);
+        await TestUtil.WaitUntilAsync(() => h.Http!.Count == 1, what: "richiesta inviata");
+        var watch = Stopwatch.StartNew();
+        h.Service.Stop();
+        Assert.Equal(SpeechOutcome.Stopped, await speaking.Bounded());
+        output.WriteLine($"Stop prima dei primi byte: SpeakAsync terminata dopo {watch.ElapsedMilliseconds} ms");
+        Assert.False(h.Service.IsSpeaking);
+
+        respond.TrySetResult();
+        await h.Service.WaitForBackgroundAsync().Bounded();
+
+        Assert.Empty(h.Player.Played); // niente di udibile
+        Assert.True(h.Cache.Contains(h.KeyFor(request)));
+        await h.Service.SpeakAsync(request, CancellationToken.None).Bounded();
+        Assert.Equal(1, h.Http!.Count);
+        Assert.Equal(["el:Salva con nome"], h.PlayedTexts);
+    }
+
+    [Fact]
+    public async Task Abandoned_request_that_never_sends_audio_is_dropped_after_the_background_limit()
+    {
+        var time = new ManualTimeProvider();
+        var network = new ControlledStream(); // intestazioni subito, byte mai
+        using var h = Harness.WithElevenLabs((_, _, _) => Task.FromResult(FakeHttpHandler.Streaming(network)), time: time);
+        var request = new SpeechRequest("Frase mai arrivata.", SpeechKind.Sentence, "it");
+
+        var speaking = h.Service.SpeakWithOutcomeAsync(request, CancellationToken.None);
+        await TestUtil.WaitUntilAsync(() => h.Http!.Count == 1, what: "richiesta inviata");
+        h.Service.Stop();
+        Assert.Equal(SpeechOutcome.Stopped, await speaking.Bounded());
+
+        await TestUtil.WaitUntilAsync(() => time.ActiveTimers >= 2, what: "timer del sottofondo e dello stream");
+        time.Advance(TimeSpan.FromSeconds(16));
+        await h.Service.WaitForBackgroundAsync().Bounded();
+
+        Assert.False(h.Cache.Contains(h.KeyFor(request)));
+        Assert.Empty(h.Player.Played);
+        await TestUtil.WaitUntilAsync(() => network.IsDisposed, what: "connessione chiusa");
+    }
+
+    [Fact]
+    public async Task Without_cache_an_abandoned_request_is_still_cancelled()
+    {
+        var cancelled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var h = Harness.WithElevenLabs(async (_, _, ct) =>
+        {
+            try { await Task.Delay(Timeout.Infinite, ct); }
+            catch (OperationCanceledException) { cancelled.TrySetResult(); throw; }
+            throw new InvalidOperationException("mai");
+        }, s => s.Speech.CacheEnabled = false);
+
+        var speaking = h.Service.SpeakWithOutcomeAsync(new SpeechRequest("Apri", SpeechKind.Label, "it"), CancellationToken.None);
+        await TestUtil.WaitUntilAsync(() => h.Http!.Count == 1, what: "richiesta inviata");
+        h.Service.Stop();
+
+        Assert.Equal(SpeechOutcome.Stopped, await speaking.Bounded());
+        await cancelled.Task.Bounded();
     }
 
     [Fact]
@@ -355,6 +469,37 @@ public sealed class SpeechServiceTests(ITestOutputHelper output)
         Assert.Equal(SpeechOutcome.Stopped, await speaking.Bounded());
         Assert.Equal(2, cloud.Count); // il pezzo corrente e al massimo uno preparato in anticipo
         Assert.Single(h.Player.Played);
+    }
+
+    [Fact]
+    public async Task Stop_during_first_chunk_puts_the_prefetched_second_chunk_in_cache()
+    {
+        var network = new ControlledStream(); // pezzo 1: primi byte, poi la rete si ferma
+        using var h = Harness.WithElevenLabs((request, _, _) => Task.FromResult(BodyText(request) == "Primo pezzo."
+            ? FakeHttpHandler.Streaming(network)
+            : FakeHttpHandler.Audio(TestUtil.Pcm("el:" + BodyText(request)))));
+        var request = new SpeechRequest("Primo pezzo. Secondo pezzo.", SpeechKind.Sentence, "it") { Chunks = ["Primo pezzo.", "Secondo pezzo."] };
+        var second = new SpeechRequest("Secondo pezzo.", SpeechKind.Sentence, "it");
+
+        network.Push(TestUtil.Repeat(1, 8000));
+        var speaking = h.Service.SpeakWithOutcomeAsync(request, CancellationToken.None);
+        await TestUtil.WaitUntilAsync(() => h.Http!.Count == 2 && h.Player.Played.Count == 1 && h.Player.Played[0].Length == 8000,
+            what: "pezzo 1 in riproduzione e pezzo 2 richiesto");
+
+        var watch = Stopwatch.StartNew();
+        h.Service.Stop();
+        Assert.False(h.Service.IsSpeaking);
+        Assert.Equal(SpeechOutcome.Stopped, await speaking.Bounded());
+        output.WriteLine($"Stop durante il pezzo 1: SpeakAsync terminata dopo {watch.ElapsedMilliseconds} ms");
+        Assert.Single(h.Player.Played); // il pezzo 2 non si sente
+
+        network.Complete(); // anche il pezzo 1 finisce in sottofondo (comportamento già esistente)
+        await h.Service.WaitForBackgroundAsync().Bounded();
+
+        Assert.True(h.Cache.Contains(h.KeyFor(second)));
+        await h.Service.SpeakAsync(second, CancellationToken.None).Bounded();
+        Assert.Equal(2, h.Http!.Count); // rilettura del pezzo 2: nessuna chiamata HTTP
+        Assert.Equal("el:Secondo pezzo.", h.PlayedTexts[^1]);
     }
 
     [Fact]

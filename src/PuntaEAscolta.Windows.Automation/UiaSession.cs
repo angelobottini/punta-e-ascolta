@@ -8,8 +8,15 @@ namespace PuntaEAscolta.Windows.Automation;
 /// </summary>
 internal sealed class UiaSession
 {
-    public const uint ConnectionTimeoutMs = 1000;
-    public const uint TransactionTimeoutMs = 2500;
+    /// <summary>
+    /// Tempi massimi di UIA per una singola chiamata. Vincoli (verificati da UiaTimeoutBudgetTests): la transazione più
+    /// 200 ms di margine resta sotto il cane da guardia di <see cref="UiaTextSource.WatchdogMs"/> (1400 ms), che a sua volta
+    /// resta sotto il tempo massimo di ogni fase del risolutore (TextResolver.DefaultUiaTimeoutMs, 1500 ms). Così una
+    /// chiamata bloccata finisce per scadenza di UIA prima che il cane da guardia butti il thread, e una fase scaduta ha
+    /// già liberato la porta prima che parta la successiva.
+    /// </summary>
+    public const uint ConnectionTimeoutMs = 800;
+    public const uint TransactionTimeoutMs = 1100;
 
     public UIA.IUIAutomation Automation { get; }
     public UIA.IUIAutomationTreeWalker RawWalker { get; }

@@ -21,6 +21,23 @@ public sealed class TextResolver : ITextResolver
     /// <summary>Margine aggiunto al rettangolo di un suggerimento senza testo prima dell'OCR.</summary>
     public const int TooltipInflatePx = 8;
 
+    /// <summary>
+    /// Posizione di un vero suggerimento rispetto al puntatore (pixel al 100%, moltiplicati per la scala del monitor): il bordo
+    /// superiore fra 10 px sopra e 100 px sotto il puntatore, il bordo sinistro non oltre 60 px a destra e il bordo destro non
+    /// oltre 300 px a sinistra. Una finestra piccola altrove (menu a tendina, popup di WPF, pannelli di Affinity) non è il
+    /// suggerimento del punto: si passa all'OCR della zona.
+    /// </summary>
+    public const int TooltipMaxAbovePx = 10;
+    public const int TooltipMaxBelowPx = 100;
+    public const int TooltipMaxRightOfPointerPx = 60;
+    public const int TooltipMaxLeftOfPointerPx = 300;
+
+    /// <summary>
+    /// Tempo massimo predefinito per ogni chiamata all'accessibilità. Il cane da guardia di UiaTextSource (1400 ms) deve
+    /// restare sotto questo valore, così una fase scaduta ha già liberato il thread UIA prima che parta la successiva.
+    /// </summary>
+    public const int DefaultUiaTimeoutMs = 1500;
+
     /// <summary>Dimensioni (al 100%) sotto le quali un elemento UIA senza testo delimita l'OCR al suo rettangolo.</summary>
     public const int SmallElementWidth = 300;
     public const int SmallElementHeight = 120;
@@ -58,7 +75,7 @@ public sealed class TextResolver : ITextResolver
     }
 
     /// <summary>Tempo massimo per ogni chiamata all'accessibilità.</summary>
-    internal TimeSpan UiaTimeout { get; set; } = TimeSpan.FromMilliseconds(1500);
+    internal TimeSpan UiaTimeout { get; set; } = TimeSpan.FromMilliseconds(DefaultUiaTimeoutMs);
 
     /// <summary>Tempo massimo per ogni riconoscimento OCR.</summary>
     internal TimeSpan OcrTimeout { get; set; } = TimeSpan.FromMilliseconds(3000);
@@ -173,8 +190,13 @@ public sealed class TextResolver : ITextResolver
         }
         ct.ThrowIfCancellationRequested();
 
-        // 3. Suggerimento visibile vicino al puntatore.
+        // 3. Suggerimento visibile vicino al puntatore, solo se è messo dove si mette un suggerimento.
         var tooltip = await GuardAsync("suggerimento", t => _ui.FindTooltipAsync(point, t), UiaTimeout, diag, ct).ConfigureAwait(false);
+        if (tooltip is not null && !IsPlacedLikeTooltip(tooltip.Bounds, point, SafeDpi(point)))
+        {
+            diag.Append(" suggerimento:lontano");
+            tooltip = null;
+        }
         if (tooltip is not null)
         {
             if (!string.IsNullOrWhiteSpace(tooltip.Text))
@@ -240,10 +262,31 @@ public sealed class TextResolver : ITextResolver
         return candidate with { Source = ReadSource.TooltipOcr, Kind = kind };
     }
 
-    private async Task<Candidate?> OcrZoneAsync(ScreenPoint point, AppSettings settings, bool wholeZone, UiElementInfo? element, bool clipToElement, StringBuilder diag, CancellationToken ct)
+    /// <summary>Scala del monitor sotto il punto; 1.0 se la piattaforma non risponde o restituisce un valore senza senso.</summary>
+    private double SafeDpi(ScreenPoint point)
     {
         double dpi = Safe("scala DPI", () => _capture.GetDpiScale(point), fallback: 1.0);
+        return dpi <= 0 || double.IsNaN(dpi) || double.IsInfinity(dpi) ? 1.0 : dpi;
+    }
+
+    /// <summary>
+    /// Vero se il rettangolo è dove Windows e le app mettono un suggerimento per il punto: bordo superiore fra
+    /// <see cref="TooltipMaxAbovePx"/> sopra e <see cref="TooltipMaxBelowPx"/> sotto il puntatore, bordo sinistro al massimo
+    /// <see cref="TooltipMaxRightOfPointerPx"/> a destra e bordo destro al massimo <see cref="TooltipMaxLeftOfPointerPx"/> a
+    /// sinistra (valori al 100%, scalati). Un rettangolo vuoto non si può verificare: non è un suggerimento.
+    /// </summary>
+    internal static bool IsPlacedLikeTooltip(ScreenRect bounds, ScreenPoint point, double dpi)
+    {
+        if (bounds.IsEmpty) return false;
         if (dpi <= 0 || double.IsNaN(dpi) || double.IsInfinity(dpi)) dpi = 1.0;
+        bool vertical = bounds.Y >= point.Y - TooltipMaxAbovePx * dpi && bounds.Y <= point.Y + TooltipMaxBelowPx * dpi;
+        bool horizontal = bounds.X <= point.X + TooltipMaxRightOfPointerPx * dpi && bounds.Right >= point.X - TooltipMaxLeftOfPointerPx * dpi;
+        return vertical && horizontal;
+    }
+
+    private async Task<Candidate?> OcrZoneAsync(ScreenPoint point, AppSettings settings, bool wholeZone, UiElementInfo? element, bool clipToElement, StringBuilder diag, CancellationToken ct)
+    {
+        double dpi = SafeDpi(point);
 
         var zone = ZoneAround(point, settings.Ocr, dpi);
         var image = Safe("cattura zona", () => _capture.Capture(zone, point));

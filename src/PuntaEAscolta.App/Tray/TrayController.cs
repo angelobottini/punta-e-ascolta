@@ -28,6 +28,7 @@ internal sealed class TrayController : ISettingsHost, IDisposable
     private readonly object _outcomeGate = new();
     private readonly object _settingsGate = new();
     private readonly object _pauseSaveGate = new();
+    private readonly object _stopKeyGate = new();
 
     /// <summary>Vero sul thread che sta salvando lo stato di pausa deciso dall'orchestratore (Changed arriva sincrono lì).</summary>
     [ThreadStatic] private static bool t_persistingPause;
@@ -92,6 +93,7 @@ internal sealed class TrayController : ISettingsHost, IDisposable
         _input.Input += _orchestrator.HandleInput;
         _orchestrator.PausedChanged += OnPausedChanged;
         _orchestrator.OutcomeProduced += OnOutcomeProduced;
+        _orchestrator.BusyChanged += OnBusyChanged;
         Services.Speech.SpeakingChanged += OnSpeakingChanged;
         Services.Dictation.StateChanged += OnDictationStateChanged;
         Store.Changed += OnSettingsChanged;
@@ -180,11 +182,27 @@ internal sealed class TrayController : ISettingsHost, IDisposable
     // Gestori degli eventi dei servizi (thread di lavoro)
     // ---------------------------------------------------------------------------------------------
 
-    private void OnSpeakingChanged(bool speaking)
+    private void OnSpeakingChanged(bool speaking) => UpdateStopKey(null);
+
+    /// <summary>La lettura ha cominciato o finito di cercare il testo (o di parlare): Esc deve seguire.</summary>
+    private void OnBusyChanged(bool busy) => UpdateStopKey(null);
+
+    /// <summary>
+    /// Esc ferma la voce e annulla la ricerca del testo: si registra mentre la voce parla (anche la rilettura della dettatura)
+    /// e mentre l'orchestratore è occupato con una lettura, compresa la fase silenziosa di ricerca. Voce e orchestratore
+    /// notificano da thread diversi e senza ordine garantito: sotto il lock si rileggono gli stati attuali, così l'ultima
+    /// chiamata usa sempre quelli più recenti e Esc non resta sottratto al sistema a lettura finita.
+    /// </summary>
+    private void UpdateStopKey(AppSettings? settings)
     {
         try
         {
-            _input?.SetStopKeyActive(speaking && Store.Current.Input.EscStopsSpeech);
+            lock (_stopKeyGate)
+            {
+                bool busy = Services.Speech.IsSpeaking || (_orchestrator?.IsBusy ?? false);
+                bool enabled = (settings ?? Store.Current).Input.EscStopsSpeech;
+                _input?.SetStopKeyActive(busy && enabled);
+            }
         }
         catch (Exception ex)
         {
@@ -220,13 +238,14 @@ internal sealed class TrayController : ISettingsHost, IDisposable
             {
                 if (_orchestrator is not { } orchestrator) return;
                 bool paused = orchestrator.Paused;
-                var copy = JsonSettingsStore.Clone(Store.Current);
-                if (copy.General.Paused == paused) return;
-                copy.General.Paused = paused;
+                if (Store.Current.General.Paused == paused) return;
                 t_persistingPause = true;
                 try
                 {
-                    Store.Save(copy);   // Changed arriva su questo thread: ApplySettings sa che non deve toccare la pausa
+                    // Si cambia SOLO la pausa sul file riletto dal disco: una modifica fatta da fuori (a mano, --set-key ad
+                    // app chiusa e poi riaperta male...) non viene riscritta con i valori vecchi in memoria.
+                    // Changed arriva su questo thread: ApplySettings sa che non deve toccare la pausa.
+                    Store.Update(s => s.General.Paused = paused);
                 }
                 finally
                 {
@@ -276,8 +295,7 @@ internal sealed class TrayController : ISettingsHost, IDisposable
             if (!t_persistingPause && _orchestrator is { } orchestrator && orchestrator.Paused != settings.General.Paused)
                 orchestrator.Paused = settings.General.Paused;
 
-            if (_input is not null && Services.Speech.IsSpeaking)
-                _input.SetStopKeyActive(settings.Input.EscStopsSpeech);
+            UpdateStopKey(settings);
 
             int max = settings.Speech.CacheMaxMegabytes;
             if (max < _lastCacheMaxMegabytes)
@@ -466,6 +484,7 @@ internal sealed class TrayController : ISettingsHost, IDisposable
         {
             _orchestrator.PausedChanged -= OnPausedChanged;
             _orchestrator.OutcomeProduced -= OnOutcomeProduced;
+            _orchestrator.BusyChanged -= OnBusyChanged;
             TryDispose("orchestratore", _orchestrator);
         }
         Services.Speech.SpeakingChanged -= OnSpeakingChanged;

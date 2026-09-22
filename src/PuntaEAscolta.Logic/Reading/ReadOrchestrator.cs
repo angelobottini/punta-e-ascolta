@@ -9,13 +9,26 @@ namespace PuntaEAscolta.Logic.Reading;
 
 /// <summary>
 /// Cuore dell'app (DESIGN.md 2.1, 2.2, 3.1 parte B): riceve gli eventi di input, riconosce i gesti, applica la regola
-/// "se la voce sta parlando qualunque attivazione la ferma e basta", risolve il testo e lo fa pronunciare.
+/// "secondo clic = stop", risolve il testo e lo fa pronunciare.
+/// <para>
+/// Regola del secondo clic: un'attivazione mentre la voce parla, oppure mentre una lettura sta ancora cercando il testo
+/// (fase silenziosa: accessibilità e OCR possono durare da 0,3 a 2 s, fino a 4,5 s con un'app bloccata), ferma e annulla
+/// tutto e basta. Unica eccezione: durante la ricerca del testo, se il puntatore si è spostato di più di
+/// <see cref="PendingReadMoveThresholdPx"/> dal punto della lettura in attesa (e nessuna delle due è una lettura della
+/// selezione), l'attivazione è una lettura nuova nel punto nuovo (la vecchia viene annullata). L'anti-rimbalzo resta.
+/// </para>
 /// <see cref="HandleInput"/> non blocca mai: accoda in un canale letto da un solo worker. Il worker non esegue letture:
 /// avvia un compito per richiesta e lo annulla quando ne arriva una nuova, così resta sempre pronto a ricevere lo stop.
 /// Non attiva finestre, non tocca il focus, non registra il testo letto (lo fa il risolutore, solo a livello Debug).
 /// </summary>
 public sealed class ReadOrchestrator : IReadOrchestrator
 {
+    /// <summary>
+    /// Spostamento del puntatore (pixel fisici, 24 x 1,0: non scalato con i DPI) oltre il quale un'attivazione durante la
+    /// ricerca del testo avvia una lettura nuova nel punto nuovo invece di fermare quella in attesa.
+    /// </summary>
+    public const double PendingReadMoveThresholdPx = 24.0 * 1.0;
+
     /// <summary>Messaggio quando si chiede la dettatura ma il servizio non è stato composto.</summary>
     public const string DictationUnavailableText = "Dettatura non disponibile";
 
@@ -43,8 +56,15 @@ public sealed class ReadOrchestrator : IReadOrchestrator
     private long _readSeq;
     private long? _lastHotkeyReadMs;
 
+    // Lettura avviata per ultima (solo worker): richiesta e progressivo; null se il compito corrente è un messaggio vocale.
+    private ReadRequest? _currentRequest;
+    private long _currentRequestSeq;
+
     // Stato condiviso fra thread.
     private long _speakingSeq;
+
+    /// <summary>Progressivo del compito attivo (lettura in risoluzione o in voce, messaggio vocale); 0 se nessuno.</summary>
+    private long _activeSeq;
     private volatile bool _paused;
     private int _disposed;
 
@@ -78,6 +98,22 @@ public sealed class ReadOrchestrator : IReadOrchestrator
     /// </summary>
     public event Action<bool>? PausedChanged;
 
+    /// <summary>
+    /// Vero da quando parte una lettura (compresa la fase silenziosa di ricerca del testo, prima che la voce parli) o un
+    /// messaggio vocale dell'orchestratore, fino alla sua fine, a uno stop o a un annullamento. Una risoluzione bloccata che
+    /// ignora l'annullamento non tiene l'orchestratore occupato: lo stop azzera subito lo stato.
+    /// </summary>
+    public bool IsBusy => Interlocked.Read(ref _activeSeq) != 0;
+
+    /// <summary>
+    /// Sollevato quando <see cref="IsBusy"/> cambia. Chi compone l'app lo usa insieme a <c>ISpeechService.SpeakingChanged</c>
+    /// per attivare Esc (<c>IInputSource.SetStopKeyActive</c>) anche mentre si cerca il testo, così Esc annulla anche
+    /// la ricerca. Arriva dal worker o dal thread di una lettura, senza ordine garantito fra thread diversi: i gestori non
+    /// devono bloccare e, per decidere, devono rileggere <see cref="IsBusy"/> sotto un proprio lock invece di fidarsi
+    /// dell'argomento. (Non è nel contratto <c>IReadOrchestrator</c> del Core, che è congelato.)
+    /// </summary>
+    public event Action<bool>? BusyChanged;
+
     /// <summary>In pausa i clic del mouse sono ignorati; le scorciatoie da tastiera funzionano ancora.</summary>
     public bool Paused
     {
@@ -106,6 +142,7 @@ public sealed class ReadOrchestrator : IReadOrchestrator
 
         CancelCurrent();
         Interlocked.Exchange(ref _speakingSeq, 0);
+        Interlocked.Exchange(ref _activeSeq, 0); // senza evento: chi compone l'app sta chiudendo
         try { _gestures.Dispose(); } catch { /* ignorato */ }
         // Voce e dettatura appartengono a chi compone l'app: non si chiudono qui.
     }
@@ -230,7 +267,11 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         return false;
     }
 
-    /// <summary>Attivazione di lettura: se la voce sta parlando la ferma e basta, altrimenti avvia una lettura nuova.</summary>
+    /// <summary>
+    /// Attivazione di lettura: se la voce sta parlando, o se una lettura sta ancora cercando il testo, ferma tutto e basta
+    /// (secondo clic = stop); durante la ricerca, con il puntatore spostato di più di <see cref="PendingReadMoveThresholdPx"/>,
+    /// avvia invece una lettura nuova nel punto nuovo. Altrimenti avvia una lettura nuova.
+    /// </summary>
     private void Trigger(ReadRequestKind kind, ScreenPoint point, string origin)
     {
         // Durante la registrazione della dettatura la voce finirebbe nel microfono: l'attivazione si ignora.
@@ -245,8 +286,39 @@ public sealed class ReadOrchestrator : IReadOrchestrator
             StopAll();
             return;
         }
+        if (IsBusy)
+        {
+            if (PendingRead() is { } pending && IsNewPointerRead(pending, kind, point))
+            {
+                _log.Info($"Attivazione ({origin}) durante la ricerca del testo con il puntatore spostato: lettura nuova");
+                StartRead(new ReadRequest(kind, point));
+                return;
+            }
+            _log.Info($"Attivazione ({origin}) durante la ricerca del testo: lettura annullata");
+            StopAll();
+            return;
+        }
         _log.Debug($"Attivazione ({origin}): {kind} a {point.X},{point.Y}");
         StartRead(new ReadRequest(kind, point));
+    }
+
+    /// <summary>Richiesta della lettura ancora attiva (in ricerca del testo), null se il compito attivo è un messaggio vocale o non c'è.</summary>
+    private ReadRequest? PendingRead()
+    {
+        long active = Interlocked.Read(ref _activeSeq);
+        return active != 0 && active == _currentRequestSeq ? _currentRequest : null;
+    }
+
+    /// <summary>
+    /// Vero se l'attivazione durante la ricerca del testo va trattata come lettura nuova: entrambe legate al puntatore
+    /// (non letture della selezione) e puntatore spostato di più di <see cref="PendingReadMoveThresholdPx"/>.
+    /// </summary>
+    internal static bool IsNewPointerRead(ReadRequest pending, ReadRequestKind kind, ScreenPoint point)
+    {
+        if (pending.Kind == ReadRequestKind.Selection || kind == ReadRequestKind.Selection) return false;
+        double dx = point.X - pending.Point.X;
+        double dy = point.Y - pending.Point.Y;
+        return dx * dx + dy * dy > PendingReadMoveThresholdPx * PendingReadMoveThresholdPx;
     }
 
     private void ToggleDictation()
@@ -261,6 +333,7 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         // La lettura in corso non deve finire nel microfono: si ferma la nostra, non l'eventuale rilettura della dettatura.
         bool oursSpeaking = Interlocked.Read(ref _speakingSeq) != 0;
         CancelCurrent();
+        MarkIdle();
         if (oursSpeaking)
         {
             Interlocked.Exchange(ref _speakingSeq, 0);
@@ -323,8 +396,27 @@ public sealed class ReadOrchestrator : IReadOrchestrator
     private void StopAll()
     {
         CancelCurrent();
+        MarkIdle();
         Interlocked.Exchange(ref _speakingSeq, 0);
         SafeStopSpeech();
+    }
+
+    /// <summary>Un compito nuovo diventa quello attivo (solo worker). Nessun evento se l'orchestratore era già occupato.</summary>
+    private void MarkBusy(long seq)
+    {
+        if (Interlocked.Exchange(ref _activeSeq, seq) == 0) RaiseBusyChanged(true);
+    }
+
+    /// <summary>Stop o annullamento (solo worker): nessun compito attivo, anche se quello annullato non è ancora finito.</summary>
+    private void MarkIdle()
+    {
+        if (Interlocked.Exchange(ref _activeSeq, 0) != 0) RaiseBusyChanged(false);
+    }
+
+    /// <summary>Fine del compito <paramref name="seq"/> (thread del compito): conta solo se è ancora quello attivo.</summary>
+    private void MarkDone(long seq)
+    {
+        if (Interlocked.CompareExchange(ref _activeSeq, 0, seq) == seq) RaiseBusyChanged(false);
     }
 
     private void SafeStopSpeech()
@@ -349,6 +441,9 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         var cts = new CancellationTokenSource();
         _currentCts = cts;
         long seq = ++_readSeq;
+        _currentRequest = request;
+        _currentRequestSeq = seq;
+        MarkBusy(seq);
         var token = cts.Token;
         _currentTask = Task.Run(() => RunReadAsync(request, seq, token));
     }
@@ -359,6 +454,9 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         var cts = new CancellationTokenSource();
         _currentCts = cts;
         long seq = ++_readSeq;
+        _currentRequest = null;
+        _currentRequestSeq = 0;
+        MarkBusy(seq);
         var token = cts.Token;
         _currentTask = Task.Run(async () =>
         {
@@ -373,6 +471,10 @@ public sealed class ReadOrchestrator : IReadOrchestrator
             catch (Exception ex)
             {
                 _log.Error("Messaggio vocale non pronunciato", ex);
+            }
+            finally
+            {
+                MarkDone(seq);
             }
         });
     }
@@ -402,6 +504,10 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         catch (Exception ex)
         {
             _log.Error("Lettura non riuscita", ex);
+        }
+        finally
+        {
+            MarkDone(seq);
         }
     }
 
@@ -491,6 +597,14 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         if (handlers is null) return;
         try { handlers(paused); }
         catch (Exception ex) { _log.Error("Un gestore di PausedChanged ha lanciato un'eccezione", ex); }
+    }
+
+    private void RaiseBusyChanged(bool busy)
+    {
+        var handlers = BusyChanged;
+        if (handlers is null) return;
+        try { handlers(busy); }
+        catch (Exception ex) { _log.Error("Un gestore di BusyChanged ha lanciato un'eccezione", ex); }
     }
 
     // ---------------------------------------------------------------------------------------------

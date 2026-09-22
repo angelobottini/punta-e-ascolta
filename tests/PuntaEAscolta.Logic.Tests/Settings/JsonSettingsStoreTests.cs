@@ -216,6 +216,147 @@ public sealed class JsonSettingsStoreTests : IDisposable
         Assert.True(File.Exists(Path.Combine(FallbackDir, JsonSettingsStore.FileName)));
     }
 
+    // ---------------------------------------------------------------------------------------------
+    // Secondo giro della revisione: impostazioni vecchie in memoria che sovrascrivono il file
+    // ---------------------------------------------------------------------------------------------
+
+    private FileStream LockFile() => new(SettingsFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+    [Fact]
+    public void Update_RereadsTheFile_KeepsExternalChanges_AndPatchesOnlyItsValue()
+    {
+        WriteFile("{ \"Input\": { \"DebounceMs\": 500 } }");
+        var store = Create();
+        Assert.Equal(500, store.Current.Input.DebounceMs);
+        int changes = 0;
+        store.Changed += _ => changes++;
+
+        // Cambiato da fuori mentre l'app è aperta (modifica a mano o un'altra copia dell'app).
+        WriteFile("{ \"Input\": { \"DebounceMs\": 777 }, \"Speech\": { \"ElevenLabsVoiceId\": \"voce-nuova\" } }");
+        var saved = store.Update(s => s.General.Paused = true);
+
+        var reloaded = new JsonSettingsStore(AppDir, FallbackDir, _log).Current;
+        Assert.True(reloaded.General.Paused);
+        Assert.Equal(777, reloaded.Input.DebounceMs);
+        Assert.Equal("voce-nuova", reloaded.Speech.ElevenLabsVoiceId);
+        Assert.Equal(777, store.Current.Input.DebounceMs);
+        Assert.Same(saved, store.Current);
+        Assert.Equal(1, changes);
+        Assert.False(File.Exists(SettingsFile + JsonSettingsStore.BackupSuffix));
+    }
+
+    [Fact]
+    public void Update_WithoutFile_StartsFromMemory()
+    {
+        var store = Create();
+
+        store.Update(s => s.General.Paused = true);
+
+        Assert.True(File.Exists(SettingsFile));
+        Assert.True(new JsonSettingsStore(AppDir, FallbackDir, _log).Current.General.Paused);
+    }
+
+    [Fact]
+    public void Update_WithCorruptFile_StartsFromMemory_AndBacksUpTheFileFirst()
+    {
+        WriteFile("{ \"Input\": { \"DebounceMs\": 500 } }");
+        var store = Create();
+        const string handEdit = "{ \"Input\": { \"DebounceMs\": 600, ";   // modifica a mano lasciata a metà
+        WriteFile(handEdit);
+
+        store.Update(s => s.General.Paused = true);
+
+        Assert.Equal(handEdit, File.ReadAllText(SettingsFile + JsonSettingsStore.BackupSuffix));
+        var reloaded = new JsonSettingsStore(AppDir, FallbackDir, _log).Current;
+        Assert.Equal(500, reloaded.Input.DebounceMs);
+        Assert.True(reloaded.General.Paused);
+    }
+
+    [Fact]
+    public void LockedFileAtStartup_UsesDefaultsWithoutQuarantine_AndBacksUpBeforeTheFirstSave()
+    {
+        const string real = "{ \"Input\": { \"DebounceMs\": 500 }, \"General\": { \"DebugLog\": false } }";
+        WriteFile(real);
+        JsonSettingsStore store;
+        using (LockFile())
+        {
+            store = Create(); // tutti i tentativi falliscono: file bloccato all'accesso
+        }
+
+        Assert.Equal(350, store.Current.Input.DebounceMs);
+        Assert.True(store.BackupPending);
+        Assert.False(File.Exists(SettingsFile + ".bad"));
+        Assert.Equal(real, File.ReadAllText(SettingsFile));
+        Assert.Contains(_log.Entries, e => e.Level == "WARN" && e.Message.Contains("nuovo tentativo", StringComparison.Ordinal));
+
+        var draft = JsonSettingsStore.Clone(store.Current);
+        draft.Input.DebounceMs = 420;
+        store.Save(draft);
+
+        Assert.Equal(real, File.ReadAllText(SettingsFile + JsonSettingsStore.BackupSuffix));
+        Assert.Equal(420, new JsonSettingsStore(AppDir, FallbackDir, _log).Current.Input.DebounceMs);
+        Assert.False(store.BackupPending);
+
+        // La copia si fa una volta sola: un secondo salvataggio non sostituisce il file vero con quello appena scritto.
+        draft.Input.DebounceMs = 430;
+        store.Save(draft);
+        Assert.Equal(real, File.ReadAllText(SettingsFile + JsonSettingsStore.BackupSuffix));
+    }
+
+    [Fact]
+    public void LockedFileAtStartup_ThenUpdate_RereadsTheRealFile()
+    {
+        WriteFile("{ \"Input\": { \"DebounceMs\": 500 } }");
+        JsonSettingsStore store;
+        using (LockFile())
+        {
+            store = Create();
+        }
+        Assert.Equal(350, store.Current.Input.DebounceMs);
+
+        store.Update(s => s.General.Paused = true);
+
+        var reloaded = new JsonSettingsStore(AppDir, FallbackDir, _log).Current;
+        Assert.Equal(500, reloaded.Input.DebounceMs); // il valore vero non è stato sostituito dal predefinito
+        Assert.True(reloaded.General.Paused);
+        Assert.Equal(500, store.Current.Input.DebounceMs);
+        Assert.False(store.BackupPending);
+        Assert.False(File.Exists(SettingsFile + JsonSettingsStore.BackupSuffix));
+    }
+
+    [Fact]
+    public async Task FileLockedOnlyBriefly_IsReadOnARetry()
+    {
+        WriteFile("{ \"Input\": { \"DebounceMs\": 500 } }");
+        var locked = LockFile();
+        var creating = Task.Run(Create);
+        await Task.Delay(40);
+        locked.Dispose();
+
+        var store = await creating.WaitAsync(TimeSpan.FromSeconds(10));
+
+        Assert.Equal(500, store.Current.Input.DebounceMs);
+        Assert.False(store.BackupPending);
+        Assert.False(File.Exists(SettingsFile + ".bad"));
+    }
+
+    [Fact]
+    public void Load_WithLockedFile_KeepsCurrentSettings()
+    {
+        WriteFile("{ \"Input\": { \"DebounceMs\": 500 } }");
+        var store = Create();
+
+        AppSettings loaded;
+        using (LockFile())
+        {
+            loaded = store.Load();
+        }
+
+        Assert.Equal(500, loaded.Input.DebounceMs);
+        Assert.Equal(500, store.Current.Input.DebounceMs);
+        Assert.True(store.BackupPending);
+    }
+
     [Fact]
     public void PublicConstructor_WithWritableDirectory_IsPortable()
     {

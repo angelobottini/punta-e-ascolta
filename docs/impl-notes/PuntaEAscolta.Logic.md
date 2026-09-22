@@ -17,7 +17,8 @@ Stato al 22/09/2026. La parte A (`Text/*`, `Resolution/*`, 155 test) è invariat
 
 - `HandleInput` fa solo `TryWrite` su un canale illimitato. Un solo worker legge il canale e **non esegue letture**: per ogni richiesta avvia un compito con il proprio `CancellationTokenSource`, annullato dalla richiesta successiva, dallo stop, dalla pausa. Così il worker è sempre libero di ricevere il secondo clic.
 - "Sta parlando" = `ISpeechService.IsSpeaking` **oppure** una nostra `SpeakAsync` ancora in corso (copre l'attesa del primo audio anche con servizi che la escludono da `IsSpeaking`). In quello stato qualunque attivazione di lettura (clic, pressione lunga, scorciatoie di lettura) fa `Stop()` e annulla la lettura in corso, niente altro.
-- Senza voce ma con una risoluzione in corso, una nuova attivazione annulla la vecchia e parte subito.
+- **Secondo giro della revisione**: anche durante la ricerca del testo (fase silenziosa, 0,3-2 s e fino a 4,5 s con un'app bloccata) un'attivazione **ferma e annulla** la lettura in attesa, niente altro: prima il secondo clic la ricominciava uguale e Matteo non poteva fermarla. Unica eccezione: puntatore spostato di più di `PendingReadMoveThresholdPx` (24 px fisici, non scalati) dal punto della lettura in attesa, ed entrambe letture legate al puntatore (non `Selection`): allora è una lettura nuova nel punto nuovo e la vecchia viene annullata. L'anti-rimbalzo resta com'era.
+- **Evento pubblico in più** `BusyChanged(bool)` e proprietà `IsBusy` (non nel contratto, il Core è congelato): vero da quando parte una lettura (anche mentre cerca il testo) o un messaggio vocale fino alla fine, a uno stop o a un annullamento; uno stop lo azzera subito anche se la risoluzione annullata non è ancora tornata. L'app lo combina con `SpeakingChanged` per registrare Esc anche durante la ricerca: Esc (`HotkeyAction.Stop`) annulla risoluzione e voce. Gli eventi arrivano da thread diversi senza ordine garantito: chi li riceve rilegge `IsBusy` sotto un proprio lock.
 - Gesti: `LongPressEnabled = false` agisce sul DOWN; con pressione lunga il clic breve si decide sull'UP e la pressione lunga (timer `TimeProvider`, `LongPressMs`) dà `ZoneAroundPointer` con il punto del DOWN. Anti-rimbalzo `DebounceMs` sul DOWN rispetto all'ultima attivazione; lo stesso anti-rimbalzo vale per le scorciatoie di lettura.
 - Pausa: i clic (anche un timer di pressione lunga già avviato) sono ignorati, le scorciatoie funzionano. Valore iniziale da `General.Paused`. Il setter `Paused` non ferma la voce; la scorciatoia `TogglePause` ferma la voce, inverte lo stato e lo conferma a voce ("Lettura in pausa" / "Lettura riattivata", `System`): è l'unico riscontro possibile in un'app solo audio.
 - **Evento pubblico in più** `PausedChanged(bool)` (non nel contratto): serve all'app per `IInputSource.SetPaused`, icona e salvataggio quando la pausa cambia da tastiera. Sollevato dal thread che cambia lo stato (worker o chiamante del setter).
@@ -30,11 +31,12 @@ Stato al 22/09/2026. La parte A (`Text/*`, `Resolution/*`, 155 test) è invariat
 ## Risolutore: decisioni
 
 - Ordine per `AtPointer`: selezione (solo se il punto cade in uno dei suoi rettangoli e `ReadSelectionWhenPointerInside`) > elemento UIA (`UiTextResolver`; saltato per `OcrOnlyProcesses`) > suggerimento (testo, altrimenti OCR del rettangolo allargato di 8 px) > OCR della zona. `Selection`: qualunque selezione, poi appunti. `ZoneAroundPointer`: solo OCR, tutta la zona.
+- Suggerimento accettato solo se è messo come un suggerimento (`IsPlacedLikeTooltip`, valori al 100% per la scala del monitor): bordo superiore fra 10 px sopra e 100 px sotto il puntatore, bordo sinistro non oltre 60 px a destra, bordo destro non oltre 300 px a sinistra. Altrimenti `suggerimento:lontano` nella diagnostica e si passa all'OCR della zona (prima una tendina o un popup di WPF entro 400 px veniva letto al posto del testo sotto il puntatore). Limite noto: un suggerimento che Windows mette sopra il puntatore perché in fondo allo schermo non c'è posto viene ignorato.
 - Zona = `ZoneWidth x ZoneHeight x DpiScale` centrata sul puntatore; puntatore e rettangolo dell'elemento riportati nello spazio dell'immagine effettivamente catturata (anche se ritagliata dal monitor).
 - Motori: Auto = primario; se nulla vicino al puntatore e il primario implementa `IPointOcrEngine`, passaggio mirato e nuova scelta; poi secondario se ancora nulla, oppure se l'elemento è `Image`/`Pane`/`Custom`/`Document` e il primario ha trovato meno di 2 righe (in quel caso vince il secondario se trova testo). `WindowsOnly`: mai il secondario. `OnnxOnly`: solo il secondario (primario se ONNX non è disponibile). Il passaggio mirato parte solo se quello normale è riuscito (non dopo tempo scaduto o errore).
 - Ritaglio: elemento UIA senza testo e piccolo (meno di 300x120 px scalati) = `clipTo`; nessun ripiego senza ritaglio (meglio "Nessun testo" che l'etichetta del vicino).
 - Testo tagliato dal bordo (facoltativo, `DiscardCutText`, attivo): un lato "taglia" solo se coincide con il rettangolo richiesto (non se la cattura è stata ristretta dal monitor). Lati sinistro e destro: si tolgono le parole che li toccano (2 px); sopra e sotto: si toglie la riga, salvo quella del puntatore. Non si applica all'OCR dei suggerimenti.
-- Tempi massimi per fase: UIA 1500 ms, OCR 3000 ms, appunti 2000 ms (`WaitAsync`: una fase che ignora il token non blocca). L'annullamento della richiesta si propaga subito.
+- Tempi massimi per fase: UIA 1500 ms (`DefaultUiaTimeoutMs`; il cane da guardia di `UiaTextSource`, 1400 ms, deve restare sotto: vedi `UiaTimeoutBudgetTests`), OCR 3000 ms, appunti 2000 ms (`WaitAsync`: una fase che ignora il token non blocca). L'annullamento della richiesta si propaga subito.
 - Tipo: riga OCR fino a 60 caratteri e suggerimenti (anche letti con OCR) = `Label`; il resto `Sentence`. `LabelLanguage` forza la lingua solo per le etichette.
 - `Diagnostics`: `Tipo@x,y`, ogni fase con esito e ms (`elemento:no(3ms)`, `ocr:win:tempo-scaduto(3001ms)`), zona, righe, motore scelto, `tagliati=`, `troncato=`, `lingua=`, `totale=`. Il testo letto va nel log solo a livello Debug.
 
@@ -53,7 +55,7 @@ Stato al 22/09/2026. La parte A (`Text/*`, `Resolution/*`, 155 test) è invariat
 
 ## Proposte per il contratto (non applicate)
 
-- `IReadOrchestrator.PausedChanged` (oggi solo sulla classe concreta).
+- `IReadOrchestrator.PausedChanged`, `IsBusy` e `BusyChanged` (oggi solo sulla classe concreta).
 
 ## Come provare
 
@@ -69,9 +71,21 @@ set DOTNET_ROOT=C:\Users\Angelo\AppData\Local\Microsoft\dotnet
 var resolver = new TextResolver(uia, capture, windowsOcr, onnxOcr, clipboard, settingsStore, log);
 var orchestrator = new ReadOrchestrator(resolver, speech, dictationOrNull, settingsStore, log);
 input.Input += orchestrator.HandleInput;                       // non blocca
-orchestrator.PausedChanged += p => { input.SetPaused(p); /* icona, General.Paused */ };
-speech.SpeakingChanged += s => input.SetStopKeyActive(s);      // Esc arriva come HotkeyAction.Stop
+orchestrator.PausedChanged += p => { input.SetPaused(p); /* icona, General.Paused con settingsStore.Update */ };
+// Esc arriva come HotkeyAction.Stop: attivo mentre la voce parla E mentre si cerca il testo (sotto un lock, rileggendo gli stati)
+void UpdateEsc() { lock (gate) input.SetStopKeyActive((speech.IsSpeaking || orchestrator.IsBusy) && settings.Input.EscStopsSpeech); }
+speech.SpeakingChanged += _ => UpdateEsc();
+orchestrator.BusyChanged += _ => UpdateEsc();
 ```
+
+## Impostazioni (secondo giro della revisione)
+
+- `JsonSettingsStore.Update(Action<AppSettings>)`: sotto il lock rilegge `settings.json` dal disco (se esiste e si interpreta), applica la modifica e salva; restituisce la copia salvata e solleva `Changed`. Serve per cambiare un solo valore (pausa, chiave dalla finestra, campi della finestra) senza riscrivere i valori cambiati da fuori con quelli vecchi in memoria. File che non si legge o non si interpreta: si parte da `Current` e il file viene prima copiato in `settings.json.bak`.
+- Lettura all'avvio: un file bloccato (`IOException`, `UnauthorizedAccessException`) viene riprovato dopo 100, 250 e 500 ms; se resta illeggibile si usano i predefiniti **in memoria**, il file non viene toccato (niente `.bad`) e il primo salvataggio lo copia in `settings.json.bak` prima di sovrascriverlo (una sola volta; se la copia non riesce il salvataggio fallisce). `BackupPending` dice se la copia è in attesa. `Load()` con il file bloccato tiene i valori in memoria.
+
+## Frasi (secondo giro della revisione)
+
+- `SentenceSplitter`: i mesi abbreviati (gen, feb, mar, apr, mag, giu, lug, ago, set, sett, ott, nov, dic) chiudono la frase davanti a una maiuscola **solo** subito dopo il numero del giorno (1-31, anche "1°"): "il 10 gen. Porta i documenti" si spezza, "il gen. Rossi è arrivato" (generale) no. Gli altri ambigui ("circa", "via", "ecc.", giorni della settimana...) non cambiano.
 
 ## Revisione del 22/09/2026 (vedi `revisione.md`)
 

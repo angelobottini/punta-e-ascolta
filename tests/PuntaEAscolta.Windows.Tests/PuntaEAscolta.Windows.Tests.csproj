@@ -16,5 +16,7 @@
     <ProjectReference Include="..\..\src\PuntaEAscolta.Windows.Input\PuntaEAscolta.Windows.Input.csproj" />
     <ProjectReference Include="..\..\src\PuntaEAscolta.Windows.Automation\PuntaEAscolta.Windows.Automation.csproj" />
     <ProjectReference Include="..\..\src\PuntaEAscolta.Windows.Ocr\PuntaEAscolta.Windows.Ocr.csproj" />
+    <!-- Solo per verificare che i tempi massimi di UIA restino sotto quelli delle fasi del risolutore. -->
+    <ProjectReference Include="..\..\src\PuntaEAscolta.Logic\PuntaEAscolta.Logic.csproj" />
   </ItemGroup>
 </Project>

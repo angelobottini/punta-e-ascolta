@@ -132,6 +132,67 @@ public class TextResolverTests
     }
 
     [Fact]
+    public async Task TooltipTextFarFromPointer_IsIgnored_ZoneOcrInstead()
+    {
+        var rig = new Rig();
+        // Tendina di WPF (Affinity) 200 px sotto il puntatore: non è il suggerimento del punto.
+        rig.Ui.Tooltip = (_, _) => Result(new UiTooltipInfo("Voce della tendina", new ScreenRect(900, 700, 200, 24)));
+        rig.Primary.Returns(AtPointer("Livelli"));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal(ReadSource.OcrLine, outcome.Source);
+        Assert.Equal("Livelli", outcome.Text);
+        Assert.Contains("suggerimento:lontano", outcome.Diagnostics, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task TooltipWithoutTextFarFromPointer_ThePopupIsNotOcred()
+    {
+        var rig = new Rig();
+        // Popup senza testo sopra e a destra del puntatore: niente OCR del popup, solo quello della zona.
+        rig.Ui.Tooltip = (_, _) => Result(new UiTooltipInfo(null, new ScreenRect(1100, 300, 300, 100)));
+        rig.Primary.Returns(AtPointer("Livelli"));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal("Livelli", outcome.Text);
+        Assert.Equal(new ScreenRect(550, 320, 900, 360), rig.Capture.Requests.Single());
+        Assert.Contains("suggerimento:lontano", outcome.Diagnostics, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task TooltipBelowPointer_AtHighDpi_IsStillAccepted()
+    {
+        var rig = new Rig();
+        rig.Capture.Dpi = 1.25;
+        // 120 px sotto il puntatore: oltre i 100 px al 100%, dentro i 125 px al 125%.
+        rig.Ui.Tooltip = (_, _) => Result(new UiTooltipInfo("Pennello", new ScreenRect(1010, 620, 120, 30)));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal(ReadSource.Tooltip, outcome.Source);
+        Assert.Equal("Pennello", outcome.Text);
+    }
+
+    [Theory]
+    [InlineData(1010, 530, 120, 24, 1.0, true)]    // classico: sotto e a destra del puntatore
+    [InlineData(1000, 490, 120, 24, 1.0, true)]    // 10 px sopra: ancora ammesso
+    [InlineData(1000, 489, 120, 24, 1.0, false)]   // 11 px sopra
+    [InlineData(1000, 600, 120, 24, 1.0, true)]    // 100 px sotto
+    [InlineData(1000, 601, 120, 24, 1.0, false)]   // 101 px sotto
+    [InlineData(1000, 620, 120, 24, 1.25, true)]   // 120 px sotto al 125%
+    [InlineData(1060, 520, 120, 24, 1.0, true)]    // bordo sinistro 60 px a destra
+    [InlineData(1061, 520, 120, 24, 1.0, false)]   // 61 px a destra
+    [InlineData(600, 520, 100, 24, 1.0, true)]     // bordo destro 300 px a sinistra
+    [InlineData(599, 520, 100, 24, 1.0, false)]    // 301 px a sinistra
+    [InlineData(1010, 530, 0, 0, 1.0, false)]      // rettangolo vuoto
+    public void IsPlacedLikeTooltip_Geometry(int x, int y, int w, int h, double dpi, bool expected)
+    {
+        Assert.Equal(expected, TextResolver.IsPlacedLikeTooltip(new ScreenRect(x, y, w, h), P, dpi));
+    }
+
+    [Fact]
     public async Task NothingFromAccessibility_ZoneOcrScaledByDpiAndCentredOnPointer()
     {
         var rig = new Rig();

@@ -144,3 +144,44 @@ public class SentenceSplitterReviewTests
         Assert.Equal(text, SentenceSplitter.ExtractSentence(text, 2));
     }
 }
+
+/// <summary>Secondo giro della revisione: "gen." è sia gennaio sia generale.</summary>
+public class SentenceSplitterMonthTests
+{
+    [Theory]
+    [InlineData("Il gen. Rossi è arrivato. Poi è ripartito.", "Il gen. Rossi è arrivato.")]
+    [InlineData("Il col. Bianchi è qui. Poi arriva il resto.", "Il col. Bianchi è qui.")]
+    [InlineData("Ha parlato il gen. Dalla Chiesa. Tutti ascoltavano.", "Ha parlato il gen. Dalla Chiesa.")]
+    [InlineData("Scrivi a mar. Rossi entro sera. Grazie.", "Scrivi a mar. Rossi entro sera.")]
+    public void MonthAbbreviation_WithoutDayNumber_IsATitleAndNeverEnds(string text, string expected)
+    {
+        Assert.Equal(expected, SentenceSplitter.ExtractSentence(text, 2));
+    }
+
+    [Theory]
+    [InlineData("Ci vediamo il 10 gen. Porta i documenti.", "Ci vediamo il 10 gen.")]
+    [InlineData("Scadenza il 1° mag. Dopo non si accetta.", "Scadenza il 1° mag.")]
+    [InlineData("Partenza il 31 dic. Ritorno a gennaio.", "Partenza il 31 dic.")]
+    [InlineData("Arrivo il 5 sett. Poi si vedrà.", "Arrivo il 5 sett.")]
+    public void MonthAbbreviation_AfterDayNumber_BeforeUppercase_EndsTheSentence(string text, string expected)
+    {
+        Assert.Equal(expected, SentenceSplitter.ExtractSentence(text, 2));
+    }
+
+    [Theory]
+    [InlineData("Il 3 mar. 2026 si parte per Roma.")]
+    [InlineData("Dal 10 gen. al 20 feb. si lavora.")]
+    [InlineData("Nel 2026 gen. Rossi va in pensione.")]
+    [InlineData("Nella stanza 15.30 gen. Verdi aspetta.")]
+    public void MonthAbbreviation_BeforeDigitLowercaseOrWithoutDay_DoesNotEnd(string text)
+    {
+        Assert.Equal(text, SentenceSplitter.ExtractSentence(text, 2));
+    }
+
+    [Fact]
+    public void SplitSentences_KeepsTitleButSplitsDate()
+    {
+        var parts = SentenceSplitter.SplitSentences("Il gen. Rossi è arrivato. Ci vediamo il 10 gen. Porta i documenti.");
+        Assert.Equal(new[] { "Il gen. Rossi è arrivato.", "Ci vediamo il 10 gen.", "Porta i documenti." }, parts);
+    }
+}

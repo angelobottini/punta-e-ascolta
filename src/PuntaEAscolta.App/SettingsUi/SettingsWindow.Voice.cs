@@ -341,9 +341,8 @@ internal sealed partial class SettingsWindow
 
         try
         {
-            var copy = JsonSettingsStore.Clone(_store.Current);
-            copy.Speech.ElevenLabsProtectedApiKey = _services.Protector.Protect(typed);
-            _store.Save(copy);
+            string protectedKey = _services.Protector.Protect(typed);
+            _store.Update(s => s.Speech.ElevenLabsProtectedApiKey = protectedKey);
             _keyBox?.Clear();
             _log.Info("Chiave ElevenLabs salvata dalla finestra impostazioni");
             ShowStatus("Chiave salvata (cifrata). Scegliere la voce e premere Salva per le altre modifiche.", error: false);
@@ -360,14 +359,12 @@ internal sealed partial class SettingsWindow
     {
         try
         {
-            var copy = JsonSettingsStore.Clone(_store.Current);
-            if (string.IsNullOrEmpty(copy.Speech.ElevenLabsProtectedApiKey))
+            if (string.IsNullOrEmpty(_store.Current.Speech.ElevenLabsProtectedApiKey))
             {
                 ShowStatus("Nessuna chiave da rimuovere.", error: false);
                 return;
             }
-            copy.Speech.ElevenLabsProtectedApiKey = "";
-            _store.Save(copy);
+            _store.Update(s => s.Speech.ElevenLabsProtectedApiKey = "");
             _log.Info("Chiave ElevenLabs rimossa dalla finestra impostazioni");
             ShowStatus("Chiave rimossa: si userà la voce di Windows.", error: false);
         }

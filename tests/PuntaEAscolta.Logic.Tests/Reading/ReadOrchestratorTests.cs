@@ -353,9 +353,158 @@ public sealed class ReadOrchestratorTests : IDisposable
         for (int i = 0; i < 1000; i++) o.HandleInput(Down(1000 + i * 1000L));
 
         Assert.True(sw.ElapsedMilliseconds < 1000, $"HandleInput troppo lento: {sw.ElapsedMilliseconds} ms");
+        await Flush(o);
+        // Con la risoluzione bloccata ogni secondo clic è uno stop: metà dei clic ferma, metà legge.
+        Assert.True(SpinWait.SpinUntil(() => _resolver.Calls.Count == 500, 5000), $"letture avviate: {_resolver.Calls.Count}");
+        int stopsBefore = _speech.StopCount;
         o.HandleInput(Hotkey(HotkeyAction.Stop, 5_000_000));
         await Flush(o);
-        Assert.Equal(1, _speech.StopCount);
+        Assert.Equal(stopsBefore + 1, _speech.StopCount);
+        Assert.False(o.IsBusy);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Secondo clic durante la ricerca del testo (fase silenziosa)
+    // ---------------------------------------------------------------------------------------------
+
+    /// <summary>Risolutore lento: segnala l'inizio e impiega 2 s (onora l'annullamento).</summary>
+    private TaskCompletionSource SlowResolver(string text = "Troppo tardi.")
+    {
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _resolver.Handler = async (_, ct) =>
+        {
+            started.TrySetResult();
+            await Task.Delay(2000, ct);
+            return FakeResolver.Text(text);
+        };
+        return started;
+    }
+
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(15, 10)]   // 18 px: tremore della mano, stesso punto
+    [InlineData(0, 24)]    // esattamente la soglia: ancora lo stesso punto
+    public async Task SecondClickDuringResolution_NearSamePoint_CancelsAndSpeaksNothing(int dx, int dy)
+    {
+        var started = SlowResolver();
+        var o = Create();
+
+        o.HandleInput(Down(1000));
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(o.IsBusy);
+        Assert.False(_speech.IsSpeaking);
+
+        o.HandleInput(Down(1700, new ScreenPoint(P.X + dx, P.Y + dy))); // 700 ms dopo: oltre l'anti-rimbalzo
+        await Idle(o);
+
+        var call = Assert.Single(_resolver.Calls);
+        Assert.True(call.Token.IsCancellationRequested);
+        Assert.Empty(_speech.Requests);
+        Assert.False(o.IsBusy);
+        Assert.Contains(_log.Entries, e => e.Message.Contains("durante la ricerca del testo: lettura annullata", StringComparison.Ordinal));
+
+        // Il clic successivo, a lettura annullata, legge di nuovo.
+        _resolver.Handler = (_, _) => Task.FromResult(FakeResolver.Text("Di nuovo."));
+        o.HandleInput(Down(3000));
+        await Idle(o);
+        Assert.Equal(2, _resolver.Calls.Count);
+        Assert.Equal("Di nuovo.", Assert.Single(_speech.Requests).Text);
+    }
+
+    [Fact]
+    public async Task SecondClickDuringResolution_FarPoint_StartsNewReadThere()
+    {
+        var far = new ScreenPoint(P.X + 30, P.Y); // 30 px > 24
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _resolver.Handler = async (r, ct) =>
+        {
+            if (r.Point == P)
+            {
+                started.TrySetResult();
+                await Task.Delay(2000, ct);
+                return FakeResolver.Text("Vecchio punto.");
+            }
+            return FakeResolver.Text("Punto nuovo.");
+        };
+        var o = Create();
+
+        o.HandleInput(Down(1000));
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        o.HandleInput(Down(1700, far));
+        await Idle(o);
+
+        var calls = _resolver.Calls;
+        Assert.Equal(2, calls.Count);
+        Assert.True(calls[0].Token.IsCancellationRequested);
+        Assert.Equal(new ReadRequest(ReadRequestKind.AtPointer, far), calls[1].Request);
+        Assert.False(calls[1].Token.IsCancellationRequested);
+        Assert.Equal("Punto nuovo.", Assert.Single(_speech.Requests).Text);
+        Assert.Equal(0, _speech.StopCount);
+    }
+
+    [Fact]
+    public async Task ClickDuringSelectionResolution_Stops_EvenFarAway()
+    {
+        var started = SlowResolver();
+        var o = Create();
+
+        o.HandleInput(Hotkey(HotkeyAction.ReadSelection, 1000));
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        o.HandleInput(Down(1700, new ScreenPoint(10, 10)));
+        await Idle(o);
+
+        Assert.Equal(ReadRequestKind.Selection, Assert.Single(_resolver.Calls).Request.Kind);
+        Assert.Empty(_speech.Requests);
+        Assert.False(o.IsBusy);
+    }
+
+    [Fact]
+    public async Task StopHotkeyDuringResolution_CancelsIt_AndBusyStateFollows()
+    {
+        var started = SlowResolver();
+        var o = Create();
+        var events = new List<bool>();
+        o.BusyChanged += b => { lock (events) events.Add(b); };
+
+        o.HandleInput(Down(1000));
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(o.IsBusy); // qui chi compone l'app attiva Esc
+        o.HandleInput(Hotkey(HotkeyAction.Stop, 1100));
+        await Idle(o);
+
+        Assert.True(Assert.Single(_resolver.Calls).Token.IsCancellationRequested);
+        Assert.Empty(_speech.Requests);
+        Assert.False(o.IsBusy);
+        lock (events) Assert.Equal(new[] { true, false }, events);
+    }
+
+    [Fact]
+    public async Task BusyChanged_CoversResolutionAndSpeech_ThenGoesBackToIdle()
+    {
+        _speech.BlockUntilStopped = true;
+        var o = Create();
+        var events = new List<bool>();
+        o.BusyChanged += b => { lock (events) events.Add(b); };
+
+        o.HandleInput(Down(1000));
+        Assert.True(await _speech.WaitStartedAsync());
+        Assert.True(o.IsBusy);
+        _speech.Stop(); // la voce finisce da sola (o la ferma qualcun altro)
+        await Idle(o);
+
+        Assert.False(o.IsBusy);
+        lock (events) Assert.Equal(new[] { true, false }, events);
+    }
+
+    [Theory]
+    [InlineData(ReadRequestKind.AtPointer, ReadRequestKind.AtPointer, 30, 0, true)]
+    [InlineData(ReadRequestKind.AtPointer, ReadRequestKind.ZoneAroundPointer, 20, 20, true)]
+    [InlineData(ReadRequestKind.AtPointer, ReadRequestKind.AtPointer, 16, 16, false)]
+    [InlineData(ReadRequestKind.Selection, ReadRequestKind.AtPointer, 500, 0, false)]
+    [InlineData(ReadRequestKind.AtPointer, ReadRequestKind.Selection, 500, 0, false)]
+    public void IsNewPointerRead_UsesDistanceOnlyForPointerReads(ReadRequestKind pending, ReadRequestKind next, int dx, int dy, bool expected)
+    {
+        Assert.Equal(expected, ReadOrchestrator.IsNewPointerRead(new ReadRequest(pending, P), next, new ScreenPoint(P.X + dx, P.Y + dy)));
     }
 
     // ---------------------------------------------------------------------------------------------

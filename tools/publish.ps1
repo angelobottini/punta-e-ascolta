@@ -10,7 +10,10 @@
        solo quelle della stessa architettura, controllata nell'intestazione PE),
        toglie i file .lib inutili, copia docs\LEGGIMI.txt.
     5. Stampa dimensioni e numero di file.
-    Nella cartella di destinazione vengono conservati settings.json, cache e logs se esistono gia'.
+    La cartella di destinazione viene sempre svuotata del tutto: le cartelle pubblicate sono quelle che si copiano sul PC
+    di Matteo e non devono mai contenere impostazioni di prova (registro di dettaglio, scorciatoie, avvio con Windows),
+    registri con il testo letto o audio in cache. Se c'erano settings.json, logs, cache e simili lo script li toglie e
+    lo dice con un avviso, anche nel riepilogo finale.
 
 .PARAMETER Configuration
     Release (predefinito) oppure Debug.
@@ -57,8 +60,9 @@ $publishRoot = Join-Path $repo 'publish'
 if (-not $ArtifactsPath) { $ArtifactsPath = Join-Path $repo 'artifacts\publish' }
 $runtimes = if ($Runtime -eq 'all') { @('win-x64', 'win-arm64') } else { @($Runtime) }
 
-# File dell'utente da non cancellare quando si ripubblica sopra una cartella gia' in uso.
-$keepNames = @('settings.json', 'settings.json.bad', 'cache', 'logs')
+# Dati creati usando l'app dalla cartella pubblicata (prove dello sviluppatore): non devono mai arrivare sul PC di Matteo.
+# Vengono tolti con tutto il resto; questi nomi servono solo per avvisare che c'erano.
+$userDataNames = @('settings.json', 'settings.json.bad', 'settings.json.bak', 'settings.json.tmp', 'cache', 'logs')
 
 function Find-Dotnet {
     if ($Dotnet) {
@@ -116,20 +120,34 @@ function Get-PeMachine {
     finally { $stream.Dispose() }
 }
 
+# Svuota del tutto la cartella di destinazione. Restituisce i nomi dei dati di prova trovati (e tolti).
 function Clear-OutputFolder {
     param([string] $Folder)
     if (-not (Test-Path $Folder)) {
         New-Item -ItemType Directory -Path $Folder | Out-Null
-        return
+        return @()
     }
-    Get-ChildItem -LiteralPath $Folder -Force | Where-Object { $keepNames -notcontains $_.Name } |
-        Remove-Item -Recurse -Force
+    $items = @(Get-ChildItem -LiteralPath $Folder -Force)
+    $found = @($items | Where-Object { $userDataNames -contains $_.Name } | ForEach-Object { $_.Name })
+    try {
+        $items | Remove-Item -Recurse -Force
+    }
+    catch {
+        throw "Impossibile svuotare ${Folder}: se l'app e' aperta da quella cartella chiuderla (PuntaEAscolta.exe --exit) e riprovare. $_"
+    }
+    if (@(Get-ChildItem -LiteralPath $Folder -Force).Count -gt 0) {
+        throw "Impossibile svuotare ${Folder}: restano dei file (in uso?)."
+    }
+    if ($found.Count -gt 0) {
+        Write-Warning ("Tolti da ${Folder} i dati di prova dello sviluppatore: " + ($found -join ', ') +
+            ". Le cartelle pubblicate non contengono mai impostazioni, registri o cache.")
+    }
+    return $found
 }
 
 function Get-FolderSize {
     param([string] $Folder)
-    $files = @(Get-ChildItem -LiteralPath $Folder -Recurse -File -Force |
-        Where-Object { $_.FullName -notmatch '\\(cache|logs)\\' -and $keepNames -notcontains $_.Name })
+    $files = @(Get-ChildItem -LiteralPath $Folder -Recurse -File -Force)
     $bytes = ($files | Measure-Object -Property Length -Sum).Sum
     if (-not $bytes) { $bytes = 0 }
     return [pscustomobject]@{ Files = $files.Count; MB = [math]::Round($bytes / 1MB, 1) }
@@ -162,7 +180,7 @@ foreach ($rid in $runtimes) {
     $out = Join-Path $publishRoot "PuntaEAscolta-$rid"
     Write-Host ""
     Write-Host "Pubblicazione $rid in $out" -ForegroundColor Cyan
-    Clear-OutputFolder $out
+    $removedUserData = @(Clear-OutputFolder $out)
 
     Invoke-Dotnet @('publish', $appProject, '-c', $Configuration, '-r', $rid, '--self-contained', 'true',
         '-p:PublishTrimmed=false', '-p:PublishSingleFile=false', '-p:PublishReadyToRun=false',
@@ -205,10 +223,20 @@ foreach ($rid in $runtimes) {
     if (-not (Test-Path $exe)) { throw "Eseguibile mancante: $exe" }
     if (-not (Test-Path (Join-Path $out 'models\v5'))) { Write-Warning "Cartella models\v5 mancante in ${out}: OCR ONNX non disponibile." }
 
+    # Controllo finale: nessun dato di prova nella cartella pubblicata.
+    $leftover = @(Get-ChildItem -LiteralPath $out -Force | Where-Object { $userDataNames -contains $_.Name })
+    if ($leftover.Count -gt 0) { throw ("Dati di prova ancora presenti in ${out}: " + (($leftover | ForEach-Object { $_.Name }) -join ', ')) }
+
     $size = Get-FolderSize $out
-    $summary += [pscustomobject]@{ Architettura = $rid; File = $size.Files; MB = $size.MB; VCRuntime = ($vcCopied.Count -gt 0); Cartella = $out }
+    $removedText = if ($removedUserData.Count -gt 0) { $removedUserData -join ', ' } else { '-' }
+    $summary += [pscustomobject]@{ Architettura = $rid; File = $size.Files; MB = $size.MB; VCRuntime = ($vcCopied.Count -gt 0); DatiProvaTolti = $removedText; Cartella = $out }
 }
 
 Write-Host ""
 Write-Host ("Pubblicazione terminata in {0:N0} s" -f $stopwatch.Elapsed.TotalSeconds) -ForegroundColor Green
 $summary | Format-Table -AutoSize | Out-String | Write-Host
+foreach ($row in $summary) {
+    if ($row.DatiProvaTolti -ne '-') {
+        Write-Warning ("$($row.Architettura): tolti i dati di prova trovati nella cartella (" + $row.DatiProvaTolti + ").")
+    }
+}

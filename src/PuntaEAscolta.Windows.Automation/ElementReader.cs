@@ -83,7 +83,7 @@ internal sealed partial class ElementReader
             }
 
             string? labeledBy = ReadLabeledByName(snap.LabeledBy);
-            var text = ReadTextContext(snap, point);
+            var text = TryReadTextContext(snap, point);
             string? processName = _processNames.Get(snap.ProcessId);
             int elapsed = (int)Stopwatch.GetElapsedTime(t0).TotalMilliseconds;
 
@@ -267,6 +267,24 @@ internal sealed partial class ElementReader
     // ------------------------------------------------------------------ TextPattern
 
     /// <summary>
+    /// Contesto di testo protetto: le chiamate sugli intervalli (Clone, ExpandToEnclosingUnit, GetText...) possono fallire
+    /// con COMException su una pagina che si ridisegna (Chromium) o un provider che rifiuta; allora l'elemento resta con
+    /// nome e valore e senza testo (Text = null), invece di perdere tutto e finire all'OCR.
+    /// </summary>
+    private UiTextContext? TryReadTextContext(ElementSnapshot snap, ScreenPoint point)
+    {
+        try
+        {
+            return ReadTextContext(snap, point);
+        }
+        catch (Exception ex)
+        {
+            _log.Debug($"UIA: contesto di testo non leggibile ({ex.GetType().Name} 0x{ex.HResult:X8}); elemento tenuto senza testo");
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Paragrafo e offset sotto il punto (algoritmo validato 17/17 su Word): RangeFromPoint -> verifica sui rettangoli
     /// della riga -> paragrafo -> prefisso -> offset. Restituisce PointerOverText=false quando il punto non è sopra testo.
     /// </summary>
@@ -380,6 +398,14 @@ internal sealed partial class ElementReader
     {
         try
         {
+            // Prima fase di ogni clic: con l'app in primo piano bloccata, GetFocusedElement resterebbe appeso fino al
+            // tempo massimo della transazione e le fasi successive aspetterebbero il thread UIA.
+            if (NativeMethods.IsForegroundWindowHung())
+            {
+                _log.Warn("UIA: la finestra in primo piano non risponde ai messaggi; selezione saltata");
+                return null;
+            }
+
             var focused = _s.Automation.GetFocusedElementBuildCache(_s.ElementCache);
             if (focused is null) return null;
 
@@ -455,15 +481,37 @@ internal sealed partial class ElementReader
         }
     }
 
-    /// <param name="IsConfident">Classe nota di suggerimento, oppure WS_EX_TOOLWINDOW insieme a WS_EX_NOACTIVATE (Affinity, Office, Chrome).</param>
+    /// <param name="IsConfident">Suggerimento vero (vedi <see cref="IsConfidentTooltip"/>): solo allora si leggono i Text discendenti o si offre il rettangolo per l'OCR.</param>
     private sealed record TooltipWindow(IntPtr Handle, ScreenRect Bounds, string ClassName, double Distance, bool IsConfident);
 
-    private static bool IsKnownTooltipClass(string className) =>
+    /// <summary>Classi che sono sempre suggerimenti: tooltips_class32 (Win32, Office) e Xaml_WindowedPopupClass (WinUI).</summary>
+    internal static bool IsKnownTooltipClass(string className) =>
         className.Equals("tooltips_class32", StringComparison.OrdinalIgnoreCase)
-        || className.StartsWith("HwndWrapper", StringComparison.OrdinalIgnoreCase)
         || className.Equals("Xaml_WindowedPopupClass", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>Finestre di primo livello visibili, piccole, con aspetto da suggerimento, entro 400 px dal punto (più vicine prima).</summary>
+    /// <summary>
+    /// Finestre di WPF (Affinity): con la classe HwndWrapper WPF crea suggerimenti, ma anche menu, tendine e popup. La classe
+    /// da sola la rende solo una candidata: si legge se espone un elemento ToolTip o se lo stile dice che è un suggerimento.
+    /// </summary>
+    internal static bool IsWpfPopupClass(string className) =>
+        className.StartsWith("HwndWrapper", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Suggerimento vero: classe nota (<see cref="IsKnownTooltipClass"/>), oppure WS_EX_TRANSPARENT insieme a WS_EX_TOOLWINDOW
+    /// e WS_EX_NOACTIVATE (i clic lo attraversano: i suggerimenti di Affinity hanno stile esteso 0x080800A8). Una finestra
+    /// strumento che si può cliccare (menu, tendina, pannello fluttuante) non lo è.
+    /// </summary>
+    internal static bool IsConfidentTooltip(string className, long exStyle)
+    {
+        if (IsKnownTooltipClass(className)) return true;
+        const long required = NativeMethods.WsExTransparent | NativeMethods.WsExToolWindow | NativeMethods.WsExNoActivate;
+        return (exStyle & required) == required;
+    }
+
+    /// <summary>
+    /// Finestre di primo livello visibili, piccole, con aspetto da suggerimento, entro 400 px dal punto (più vicine prima).
+    /// Si saltano quelle di app bloccate: interrogarle con UIA terrebbe occupato il thread fino al tempo massimo.
+    /// </summary>
     private static List<TooltipWindow> EnumerateTooltipWindows(ScreenPoint point)
     {
         var list = new List<TooltipWindow>();
@@ -483,16 +531,15 @@ internal sealed partial class ElementReader
 
                 long exStyle = NativeMethods.GetWindowLongPtr(hwnd, NativeMethods.GwlExStyle).ToInt64();
                 bool toolWindow = (exStyle & NativeMethods.WsExToolWindow) != 0;
-                bool noActivate = (exStyle & NativeMethods.WsExNoActivate) != 0;
                 string className = NativeMethods.GetClassNameSafe(hwnd);
-                bool knownClass = IsKnownTooltipClass(className);
-                if (!toolWindow && !knownClass) return true;
+                if (!toolWindow && !IsKnownTooltipClass(className) && !IsWpfPopupClass(className)) return true;
 
                 NativeMethods.GetWindowThreadProcessId(hwnd, out uint pid);
                 if (pid == ownPid) return true;
                 if (NativeMethods.IsCloaked(hwnd)) return true;
+                if (NativeMethods.IsHungAppWindow(hwnd)) return true;
 
-                list.Add(new TooltipWindow(hwnd, bounds, className, distance, knownClass || (toolWindow && noActivate)));
+                list.Add(new TooltipWindow(hwnd, bounds, className, distance, IsConfidentTooltip(className, exStyle)));
             }
             catch (Exception)
             {
@@ -512,8 +559,9 @@ internal sealed partial class ElementReader
     }
 
     /// <summary>
-    /// Testo del suggerimento: elemento ToolTip (radice o discendente); altrimenti, solo per finestre dall'aspetto
-    /// sicuro di suggerimento, i Text discendenti. null se la finestra è muta o non è un suggerimento.
+    /// Testo del suggerimento: elemento ToolTip (radice o discendente); altrimenti, solo per suggerimenti veri
+    /// (<see cref="IsConfidentTooltip"/>: il nome di classe HwndWrapper non basta), i Text discendenti. null se la finestra
+    /// è muta o non è un suggerimento (una tendina o un popup di WPF non si legge per intero).
     /// </summary>
     private string? ReadTooltipText(TooltipWindow window)
     {
@@ -530,7 +578,8 @@ internal sealed partial class ElementReader
             if (tipName is not null) return tipName;
         }
 
-        // senza un elemento ToolTip, una semplice finestra strumento potrebbe essere una barra fluttuante: non si legge
+        // senza un elemento ToolTip, una finestra strumento o un popup di WPF potrebbe essere una barra fluttuante o una
+        // tendina: si legge solo se lo stile dice che è un suggerimento
         if (tip is null && snap.Kind != UiElementKind.ToolTip && !window.IsConfident) return null;
 
         var texts = ElementSnapshot.Safe(

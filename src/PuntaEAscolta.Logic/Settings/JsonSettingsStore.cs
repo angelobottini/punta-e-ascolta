@@ -12,12 +12,25 @@ namespace PuntaEAscolta.Logic.Settings;
 /// Posizione: la cartella dell'app se scrivibile (cartella portatile), altrimenti <c>%AppData%\PuntaEAscolta</c>.
 /// <see cref="DataDirectory"/> è la stessa cartella: lì vanno <c>cache</c> e <c>logs</c>.
 /// Tollerante a file mancante, parziale o con membri sconosciuti; un file corrotto viene rinominato <c>.bad</c> e si riparte dai predefiniti.
-/// Salvataggio atomico: file temporaneo e poi sostituzione.
+/// Un file presente ma non leggibile (bloccato all'accesso da antivirus o sincronizzazione) viene riprovato qualche volta;
+/// se resta illeggibile si usano i predefiniti in memoria e il primo salvataggio copia prima il file in <c>settings.json.bak</c>,
+/// così le impostazioni vere non vanno mai perse.
+/// Salvataggio atomico: file temporaneo e poi sostituzione. Per cambiare un solo valore senza riscrivere quelli cambiati da
+/// fuori (modifica a mano, riga di comando) si usa <see cref="Update"/>, che rilegge il file sotto il lock.
 /// </summary>
 public sealed class JsonSettingsStore : ISettingsStore
 {
     public const string FileName = "settings.json";
     public const string FallbackFolderName = "PuntaEAscolta";
+
+    /// <summary>Estensione della copia di sicurezza fatta prima di sovrascrivere un file che non si era riusciti a leggere.</summary>
+    public const string BackupSuffix = ".bak";
+
+    /// <summary>Attese fra i tentativi di lettura di un file bloccato (in tutto meno di un secondo, solo in quel caso).</summary>
+    internal static readonly TimeSpan[] ReadRetryDelays =
+    {
+        TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(250), TimeSpan.FromMilliseconds(500),
+    };
 
     private static readonly UTF8Encoding Utf8NoBom = new(encoderShouldEmitUTF8Identifier: false);
 
@@ -44,6 +57,12 @@ public sealed class JsonSettingsStore : ISettingsStore
     private readonly ILog _log;
     private readonly object _gate = new();
     private AppSettings _current;
+
+    /// <summary>
+    /// Vero se il file esiste ma non è stato letto (o interpretato, in <see cref="Update"/>): il prossimo salvataggio lo copia
+    /// prima in <c>settings.json.bak</c>. Si azzera con una lettura riuscita o dopo la copia. Protetto da <c>_gate</c>.
+    /// </summary>
+    private bool _backupBeforeSave;
 
     public JsonSettingsStore(string appDirectory, ILog? log = null)
         : this(appDirectory, DefaultFallbackDirectory(), log)
@@ -74,7 +93,7 @@ public sealed class JsonSettingsStore : ISettingsStore
 
         DataDirectory = baseDirectory;
         FilePath = Path.Combine(baseDirectory, FileName);
-        _current = LoadCore();
+        _current = LoadCore() ?? new AppSettings();
     }
 
     public string FilePath { get; }
@@ -84,6 +103,12 @@ public sealed class JsonSettingsStore : ISettingsStore
     /// <summary>True se le impostazioni stanno nella cartella dell'app (modalità portatile), false se nel ripiego %AppData%.</summary>
     public bool IsPortable { get; }
 
+    /// <summary>Vero se il file c'è ma non è stato letto: il prossimo salvataggio ne farà prima una copia in <c>settings.json.bak</c>.</summary>
+    public bool BackupPending
+    {
+        get { lock (_gate) return _backupBeforeSave; }
+    }
+
     public AppSettings Current
     {
         get { lock (_gate) return _current; }
@@ -91,13 +116,16 @@ public sealed class JsonSettingsStore : ISettingsStore
 
     public event Action<AppSettings>? Changed;
 
-    /// <summary>Rilegge il file (o i predefiniti) e aggiorna <see cref="Current"/>, notificando <see cref="Changed"/>.</summary>
+    /// <summary>
+    /// Rilegge il file (o i predefiniti) e aggiorna <see cref="Current"/>, notificando <see cref="Changed"/>. Se il file c'è ma
+    /// non si legge, <see cref="Current"/> resta com'era.
+    /// </summary>
     public AppSettings Load()
     {
         AppSettings loaded;
         lock (_gate)
         {
-            loaded = LoadCore();
+            loaded = LoadCore() ?? _current;
             _current = loaded;
         }
         RaiseChanged(loaded);
@@ -111,27 +139,81 @@ public sealed class JsonSettingsStore : ISettingsStore
         AppSettings copy;
         lock (_gate)
         {
-            Sanitize(settings);
-            var directory = Path.GetDirectoryName(FilePath)!;
-            var temp = FilePath + ".tmp";
-            try
-            {
-                Directory.CreateDirectory(directory);
-                var json = JsonSerializer.Serialize(settings, Options);
-                File.WriteAllText(temp, json, Utf8NoBom);
-                File.Move(temp, FilePath, overwrite: true);
-                copy = Clone(settings);
-                _current = copy;
-            }
-            catch (Exception ex)
-            {
-                _log.Error("Salvataggio delle impostazioni fallito", ex);
-                TryDelete(temp);
-                throw;
-            }
+            copy = SaveCore(settings);
         }
         _log.Info("Impostazioni salvate");
         RaiseChanged(copy);
+    }
+
+    /// <summary>
+    /// Modifica mirata: sotto il lock rilegge <c>settings.json</c> dal disco (se esiste e si interpreta), applica
+    /// <paramref name="mutate"/> e salva. Così i valori cambiati da fuori mentre l'app è aperta (modifica a mano, un'altra
+    /// copia dell'app) non vengono riscritti con quelli vecchi in memoria. Se il file manca si parte da <see cref="Current"/>;
+    /// se c'è ma non si legge o non si interpreta si parte da <see cref="Current"/> e il file viene prima copiato in
+    /// <c>settings.json.bak</c>. Restituisce la copia salvata; <see cref="Changed"/> la notifica (con gli eventuali valori
+    /// cambiati da fuori, che così vengono anche applicati).
+    /// </summary>
+    public AppSettings Update(Action<AppSettings> mutate)
+    {
+        ArgumentNullException.ThrowIfNull(mutate);
+        AppSettings copy;
+        lock (_gate)
+        {
+            var (status, fromDisk, error) = ReadFile(retry: true);
+            AppSettings target;
+            switch (status)
+            {
+                case ReadStatus.Ok:
+                    target = fromDisk!;
+                    _backupBeforeSave = false;
+                    break;
+                case ReadStatus.Missing:
+                    target = Clone(_current);
+                    break;
+                default:
+                    _log.Warn($"File impostazioni non leggibile durante l'aggiornamento ({error?.GetType().Name}: {error?.Message}): parto dai valori in memoria e ne faccio prima una copia");
+                    _backupBeforeSave = true;
+                    target = Clone(_current);
+                    break;
+            }
+            mutate(target);
+            copy = SaveCore(target);
+        }
+        _log.Info("Impostazioni aggiornate");
+        RaiseChanged(copy);
+        return copy;
+    }
+
+    /// <summary>Scrittura atomica sotto il lock; se serve, copia di sicurezza del file che non si era riusciti a leggere.</summary>
+    private AppSettings SaveCore(AppSettings settings)
+    {
+        Sanitize(settings);
+        var directory = Path.GetDirectoryName(FilePath)!;
+        var temp = FilePath + ".tmp";
+        try
+        {
+            Directory.CreateDirectory(directory);
+            if (_backupBeforeSave && File.Exists(FilePath))
+            {
+                // Se la copia non riesce il salvataggio fallisce: meglio non salvare che perdere il file vero.
+                var backup = FilePath + BackupSuffix;
+                File.Copy(FilePath, backup, overwrite: true);
+                _log.Warn($"Il file impostazioni non era stato letto: copiato in {Path.GetFileName(backup)} prima di sovrascriverlo");
+            }
+            _backupBeforeSave = false;
+            var json = JsonSerializer.Serialize(settings, Options);
+            File.WriteAllText(temp, json, Utf8NoBom);
+            File.Move(temp, FilePath, overwrite: true);
+            var copy = Clone(settings);
+            _current = copy;
+            return copy;
+        }
+        catch (Exception ex)
+        {
+            _log.Error("Salvataggio delle impostazioni fallito", ex);
+            TryDelete(temp);
+            throw;
+        }
     }
 
     /// <summary>Copia indipendente (utile alla finestra impostazioni per lavorare su una bozza).</summary>
@@ -144,23 +226,69 @@ public sealed class JsonSettingsStore : ISettingsStore
         return copy;
     }
 
-    private AppSettings LoadCore()
+    /// <summary>
+    /// Lettura all'avvio e in <see cref="Load"/> (sotto il lock o nel costruttore). File mancante: predefiniti. File corrotto:
+    /// rinominato <c>.bad</c>, predefiniti. File presente ma illeggibile anche dopo i nuovi tentativi: null (chi chiama decide
+    /// che cosa tenere) e copia di sicurezza al prossimo salvataggio.
+    /// </summary>
+    private AppSettings? LoadCore()
     {
-        if (!File.Exists(FilePath))
+        var (status, settings, error) = ReadFile(retry: true);
+        switch (status)
         {
-            _log.Info($"Nessun file impostazioni in {FilePath}: uso i predefiniti");
-            return new AppSettings();
+            case ReadStatus.Ok:
+                _backupBeforeSave = false;
+                return settings;
+            case ReadStatus.Missing:
+                _backupBeforeSave = false;
+                _log.Info($"Nessun file impostazioni in {FilePath}: uso i predefiniti");
+                return new AppSettings();
+            case ReadStatus.Corrupt:
+                _backupBeforeSave = false;
+                Quarantine(error!);
+                return new AppSettings();
+            default:
+                _backupBeforeSave = true;
+                _log.Error($"Lettura del file impostazioni fallita dopo {ReadRetryDelays.Length + 1} tentativi: uso i valori predefiniti in memoria; " +
+                           $"il file resta com'è e al primo salvataggio verrà copiato in {FileName}{BackupSuffix}", error);
+                return null;
         }
+    }
+
+    private enum ReadStatus { Missing, Ok, Unreadable, Corrupt }
+
+    /// <summary>
+    /// Legge e interpreta il file senza rinominare né modificare nulla. Un file bloccato (IOException, accesso negato) viene
+    /// riprovato con le attese di <see cref="ReadRetryDelays"/> se <paramref name="retry"/> è vero.
+    /// </summary>
+    private (ReadStatus Status, AppSettings? Settings, Exception? Error) ReadFile(bool retry)
+    {
+        if (!File.Exists(FilePath)) return (ReadStatus.Missing, null, null);
 
         string json;
-        try
+        int attempt = 0;
+        while (true)
         {
-            json = File.ReadAllText(FilePath);
-        }
-        catch (Exception ex)
-        {
-            _log.Error("Lettura del file impostazioni fallita: uso i predefiniti", ex);
-            return new AppSettings();
+            try
+            {
+                json = File.ReadAllText(FilePath);
+                break;
+            }
+            catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
+            {
+                return (ReadStatus.Missing, null, null);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                if (!retry || attempt >= ReadRetryDelays.Length) return (ReadStatus.Unreadable, null, ex);
+                var delay = ReadRetryDelays[attempt++];
+                _log.Warn($"File impostazioni non leggibile ({ex.GetType().Name}): nuovo tentativo fra {delay.TotalMilliseconds:0} ms");
+                Thread.Sleep(delay);
+            }
+            catch (Exception ex)
+            {
+                return (ReadStatus.Unreadable, null, ex);
+            }
         }
 
         try
@@ -168,17 +296,11 @@ public sealed class JsonSettingsStore : ISettingsStore
             if (string.IsNullOrWhiteSpace(json)) throw new JsonException("file vuoto");
             var settings = JsonSerializer.Deserialize<AppSettings>(json, Options) ?? throw new JsonException("documento JSON nullo");
             Sanitize(settings);
-            return settings;
+            return (ReadStatus.Ok, settings, null);
         }
-        catch (JsonException ex)
+        catch (Exception ex) when (ex is JsonException or NotSupportedException or InvalidOperationException or FormatException or OverflowException)
         {
-            Quarantine(ex);
-            return new AppSettings();
-        }
-        catch (Exception ex) when (ex is NotSupportedException or InvalidOperationException or FormatException or OverflowException)
-        {
-            Quarantine(ex);
-            return new AppSettings();
+            return (ReadStatus.Corrupt, null, ex);
         }
     }
 

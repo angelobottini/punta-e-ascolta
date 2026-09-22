@@ -8,6 +8,7 @@ internal static class NativeMethods
 {
     public const uint GaRoot = 2;
     public const int GwlExStyle = -20;
+    public const long WsExTransparent = 0x00000020;
     public const long WsExToolWindow = 0x00000080;
     public const long WsExNoActivate = 0x08000000;
     public const int DwmwaCloaked = 14;
@@ -35,6 +36,9 @@ internal static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -89,6 +93,15 @@ internal static class NativeMethods
     public static bool IsWindowAtPointHung(int x, int y)
     {
         IntPtr hwnd = WindowFromPoint(new Point { X = x, Y = y });
+        return IsRootWindowHung(hwnd);
+    }
+
+    /// <summary>True se la finestra di primo livello dell'app in primo piano non risponde ai messaggi.</summary>
+    public static bool IsForegroundWindowHung() => IsRootWindowHung(GetForegroundWindow());
+
+    /// <summary>True se la finestra di primo livello che contiene <paramref name="hwnd"/> non risponde (false per handle nullo).</summary>
+    public static bool IsRootWindowHung(IntPtr hwnd)
+    {
         if (hwnd == IntPtr.Zero) return false;
         IntPtr root = GetAncestor(hwnd, GaRoot);
         if (root == IntPtr.Zero) root = hwnd;

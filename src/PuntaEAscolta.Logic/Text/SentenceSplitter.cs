@@ -26,16 +26,25 @@ public static class SentenceSplitter
 
     /// <summary>
     /// Abbreviazioni che sono anche parole comuni o che chiudono spesso una frase ("circa.", "via.", "no.", "5 min.", "ecc.",
-    /// mesi e giorni): il punto chiude la frase se la parola dopo comincia con una maiuscola ("alle 15.45 circa. Vedi pag. 12").
-    /// Davanti a cifre o minuscole resta un'abbreviazione ("3 mar. 2026", "ecc. ma non importa"). Le altre voci della lista
-    /// (titoli come "sig.", "dott.", "gen."... e rimandi come "pag.", "art.") precedono un nome o un numero: non chiudono mai.
+    /// giorni della settimana): il punto chiude la frase se la parola dopo comincia con una maiuscola ("alle 15.45 circa. Vedi pag. 12").
+    /// Davanti a cifre o minuscole resta un'abbreviazione ("ecc. ma non importa"). Le altre voci della lista
+    /// (titoli come "sig.", "dott.", "col."... e rimandi come "pag.", "art.") precedono un nome o un numero: non chiudono mai.
     /// </summary>
     private static readonly HashSet<string> AmbiguousAbbreviations = new(StringComparer.OrdinalIgnoreCase)
     {
         "circa", "ca", "via", "no", "min", "max", "sec", "h", "km", "kg", "mq", "mc", "cm", "mm", "ml", "gr", "lt",
         "ecc", "etc", "approx", "inc", "ltd", "corp", "co", "dept", "jr", "sr", "spa", "srl", "soc",
-        "gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "sett", "ott", "nov", "dic",
         "lun", "mart", "merc", "giov", "ven", "sab", "dom", "fax",
+    };
+
+    /// <summary>
+    /// Mesi abbreviati: ambigui (fine frase davanti a una maiuscola) SOLO subito dopo il numero del giorno
+    /// ("il 10 gen. Porta i documenti"); altrimenti sono titoli o parole che precedono un nome e non chiudono mai
+    /// ("il gen. Rossi", generale; "3 mar. 2026" resta intero perché dopo c'è una cifra).
+    /// </summary>
+    private static readonly HashSet<string> MonthAbbreviations = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "sett", "ott", "nov", "dic",
     };
 
     /// <summary>Restituisce la frase di <paramref name="paragraph"/> che contiene il carattere in posizione <paramref name="offset"/>, già ripulita dai caratteri di controllo.</summary>
@@ -165,12 +174,34 @@ public static class SentenceSplitter
         if (word.Length <= 2 && char.IsDigit(word[0]) && NextIsLower(text, i + 1)) return false;
 
         string lookup = word.ToString();
+        if (MonthAbbreviations.Contains(lookup)) return PrecededByDayNumber(text, i - word.Length) && NextIsUpperLetter(text, i + 1);
         if (AmbiguousAbbreviations.Contains(lookup)) return NextIsUpperLetter(text, i + 1);
         if (Abbreviations.Contains(lookup)) return false;
 
         // Sigle maiuscole corte tipo "U.S." già gestite sopra; una parola tutta minuscola seguita da minuscola: dubbio, non chiudere
         if (NextIsLower(text, i + 1) && word.Length <= 4 && IsAllLower(word)) return false;
         return true;
+    }
+
+    /// <summary>
+    /// La parola che comincia in <paramref name="wordStart"/> è preceduta (dopo almeno uno spazio) da un numero di giorno
+    /// da 1 a 31, anche con il segno di ordinale ("10 gen.", "1° mag.", "1º mag.").
+    /// </summary>
+    private static bool PrecededByDayNumber(string text, int wordStart)
+    {
+        int k = wordStart;
+        while (k > 0 && char.IsWhiteSpace(text[k - 1])) k--;
+        if (k == wordStart || k == 0) return false;
+
+        int end = k;
+        if (text[end - 1] is (char)0x00B0 or (char)0x00BA) end--;
+        int start = end;
+        while (start > 0 && char.IsAsciiDigit(text[start - 1]) && end - start < 3) start--;
+        int digits = end - start;
+        if (digits is < 1 or > 2) return false;
+        if (start > 0 && (char.IsLetterOrDigit(text[start - 1]) || text[start - 1] is '.' or ',')) return false; // "15.30 gen", "A1 gen"
+        int day = int.Parse(text.AsSpan(start, digits), System.Globalization.CultureInfo.InvariantCulture);
+        return day is >= 1 and <= 31;
     }
 
     private static bool IsAllLower(ReadOnlySpan<char> s)

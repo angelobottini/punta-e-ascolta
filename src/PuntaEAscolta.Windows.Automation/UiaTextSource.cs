@@ -5,13 +5,20 @@ namespace PuntaEAscolta.Windows.Automation;
 
 /// <summary>
 /// Accesso al testo dell'interfaccia tramite UI Automation COM (UIA3, CUIAutomation8).
-/// Tutte le chiamate UIA girano su un thread MTA dedicato con coda di lavoro; un cane da guardia di 2000 ms
+/// Tutte le chiamate UIA girano su un thread MTA dedicato con coda di lavoro; un cane da guardia di 1400 ms
 /// restituisce null, abbandona il thread bloccato e ne crea uno nuovo. Mai focus, mai finestre, mai eccezioni al chiamante.
 /// </summary>
 public sealed class UiaTextSource : IUiTextSource
 {
-    /// <summary>Tempo massimo concesso a una richiesta prima di rispondere null e sostituire il thread.</summary>
-    public const int WatchdogMs = 2000;
+    /// <summary>
+    /// Tempo massimo concesso a una richiesta prima di rispondere null e sostituire il thread. Deve restare sopra il tempo
+    /// della transazione UIA più un margine (<see cref="UiaSession.TransactionTimeoutMs"/> + 200) e sotto il tempo massimo
+    /// di una fase del risolutore (TextResolver.DefaultUiaTimeoutMs, 1500 ms): vedi UiaTimeoutBudgetTests.
+    /// </summary>
+    public const int WatchdogMs = 1400;
+
+    /// <summary>Margine minimo fra la scadenza della transazione UIA e il cane da guardia.</summary>
+    internal const int WatchdogMarginMs = 200;
 
     private readonly ILog _log;
     private readonly ProcessNameCache _processNames = new();

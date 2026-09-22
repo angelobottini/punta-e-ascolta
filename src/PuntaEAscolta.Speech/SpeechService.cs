@@ -17,6 +17,11 @@ namespace PuntaEAscolta.Speech;
 /// <item>Cloud: tempo massimo per i primi byte PCM (<c>FirstAudioTimeoutLabelMs</c> / <c>FirstAudioTimeoutSentenceMs</c>), poi ripiego immediato
 /// sulla voce locale. L'audio suonato viene copiato e salvato in cache solo se lo stream finisce normalmente; dopo uno Stop lo
 /// scaricamento prosegue in sottofondo fino a 15 s, altrimenti la copia viene scartata.</item>
+/// <item>Audio già pagato: con la cache attiva (chiave di cache calcolata) una richiesta cloud abbandonata (Stop prima dei primi
+/// byte, pezzo successivo preparato in anticipo, tempo massimo del primo audio superato) NON viene annullata: finisce in
+/// sottofondo, senza suonare, entro 15 s dall'abbandono e al massimo fino alla chiusura del servizio, e l'audio completo va in
+/// cache; così rileggere lo stesso testo non lo fa pagare di nuovo. Mai audio parziale in cache. Senza cache la richiesta
+/// abbandonata viene annullata come prima.</item>
 /// <item>Interruttore automatico: vedi <see cref="CloudCircuitBreaker"/>.</item>
 /// <item>Pezzi (<see cref="SpeechRequest.Chunks"/>) in ordine, preparando in anticipo solo il successivo.</item>
 /// <item><see cref="Stop"/> immediato e idempotente; una nuova lettura annulla la precedente. Mai eccezioni verso il chiamante,
@@ -248,7 +253,16 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
             }
             if (IsCloudUsable())
             {
-                pending.StartCloud(ct => PrepareCloudAsync(chunkRequest, pending.Key, ct), token);
+                if (pending.Key is { } key && !token.IsCancellationRequested) // lettura già fermata: nessuna richiesta nuova
+                {
+                    // Con la cache la richiesta non dipende dalla lettura: se viene abbandonata finisce in sottofondo e va in cache.
+                    pending.StartCloud(ct => PrepareCloudAsync(chunkRequest, pending, ct), _lifetime.Token,
+                        (task, cts) => FinishCloudInBackground(task, cts, key));
+                }
+                else
+                {
+                    pending.StartCloud(ct => PrepareCloudAsync(chunkRequest, pending, ct), token, finishInBackground: null);
+                }
                 return pending;
             }
         }
@@ -277,7 +291,7 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
             {
                 _breaker.RecordFailure(SpeechProviderReason.Timeout);
                 _log.Warn($"Voce: nessun audio da ElevenLabs entro {timeoutMs} ms, uso la voce locale.");
-                pending.AbandonCloud();
+                pending.AbandonCloud(); // con la cache la richiesta finisce in sottofondo
             }
         }
 
@@ -294,7 +308,12 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
         return audio;
     }
 
-    private async Task<PreparedAudio?> PrepareCloudAsync(SpeechRequest request, SpeechCacheKey? key, CancellationToken ct)
+    /// <summary>
+    /// Richiesta cloud di un pezzo fino ai primi byte PCM. Se nel frattempo il pezzo è stato abbandonato e la richiesta prosegue
+    /// in sottofondo (<see cref="PendingChunk.Detached"/>), l'esito non tocca l'interruttore automatico (il tempo scaduto è
+    /// già stato contato; una risposta tardiva non deve farlo sembrare sano) e gli errori si registrano solo a livello Debug.
+    /// </summary>
+    private async Task<PreparedAudio?> PrepareCloudAsync(SpeechRequest request, PendingChunk pending, CancellationToken ct)
     {
         CloudAudioBuffer? buffer = null;
         SpeechAudio? audio = null;
@@ -310,14 +329,13 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
                 SpeechProviderReason reason = buffer.Fault is SpeechProviderException spe ? spe.Reason
                     : buffer.Fault is not null ? SpeechProviderReason.Network
                     : SpeechProviderReason.Server;
-                _breaker.RecordFailure(reason);
-                _log.Warn($"Voce: ElevenLabs non ha inviato audio ({reason}), uso la voce locale.");
+                RecordCloudFailure(pending, reason, $"ElevenLabs non ha inviato audio ({reason})");
                 buffer.Dispose();
                 return null;
             }
 
-            _breaker.RecordSuccess();
-            return new PreparedAudio(buffer, audio.Format, AudioOrigin.Cloud, buffer, key);
+            if (!pending.Detached) _breaker.RecordSuccess();
+            return new PreparedAudio(buffer, audio.Format, AudioOrigin.Cloud, buffer, pending.Key);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -327,17 +345,86 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
         catch (SpeechProviderException ex)
         {
             DisposeQuietly(buffer, audio);
-            _breaker.RecordFailure(ex.Reason);
-            _log.Info($"Voce: ElevenLabs non disponibile per questa lettura ({ex.Reason}), uso la voce locale.");
+            RecordCloudFailure(pending, ex.Reason, $"ElevenLabs non disponibile per questa lettura ({ex.Reason})", warn: false);
             return null;
         }
         catch (Exception ex)
         {
             DisposeQuietly(buffer, audio);
-            _breaker.RecordFailure(SpeechProviderReason.Network);
-            _log.Warn($"Voce: errore imprevisto del fornitore cloud ({ex.GetType().Name}: {ex.Message}), uso la voce locale.");
+            RecordCloudFailure(pending, SpeechProviderReason.Network, $"errore imprevisto del fornitore cloud ({ex.GetType().Name}: {ex.Message})");
             return null;
         }
+    }
+
+    private void RecordCloudFailure(PendingChunk pending, SpeechProviderReason reason, string what, bool warn = true)
+    {
+        if (pending.Detached)
+        {
+            if (_log.IsDebugEnabled) _log.Debug($"Voce: richiesta in sottofondo non riuscita: {what}.");
+            return;
+        }
+        _breaker.RecordFailure(reason);
+        string message = $"Voce: {what}, uso la voce locale.";
+        if (warn) _log.Warn(message);
+        else _log.Info(message);
+    }
+
+    /// <summary>
+    /// Pezzo cloud abbandonato con la cache attiva: la richiesta prosegue senza suonare, al massimo per
+    /// <see cref="BackgroundCompletionLimit"/> dall'abbandono (primi byte e fine dello stream insieme) e fino alla chiusura del
+    /// servizio; l'audio va in cache solo se lo stream finisce normalmente. Allo scadere la richiesta viene annullata.
+    /// </summary>
+    private void FinishCloudInBackground(Task<PreparedAudio?> cloudTask, CancellationTokenSource cts, SpeechCacheKey key)
+    {
+        RunInBackground(async () =>
+        {
+            long start = _time.GetTimestamp();
+            PreparedAudio? audio = null;
+            try
+            {
+                audio = await cloudTask.WaitAsync(BackgroundCompletionLimit, _time, _lifetime.Token).ConfigureAwait(false);
+                if (audio?.Buffer is not { } buffer) return;
+
+                buffer.DetachConsumer(); // nessuno la suonerà
+                TimeSpan remaining = BackgroundCompletionLimit - _time.GetElapsedTime(start);
+                bool complete = remaining > TimeSpan.Zero
+                    && await buffer.WaitForEndAsync(remaining, _lifetime.Token).ConfigureAwait(false);
+                if (complete)
+                {
+                    StoreInCache(key, audio.Format, buffer.GetData());
+                }
+                else if (_log.IsDebugEnabled)
+                {
+                    _log.Debug("Voce: richiesta abbandonata non completata in sottofondo, audio parziale scartato.");
+                }
+            }
+            catch (TimeoutException)
+            {
+                if (_log.IsDebugEnabled) _log.Debug("Voce: richiesta abbandonata senza audio entro il tempo massimo, annullata.");
+            }
+            catch (OperationCanceledException)
+            {
+                // Servizio chiuso o richiesta annullata.
+            }
+            finally
+            {
+                if (audio is not null)
+                {
+                    audio.Dispose(); // chiude lo scaricamento e la connessione
+                    cts.Dispose();
+                }
+                else
+                {
+                    // Richiesta ancora in corso (tempo scaduto) o finita senza audio: si annulla e si chiude l'eventuale audio tardivo.
+                    try { cts.Cancel(); } catch (Exception) { /* già chiuso */ }
+                    _ = cloudTask.ContinueWith(static (t, state) =>
+                    {
+                        if (t.IsCompletedSuccessfully) t.Result?.Dispose();
+                        ((CancellationTokenSource)state!).Dispose();
+                    }, cts, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+                }
+            }
+        });
     }
 
     private async Task<PreparedAudio?> PrepareLocalAsync(SpeechRequest request, CancellationToken ct)
@@ -621,6 +708,8 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
     private sealed class PendingChunk(SpeechRequest request, int index, int count)
     {
         private CancellationTokenSource? _cloudCts;
+        private Action<Task<PreparedAudio?>, CancellationTokenSource>? _finishInBackground;
+        private volatile bool _detached;
 
         public SpeechRequest Request { get; } = request;
         public int Index { get; } = index;
@@ -630,25 +719,43 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
         public Task<PreparedAudio?>? CloudTask { get; private set; }
         public Task<PreparedAudio?>? LocalTask { get; set; }
 
-        public void StartCloud(Func<CancellationToken, Task<PreparedAudio?>> prepare, CancellationToken utteranceToken)
+        /// <summary>La richiesta cloud è stata abbandonata dalla lettura e prosegue in sottofondo solo per la cache.</summary>
+        public bool Detached => _detached;
+
+        /// <param name="parentToken">Token della lettura, oppure quello della vita del servizio se la richiesta deve poter finire in sottofondo.</param>
+        /// <param name="finishInBackground">Chi completa la richiesta abbandonata e la mette in cache; null = annullarla.</param>
+        public void StartCloud(Func<CancellationToken, Task<PreparedAudio?>> prepare, CancellationToken parentToken,
+            Action<Task<PreparedAudio?>, CancellationTokenSource>? finishInBackground)
         {
-            _cloudCts = CancellationTokenSource.CreateLinkedTokenSource(utteranceToken);
+            _cloudCts = CancellationTokenSource.CreateLinkedTokenSource(parentToken);
+            _finishInBackground = finishInBackground;
             CloudTask = prepare(_cloudCts.Token);
         }
 
-        /// <summary>Rinuncia alla richiesta cloud (tempo scaduto o lettura finita): la annulla e chiude l'eventuale audio arrivato tardi.</summary>
+        /// <summary>
+        /// Rinuncia alla richiesta cloud (tempo scaduto, lettura fermata o finita). Con la cache la passa a chi la completa in
+        /// sottofondo; altrimenti la annulla e chiude l'eventuale audio arrivato tardi.
+        /// </summary>
         public void AbandonCloud()
         {
-            if (CloudTask is null) return;
+            if (CloudTask is not { } task) return;
             var cts = _cloudCts;
+            CloudTask = null;
+            _cloudCts = null;
+
+            if (_finishInBackground is { } finish && cts is not null)
+            {
+                _detached = true;
+                finish(task, cts);
+                return;
+            }
+
             try { cts?.Cancel(); } catch (Exception) { /* già chiuso */ }
-            _ = CloudTask.ContinueWith(static (t, state) =>
+            _ = task.ContinueWith(static (t, state) =>
             {
                 if (t.IsCompletedSuccessfully) t.Result?.Dispose();
                 ((CancellationTokenSource?)state)?.Dispose();
             }, cts, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-            CloudTask = null;
-            _cloudCts = null;
         }
 
         /// <summary>Rinuncia a tutto il pezzo (lettura fermata o pezzo non sintetizzabile).</summary>

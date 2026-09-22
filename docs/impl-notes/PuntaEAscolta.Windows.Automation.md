@@ -8,14 +8,14 @@ Unico tipo pubblico: `UiaTextSource : IUiTextSource`, costruttore `(ILog log)`.
 
 | File | Ruolo |
 |---|---|
-| `UiaTextSource.cs` | Facciata: serializza le richieste (una in volo), le esegue sul thread UIA, applica il cane da guardia (2000 ms), gestisce l'annullamento. Non lancia mai. |
+| `UiaTextSource.cs` | Facciata: serializza le richieste (una in volo), le esegue sul thread UIA, applica il cane da guardia (1400 ms), gestisce l'annullamento. Non lancia mai. |
 | `UiaWorker.cs` | Thread MTA dedicato, in background, senza finestre, con coda `BlockingCollection`. Possiede la `UiaSession`. `Abandon()` lo lascia morire da solo quando la chiamata bloccata torna. |
-| `UiaSession.cs` | `CUIAutomation8` con `ConnectionTimeout` 1000, `TransactionTimeout` 2500, `AutoSetFocus` 0; `RawViewWalker`; richiesta di cache (vista raw, solo elemento) con ControlType, Name, ClassName, FrameworkId, AutomationId, BoundingRectangle, IsEnabled, IsOffscreen, HelpText, FullDescription, ItemStatus, AcceleratorKey, AccessKey, IsPassword, LabeledBy, ProcessId, NativeWindowHandle, IsTextPatternAvailable e i pattern Value, Toggle, LegacyIAccessible, Text. |
+| `UiaSession.cs` | `CUIAutomation8` con `ConnectionTimeout` 800, `TransactionTimeout` 1100, `AutoSetFocus` 0; `RawViewWalker`; richiesta di cache (vista raw, solo elemento) con ControlType, Name, ClassName, FrameworkId, AutomationId, BoundingRectangle, IsEnabled, IsOffscreen, HelpText, FullDescription, ItemStatus, AcceleratorKey, AccessKey, IsPassword, LabeledBy, ProcessId, NativeWindowHandle, IsTextPatternAvailable e i pattern Value, Toggle, LegacyIAccessible, Text. |
 | `ElementReader.cs` | La logica di raccolta (gira sul thread UIA): `GetElementAt`, `GetSelection`, `FindTooltip`. |
 | `ElementSnapshot.cs` | Lettura protetta delle proprietà dalla cache; conversione dei rettangoli (guardia su NaN, infinito, degeneri, oltre 1e6). |
 | `ControlTypeMap.cs` | ControlType -> `UiElementKind`; insiemi "controllo con etichetta", "ospite di testo", "può risalire". |
 | `ProcessNameCache.cs` | pid -> nome processo, scadenza 60 s, massimo 256 voci. |
-| `NativeMethods.cs` | `WindowFromPoint`, `GetAncestor`, `IsHungAppWindow`, `EnumWindows`, `GetWindowRect`, `GetWindowLongPtr`, `GetClassName`, `DwmGetWindowAttribute` (cloaked). Solo lettura. |
+| `NativeMethods.cs` | `WindowFromPoint`, `GetAncestor`, `GetForegroundWindow`, `IsHungAppWindow`, `EnumWindows`, `GetWindowRect`, `GetWindowLongPtr`, `GetClassName`, `DwmGetWindowAttribute` (cloaked). Solo lettura. |
 | `UiaIds.cs` | Costanti numeriche UIA. |
 
 ### GetElementAtAsync
@@ -29,7 +29,7 @@ Unico tipo pubblico: `UiaTextSource : IUiTextSource`, costruttore `(ILog log)`.
    - Il nome NON viene ripulito (trattini bassi, `StudioPage, Title = X`, LRM dell'orologio): spetta a `LabelCleaner` in Logic.
 4. `Value` dal ValuePattern in cache, `ToggleState` dal TogglePattern, `LabeledByName` dall'elemento `LabeledBy`. `LegacyIAccessible` (Name, Description, Value: chiamate vive) **solo se il nome è ancora vuoto**, come raccomandato da probe-office (raddoppia il costo su Office).
 5. `ParentKind`/`ParentName` dal genitore raw dell'elemento normalizzato. `ProcessName` dalla cache. `ElapsedMs` misurato sul thread UIA.
-6. Contesto di testo (`UiTextContext`), vedi sotto.
+6. Contesto di testo (`UiTextContext`), vedi sotto. Protetto a parte (`TryReadTextContext`): un'eccezione sugli intervalli di testo (pagina di Chromium che si ridisegna) va nel log a livello Debug e dà `Text = null`, ma l'elemento resta con nome e valore (prima si perdeva tutto e si finiva all'OCR, per esempio sul collegamento "Accedi").
 
 ### TextPattern (frase sotto il punto)
 
@@ -41,16 +41,17 @@ Attenzione per Logic: il paragrafo può essere fatto solo di U+FFFC (oggetti inc
 
 ### GetSelectionAsync
 
-`GetFocusedElementBuildCache` -> TextPattern sull'elemento o sul primo antenato che lo ha (fino a 8 livelli) -> `GetSelection` -> testo concatenato (`GetText(8000)` per intervallo) e rettangoli per riga. `null` se nessuna selezione o solo cursore (testo vuoto). Vale solo per l'app in primo piano.
+Prima di tutto (è la prima fase di ogni clic): se la finestra di primo livello in primo piano non risponde (`IsHungAppWindow(GetAncestor(GetForegroundWindow(), GA_ROOT))`) si torna `null` con un Warn, senza interrogare UIA. Poi `GetFocusedElementBuildCache` -> TextPattern sull'elemento o sul primo antenato che lo ha (fino a 8 livelli) -> `GetSelection` -> testo concatenato (`GetText(8000)` per intervallo) e rettangoli per riga. `null` se nessuna selezione o solo cursore (testo vuoto). Vale solo per l'app in primo piano.
 
 ### FindTooltipAsync
 
-`EnumWindows` -> finestre visibili, non "cloaked" da DWM, non del nostro processo, alte meno di 120 px e larghe meno di 800, con `WS_EX_TOOLWINDOW` oppure classe `tooltips_class32`, `HwndWrapper*`, `Xaml_WindowedPopupClass`, entro 400 px dal punto; ordinate per distanza. Per le prime 3: `ElementFromHandleBuildCache` -> `Name` di un elemento `ToolTip` (radice o discendente); in mancanza, i `Text` discendenti uniti con a capo, ma **solo** se la finestra ha l'aspetto sicuro di un suggerimento (classe nota, oppure `WS_EX_TOOLWINDOW` + `WS_EX_NOACTIVATE`), per non leggere barre fluttuanti. Se nessuna espone testo si restituisce `UiTooltipInfo(null, rettangolo)` della finestra sicura più vicina, per l'OCR. Nessuna ricerca `Descendants` dalla radice del desktop.
+`EnumWindows` -> finestre visibili, non "cloaked" da DWM, non del nostro processo, **non bloccate** (`IsHungAppWindow`), alte meno di 120 px e larghe meno di 800, con `WS_EX_TOOLWINDOW` oppure classe `tooltips_class32`, `HwndWrapper*`, `Xaml_WindowedPopupClass`, entro 400 px dal punto; ordinate per distanza. Per le prime 3: `ElementFromHandleBuildCache` -> `Name` di un elemento `ToolTip` (radice o discendente); in mancanza, i `Text` discendenti uniti con a capo, ma **solo** se la finestra è un suggerimento vero (`IsConfidentTooltip`: classe `tooltips_class32` o `Xaml_WindowedPopupClass`, oppure `WS_EX_TRANSPARENT` insieme a `WS_EX_TOOLWINDOW` e `WS_EX_NOACTIVATE`; i suggerimenti di Affinity hanno stile esteso `0x080800A8`). Il solo nome di classe `HwndWrapper` non basta più: WPF lo usa anche per menu, tendine e popup, che venivano letti per intero. Se nessuna espone testo si restituisce `UiTooltipInfo(null, rettangolo)` del suggerimento vero più vicino, per l'OCR. Nessuna ricerca `Descendants` dalla radice del desktop. La posizione rispetto al puntatore la controlla Logic (`TextResolver.IsPlacedLikeTooltip`).
 
 ### Cane da guardia e thread
 
-- Una sola richiesta in volo (`SemaphoreSlim`): il cane da guardia misura il lavoro vero, non l'attesa in coda. Se la porta resta occupata oltre 2000 ms la richiesta rinuncia (Warn).
-- Lavoro oltre 2000 ms -> `null`, `Warn`, thread abbandonato (`CompleteAdding`, resta in background e termina da solo se la chiamata torna), nuovo thread creato subito. Verificato: null dopo 2030 ms, richiesta successiva servita dal nuovo thread in 111 ms (di cui il riscaldamento).
+- Una sola richiesta in volo (`SemaphoreSlim`): il cane da guardia misura il lavoro vero, non l'attesa in coda. Se la porta resta occupata oltre 1400 ms la richiesta rinuncia (Warn).
+- Lavoro oltre 1400 ms -> `null`, `Warn`, thread abbandonato (`CompleteAdding`, resta in background e termina da solo se la chiamata torna), nuovo thread creato subito. Verificato (con il vecchio valore di 2000 ms): null dopo 2030 ms, richiesta successiva servita dal nuovo thread in 111 ms (di cui il riscaldamento).
+- Tempi coerenti (secondo giro della revisione): `TransactionTimeout` 1100 + 200 ms di margine < cane da guardia 1400 < fase del risolutore 1500 (`TextResolver.DefaultUiaTimeoutMs`). Prima il cane da guardia (2000) stava sopra la fase (1500) e sotto la transazione (2500): con un'app lenta le fasi successive aspettavano la porta. Invarianti verificati da `UiaTimeoutBudgetTests`.
 - Annullamento del chiamante: la richiesta torna subito `null`; il lavoro prosegue sotto il cane da guardia, che libera la porta. Verificato: ritorno in 299 ms con token a 300 ms.
 - Tutte le eccezioni sono catturate: `COMException` transitorie (ELEMENTNOTAVAILABLE, TIMEOUT, RPC scollegato, E_FAIL) a livello Debug; le altre COM/InvalidCast/Argument ecc. a livello Warn con HRESULT; il resto a Error. Il thread di lavoro non lascia mai uscire eccezioni.
 - Log: il testo utente (nomi, paragrafi) compare solo a livello Debug; nessuna chiave o dato sensibile.

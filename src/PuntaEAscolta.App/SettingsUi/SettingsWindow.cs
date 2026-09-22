@@ -168,9 +168,12 @@ internal sealed partial class SettingsWindow : Window
             return;
         }
 
+        AppSettings saved;
         try
         {
-            _store.Save(target);
+            // I campi della finestra si scrivono sul file riletto dal disco (i collettori sono puri e già validati sopra):
+            // ciò che la finestra non mostra, come la chiave, resta quello del file anche se è cambiato da fuori.
+            saved = _store.Update(s => CollectInto(s));
         }
         catch (Exception ex)
         {
@@ -178,7 +181,7 @@ internal sealed partial class SettingsWindow : Window
             return;
         }
 
-        bool startupOk = StartupRegistration.Apply(target.General.StartWithWindows, _log);
+        bool startupOk = StartupRegistration.Apply(saved.General.StartWithWindows, _log);
         RefreshProblems();
         var problems = _host.InputProblems;
         string message = "Impostazioni salvate e applicate.";
