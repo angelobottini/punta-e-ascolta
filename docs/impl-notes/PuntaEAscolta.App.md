@@ -25,9 +25,9 @@ Stato al 22/09/2026: completo. Compila con 0 errori e 0 avvisi insieme a tutta l
 Ordine: `JsonSettingsStore(cartella dell'exe)` + `FileLog(dati\logs, () => General.DebugLog)` → `DpapiSecretProtector` → `HttpClient` → `WindowsOcrEngine(() => Ocr.WindowsOcrLanguage)` (primario) → `OnnxOcrEngine` (secondario) → `GdiScreenCapture`, `UiaTextSource`, `ClipboardSelectionReader` → `NAudioPlayer`, `WindowsVoiceSynthesizer`, `ElevenLabsSynthesizer`, `SpeechCache(dati\cache)`, `SpeechService` → `NAudioRecorder`, `ElevenLabsSpeechToText`, `SendInputTextInjector`, `DictationService` → `TextResolver`. Solo in modalità icona: `ReadOrchestrator` e `WindowsInputSource`.
 
 - `input.Input += orchestrator.HandleInput`.
-- `speech.SpeakingChanged` → `input.SetStopKeyActive(parla && Input.EscStopsSpeech)`.
+- `speech.SpeakingChanged` e `orchestrator.BusyChanged` → `UpdateStopKey`: sotto un lock rilegge `speech.IsSpeaking || orchestrator.IsBusy` e chiama `input.SetStopKeyActive(occupato && Input.EscStopsSpeech)`. Così Esc funziona anche mentre si cerca il testo (fase silenziosa) e annulla la ricerca; a lettura finita Esc torna al sistema anche se gli eventi arrivano in ordine sparso.
 - `settings.Changed` → `input.Apply(...)` solo se `Input`/`Dictation` sono cambiati (impronta JSON); allinea `orchestrator.Paused` a `General.Paused`; `cache.Trim()` se il limite scende; aggiorna icona e menu. Serializzato con un lock (salvataggi dalla finestra e dalla pausa possono sovrapporsi).
-- `orchestrator.PausedChanged` → `input.SetPaused`, icona, salvataggio di `General.Paused` su un thread del pool (mai sul worker dell'orchestratore).
+- `orchestrator.PausedChanged` → `input.SetPaused`, icona, salvataggio di `General.Paused` su un thread del pool (mai sul worker dell'orchestratore) con `JsonSettingsStore.Update`: si rilegge il file e si cambia solo la pausa, senza riscrivere valori cambiati da fuori. Anche **Salva**, **Salva chiave** e **Rimuovi chiave** della finestra passano da `Update` (i campi della finestra sul file riletto).
 - `orchestrator.OutcomeProduced` → ultimo esito per la scheda Diagnostica. `dictation.StateChanged` → descrizione dell'icona.
 - Avvio: `player.WarmUpAsync` + `windowsVoice.WarmUpAsync` in sottofondo; `onnx.WarmUpAsync` dopo 3 s (non in modo `WindowsOnly`). **Silenzio all'avvio**, salvo `input.LastProblems` non vuoto: si dice "Punta e Ascolta. Attenzione. ..." con la voce locale (`SpeechKind.System`), con "+" letto "più".
 - Chiusura (menu Esci, `--exit`, fine sessione di Windows): input, orchestratore, icona, poi i servizi in ordine inverso, infine registro e mutex.
@@ -72,7 +72,7 @@ Nota: l'eseguibile è WinExe. Da cmd usare `start /wait PuntaEAscolta.exe ...`, 
 
 - Finestra impostazioni e menu dell'icona non provati con clic reali (la persona usa il PC): la finestra è stata costruita e disegnata fuori schermo (`--anteprima-impostazioni`), menu e pulsanti no. "Leggi la selezione" dal menu non provato.
 - Nessuna prova con una chiave ElevenLabs vera (verifica, crediti, voci, prova voce) né con il microfono.
-- `--set-key` con l'app aperta: l'app non rilegge `settings.json` e un salvataggio dalla sua finestra riscriverebbe la chiave vecchia. Il comando lo segnala; chiudere prima l'app (`--exit`).
+- `--set-key` con l'app aperta **rifiuta** (codice 1, "Chiudere prima l'app con --exit...") prima di leggere la chiave: l'app non rilegge `settings.json` da sola. Scelta preferita a "salva e avvisa l'app" (più semplice, niente stati a metà). Se l'app viene aperta durante `--verifica`, la chiave si salva comunque e il messaggio chiede di riavviarla.
 - Su questo PC `Win+Shift+A` (predefinito di "Leggi la selezione") è occupato: a ogni avvio l'app lo dice. Consiglio per l'assistente: `Win+Shift+F9` (provata: libera).
 - Pubblicazione x64 non eseguita qui (script pronto, stesso percorso).
 
@@ -92,3 +92,4 @@ powershell -ExecutionPolicy Bypass -File tools\publish.ps1 [-Runtime win-arm64] 
 
 - Pausa: il salvataggio in `settings.json` registra lo stato ATTUALE dell'orchestratore (un solo salvataggio in coda alla volta) e non rimanda più `General.Paused` all'orchestratore quando è lui ad averlo deciso. Prima due pressioni ravvicinate potevano lasciare l'app in pausa, in silenzio e anche dopo il riavvio, subito dopo che la voce aveva detto "Lettura riattivata". "Pausa" dal menu dell'icona passa ora dal worker dell'orchestratore come la scorciatoia (con conferma a voce).
 - Finestra impostazioni: le scorciatoie passano anche da `WindowsInputSource.ValidateHotkey` (niente Esc, niente tasti senza Ctrl/Alt/Win salvo F1-F24, Pausa, Bloc Scorr e tasti multimediali).
+- Secondo giro: Esc attivo anche durante la ricerca del testo (`BusyChanged`); salvataggi mirati con `JsonSettingsStore.Update`; `--set-key` rifiuta con l'app aperta. Nessun progetto di test per l'App: verificato con la compilazione e `--selftest`.

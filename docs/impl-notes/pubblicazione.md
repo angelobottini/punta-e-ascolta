@@ -123,12 +123,12 @@ Caso peggiore visto (x64, prima prova, puntatore a 600,600 su un'area vuota del 
 
 ## In sintesi
 
-- La cartella x64 è corretta e completa: tutto AMD64, VC++ x64 accanto all'exe e usate davvero, modelli presenti, niente file dell'utente.
+- La cartella x64 è corretta e completa: tutto AMD64, VC++ x64 accanto all'exe e usate davvero, modelli presenti, niente file dell'utente (dal secondo giro della revisione lo garantisce lo script, vedi "Da sapere").
 - In emulazione su Snapdragon tutto funziona; è circa **1,5-2 volte più lenta** della ARM64 nativa (ONNX circa 1,7-2,1 volte, UIA circa 1,5-2 volte). Su questo PC va usata la cartella ARM64; la x64 è per i PC Intel/AMD, dove girerà nativa (tempi reali da misurare su un PC Intel).
 - Cartelle lasciate pulite: tolte le cartelle `logs` create dalle prove (nessuna `cache`, nessun `settings.json`).
 
 ## Da sapere
 
-1. `publish.ps1` conserva `logs`, `cache` e `settings.json` quando si ripubblica sopra una cartella già usata (voluto). Prima di copiare una cartella su un altro PC controllare che non ci siano, altrimenti si portano dietro registri e impostazioni di prova.
+1. **Secondo giro della revisione**: `publish.ps1` svuota **sempre del tutto** la cartella di destinazione. Prima conservava `settings.json`, `settings.json.bad`, `cache` e `logs` e li nascondeva dal riepilogo: una ripubblicazione sopra una cartella usata per le prove avrebbe portato sul PC di Matteo impostazioni dello sviluppatore (registro di dettaglio, scorciatoie, avvio con Windows), registri con il testo letto e audio in cache. Ora, se ci sono `settings.json`, `settings.json.bad`, `settings.json.bak`, `settings.json.tmp`, `cache` o `logs`, lo script li toglie con il resto, lo dice con un avviso (anche dopo la tabella finale, colonna `DatiProvaTolti`) e alla fine controlla che non ne sia rimasto nessuno. Il riepilogo conta tutti i file. Se l'app è aperta da quella cartella la pulizia fallisce con un messaggio che chiede di chiuderla (`--exit`). Per le prove usare la cartella di compilazione, non quelle pubblicate.
 2. La prima esecuzione dopo ogni pubblicazione è più lenta (x64 fino a 6,4 s di autodiagnosi contro 3,6 s): Prism ricostruisce la sua cache di traduzione; lo stesso accade in misura minore in ARM64 (file appena scritti).
 3. Non provati: clic reale della rotellina, menu dell'icona e finestra interattiva con la build x64; nessuna prova su un vero PC Intel.
