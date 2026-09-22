@@ -6,7 +6,8 @@
     1. Compila tutta la soluzione (Release).
     2. Esegue i test unitari (salvo -SkipTests).
     3. Pubblica l'app per ogni architettura: self-contained, non ridotta (no trimming), non a file singolo.
-    4. Copia accanto all'eseguibile le librerie Visual C++ richieste da ONNX Runtime (se trovate sul PC di compilazione),
+    4. Copia accanto all'eseguibile le librerie Visual C++ richieste da ONNX Runtime (se trovate sul PC di compilazione,
+       solo quelle della stessa architettura, controllata nell'intestazione PE),
        toglie i file .lib inutili, copia docs\LEGGIMI.txt.
     5. Stampa dimensioni e numero di file.
     Nella cartella di destinazione vengono conservati settings.json, cache e logs se esistono gia'.
@@ -98,6 +99,23 @@ function Find-VcRuntimeFolder {
     return ($found | Sort-Object FullName -Descending | Select-Object -First 1).FullName
 }
 
+# Tipo di macchina dell'intestazione PE (0x8664 = x64, 0xAA64 = ARM64); $null se il file non e' un PE.
+function Get-PeMachine {
+    param([string] $Path)
+    $stream = [IO.File]::OpenRead($Path)
+    try {
+        $reader = New-Object IO.BinaryReader($stream)
+        if ($stream.Length -lt 64 -or $reader.ReadUInt16() -ne 0x5A4D) { return $null }
+        $stream.Position = 0x3C
+        $peOffset = $reader.ReadInt32()
+        if ($peOffset -le 0 -or $peOffset -gt $stream.Length - 6) { return $null }
+        $stream.Position = $peOffset
+        if ($reader.ReadUInt32() -ne 0x00004550) { return $null }
+        return [int] $reader.ReadUInt16()
+    }
+    finally { $stream.Dispose() }
+}
+
 function Clear-OutputFolder {
     param([string] $Folder)
     if (-not (Test-Path $Folder)) {
@@ -151,18 +169,28 @@ foreach ($rid in $runtimes) {
         '--artifacts-path', $ArtifactsPath, '-o', $out)
 
     # ONNX Runtime importa le librerie Visual C++ (MSVCP140, VCRUNTIME140...): il publish non le copia.
+    # Si copia solo cio' che ha la stessa architettura dell'app: nel Redist ARM64 vcruntime140_1.dll e' ARM64EC
+    # (intestazione x64, serve solo al codice x64/ARM64EC) e l'onnxruntime ARM64 non lo importa.
     $arch = if ($rid -eq 'win-arm64') { 'arm64' } else { 'x64' }
+    $machine = if ($rid -eq 'win-arm64') { 0xAA64 } else { 0x8664 }
     $vcFolder = Find-VcRuntimeFolder $arch
     $vcCopied = @()
+    $vcSkipped = @()
     if ($vcFolder) {
         foreach ($dll in @('msvcp140.dll', 'msvcp140_1.dll', 'vcruntime140.dll', 'vcruntime140_1.dll')) {
             $source = Join-Path $vcFolder $dll
-            if (Test-Path $source) {
-                Copy-Item -LiteralPath $source -Destination (Join-Path $out $dll) -Force
-                $vcCopied += $dll
+            if (-not (Test-Path $source)) { continue }
+            if ((Get-PeMachine $source) -ne $machine) {
+                $vcSkipped += $dll
+                continue
             }
+            Copy-Item -LiteralPath $source -Destination (Join-Path $out $dll) -Force
+            $vcCopied += $dll
         }
         Write-Host ("Librerie Visual C++ copiate da " + $vcFolder + ": " + ($vcCopied -join ', '))
+        if ($vcSkipped.Count -gt 0) {
+            Write-Host ("Non copiate (architettura diversa da $arch): " + ($vcSkipped -join ', '))
+        }
     }
     else {
         Write-Warning "Librerie Visual C++ ($arch) non trovate su questo PC: sui PC senza Visual C++ Redistributable l'OCR ONNX risultera' non disponibile (resta l'OCR di Windows)."
