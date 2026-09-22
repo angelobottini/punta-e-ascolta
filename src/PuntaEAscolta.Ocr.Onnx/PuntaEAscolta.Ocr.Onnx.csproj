@@ -10,4 +10,16 @@
     <PackageReference Include="RapidOcrNet" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" />
   </ItemGroup>
+  <ItemGroup>
+    <!--
+      Modelli PP-OCRv5 latin inclusi nel pacchetto RapidOcrNet (versione fissata in Directory.Packages.props).
+      Il pacchetto li copia in models\v5 solo per il progetto che lo riferisce direttamente: dichiararli qui come
+      <None> li fa arrivare anche a chi riferisce questo progetto (app, bench, test) e nella cartella di publish.
+    -->
+    <None Include="$(NuGetPackageRoot)rapidocrnet/4.2.0/models/v5/*.onnx;$(NuGetPackageRoot)rapidocrnet/4.2.0/models/v5/*.txt"
+          Link="models\v5\%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
 </Project>

@@ -1,0 +1,53 @@
+PUNTA E ASCOLTA
+================
+
+Che cos'è
+---------
+Punta e Ascolta legge a voce ciò che si trova sotto il puntatore del mouse, solo quando glielo chiedi.
+Funziona in qualsiasi programma: menu, pulsanti, celle di Excel, frasi di Word, testo dentro fotografie.
+
+Come si usa
+-----------
+1. Porta il puntatore sopra una voce di menu, un pulsante, una frase o un cartello in una foto.
+2. Premi la ROTELLINA del mouse (clic centrale). L'app legge il testo.
+3. Per interrompere la voce premi di nuovo la rotellina, oppure Esc.
+
+Altre funzioni:
+- Testo selezionato: seleziona il testo e premi la rotellina dentro la selezione, oppure Win+Maiusc+A.
+- Dettatura (se attivata dall'assistente): premi la scorciatoia (predefinita Win+Maiusc+D), parla, premi di nuovo.
+  L'app rilegge quello che ha capito e poi lo scrive nel programma aperto.
+
+Avvio
+-----
+Fai doppio clic su PuntaEAscolta.exe. Compare un'icona vicino all'orologio.
+Con il tasto destro sull'icona: Pausa/Riprendi, Impostazioni, Apri cartella dei log, Esci.
+Se vuoi che parta da sola con Windows: Impostazioni > Generale > "Avvia con Windows".
+
+Prima configurazione (per l'assistente)
+---------------------------------------
+1. Apri Impostazioni dall'icona vicino all'orologio.
+2. Scheda Voce: incolla la chiave API di ElevenLabs, premi "Verifica" e poi "Salva chiave".
+   Scegli la voce dall'elenco e premi "Prova voce". Senza chiave, o senza internet, l'app usa la voce di Windows.
+3. Scheda Attivazione: controlla che il pulsante del mouse sia quello desiderato (predefinito: rotellina).
+4. Scheda Dettatura: attivala se serve e scegli il microfono delle cuffie.
+5. Le impostazioni sono nel file settings.json accanto al programma. La chiave API è cifrata e vale solo su questo PC
+   e per questo utente di Windows: se copi la cartella su un altro PC va reinserita.
+
+Cartelle
+--------
+- PuntaEAscolta-win-x64: per PC con processore Intel o AMD.
+- PuntaEAscolta-win-arm64: per PC con processore Snapdragon (ARM).
+Ogni cartella è indipendente e portatile: si può copiare su una chiavetta.
+
+Limiti noti
+-----------
+- Nelle finestre eseguite come amministratore il clic della rotellina non viene intercettato.
+- Il testo molto piccolo o quasi invisibile può essere letto male dal riconoscimento ottico.
+- Mentre l'app è attiva, la rotellina non fa più lo scorrimento automatico o la panoramica negli altri programmi.
+  Si può scegliere un altro pulsante nelle Impostazioni.
+- All'avvio Windows potrebbe chiedere conferma perché il programma non è firmato: scegliere "Esegui comunque".
+
+Assistenza
+----------
+Nella scheda Diagnostica delle Impostazioni si trovano gli ultimi messaggi del registro e l'ultimo esito di lettura.
+La cartella dei log si apre dal menu dell'icona vicino all'orologio.
