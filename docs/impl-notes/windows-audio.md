@@ -107,3 +107,7 @@ AudioSpike.exe <comando> [debug]
 ```
 
 Comandi: `warmup voices ssml wav synth rate latency stop cycles concurrent edge net tones dpapi devices chain silence backpressure tail`, più `stall` (10 s) e `rawinit` (misura grezza dell'apertura del dispositivo). I log delle prove sono in `scratchpad\spikes\audio\logs\v2-*.txt`. Le misure di fine e arresto usano una cattura loopback dell'uscita (solo in memoria, nessun microfono); con altro audio in riproduzione le misure non sono affidabili.
+
+## Revisione del 22/09/2026
+
+- `NAudioPlayer.PlayAsync` con un token già annullato ritorna subito senza toccare la riproduzione in corso: una lettura rimasta indietro (ferma in un passaggio sincrono mentre ne partiva un'altra) interrompeva la nuova appena avviata.

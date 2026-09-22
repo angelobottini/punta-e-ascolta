@@ -72,3 +72,12 @@ input.Input += orchestrator.HandleInput;                       // non blocca
 orchestrator.PausedChanged += p => { input.SetPaused(p); /* icona, General.Paused */ };
 speech.SpeakingChanged += s => input.SetStopKeyActive(s);      // Esc arriva come HotkeyAction.Stop
 ```
+
+## Revisione del 22/09/2026 (vedi `revisione.md`)
+
+- `LabelCleaner`: scorciatoia fra parentesi in coda ("Grassetto (CTRL+G)", "(CTRL+barra spaziatrice)", "(F1)"); "(elemento aggiunto)" e "Avvio dell'accesso rapido - " di Esplora file. Un modificatore scritto a parole conta solo se seguito da + o -: "Altro", "Alto", "Controllo", "Opzione", "Windows", "SUPER 95" non sono più scorciatoie (prima l'OCR le cancellava).
+- `EmojiFilter`: occhi delle emoticon solo ":", ";", "=" (più "xD", "8-)", "B-)"): "Windows XP", "8) Salva il file", "Unità D: piena", "x3" restano intatti.
+- `SentenceSplitter`: abbreviazioni che sono anche parole comuni o chiudono spesso una frase ("circa", "via", "no", "min", "ecc.", mesi e giorni...) chiudono la frase se la parola dopo comincia con una maiuscola; davanti a cifre e minuscole restano abbreviazioni.
+- `UiTextResolver`: area di testo grande (pagina di Word, Blocco note, corpo di un messaggio) con il puntatore fuori dal testo -> null (niente "Contenuto pagina 1", mai il documento intero); valore su più righe o oltre 200 caratteri mai letto come valore di un campo; Edit dentro una voce di elenco con valore uguale al nome della voce (Esplora file) -> solo il nome del file; ripieghi (HelpText, descrizioni, LegacyName) filtrati come il Name (nomi di tipo .NET, identificatori); MenuItem senza nome alto al massimo 12 px -> separatore, silenzio; nome minuscolo attaccato ("newdocnew") con HelpText -> HelpText; cella di tabella non di foglio di calcolo con testo lungo -> frase, non tutta la cella.
+- `PointerTextSelector` (zona intera): righe raggruppate in blocchi (colonne, cartelli); prima il blocco sotto il puntatore, poi gli altri dall'alto e da sinistra; righe a capo di una stessa frase unite senza pausa.
+- `TextResolver`: barra di scorrimento (o suo figlio) senza nome -> silenzio, niente OCR della riga vicina.

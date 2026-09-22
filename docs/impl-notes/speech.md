@@ -88,3 +88,9 @@ var dictation = new DictationService(recorder, stt, injector, speech, settings, 
 - Un solo `HttpClient` condiviso (SocketsHttpHandler con `ConnectTimeout` di qualche secondo). Il `Timeout` di `HttpClient` vale solo fino alle intestazioni (`ResponseHeadersRead`): i tempi veri li governa il servizio.
 - `SpeechService` e `DictationService` non chiudono le dipendenze ricevute (lettore, registratore, sintetizzatori): le chiude la composizione.
 - L'orchestratore attuale è compatibile: lancia `ToggleAsync` su un'attività propria con il token di chiusura e ferma solo la propria voce. Se durante `Recording` l'utente clicca per leggere, la lettura finisce nel microfono: valutare di ignorare le letture mentre `dictation.State == Recording`.
+
+## Revisione del 22/09/2026 (vedi `revisione.md`)
+
+- Chiave API nei log: i corpi d'errore non JSON venivano troncati (200 caratteri per Scribe, 2000 per la sintesi) PRIMA di togliere la chiave; un taglio a metà chiave ne lasciava un pezzo (fino a 30 caratteri su 37 nella prova). Ora si toglie la chiave dal corpo intero e solo dopo si tronca (`ElevenLabsErrors.Redact` tronca sempre a 2000 caratteri).
+- Dettatura: se l'annullamento dell'utente e la fine della rilettura si incrociavano (un thread ha deciso l'annullamento ma non ha ancora annullato il token), la pipeline poteva inserire il testo appena annullato. `Session.Cancel` chiamato mentre un altro thread sta annullando ora aspetta (al massimo 1 s) che il token risulti annullato.
+- Rimasto aperto: il pezzo successivo già scaricato in anticipo viene scartato se la lettura si ferma e, alla rilettura, pagato di nuovo (solo crediti, nessun effetto per l'utente).

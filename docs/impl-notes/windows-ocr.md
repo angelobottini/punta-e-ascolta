@@ -19,7 +19,7 @@ Stato: completo, compila con 0 errori e 0 avvisi (`net10.0-windows10.0.19041.0`)
 
 ### Secondo passaggio: `RecognizeLowContrastAsync(image, x, y, ct)`
 - `(x, y)` sono in **pixel dell'immagine passata** (le stesse coordinate dei `Box` restituiti), non di schermo. Il chiamante che ha il puntatore in `ScreenPoint` fa `x = p.X - image.ScreenBounds.X`.
-- Ritaglio 400x120 centrato su (x, y), ritagliato dentro l'immagine; 2x; scala di grigi e stiramento fra il 1o e il 99,5o percentile della luminanza del ritaglio (nessun tetto al guadagno, come nella sonda; sotto 8 livelli di escursione la zona e piatta e non si stira). Stesso margine e stessa dimensione minima del primo passaggio.
+- Revisione del 22/09/2026: **fascia alta 120 px e larga quanto l'immagine**, centrata sulla riga di (x, y); 2x; scala di grigi e stiramento fra il 1o e il 99,5o percentile della luminanza del **ritaglio 400x120 attorno al punto** (come misurato nella sonda: nessun tetto al guadagno, sotto 8 livelli di escursione la zona e piatta e non si stira). Prima il ritaglio era 400x120 anche in larghezza e le parole tagliate dai suoi lati tornavano come testo ("ta come PDF" per "Esporta come PDF..."); il chiamante non poteva riconoscerle perché quei lati non sono bordi della cattura. Ora i lati della fascia coincidono con quelli della cattura (li filtra `TextResolver.DropCutText`) e le righe che toccano i bordi superiore e inferiore della fascia vengono scartate qui (`OcrPreprocessor.DropLinesCutByCrop`). Stesso margine e stessa dimensione minima del primo passaggio. Costo misurato: 30-50 ms invece di 15-20 (zona 1125x450).
 - Da usare solo se il primo passaggio non trova nulla sulla riga del puntatore: costa 12-22 ms.
 
 ### Comune ai due passaggi
@@ -27,6 +27,7 @@ Stato: completo, compila con 0 errori e 0 avvisi (`net10.0-windows10.0.19041.0`)
 - Un solo riconoscimento alla volta (`SemaphoreSlim(1,1)`): chiamate concorrenti vengono messe in coda, non falliscono.
 - Pixel al motore: `SoftwareBitmap.CreateCopyFromBuffer(Bgra8, BitmapAlphaMode.Ignore)`. Misurato: con alfa 255 e con alfa 0 i tre modi `Ignore`, `Premultiplied`, `Straight` danno risultati identici (36 righe sul menu File); si usa `Ignore` perche il pre-trattamento produce sempre alfa 255 e protegge comunque dalle catture con alfa 0. La sorgente viene letta come `Format32bppRgb` proprio per ignorare l'alfa delle catture.
 - Risultato: `OcrLine.Text` = parole unite da spazi, `Box` = unione dei riquadri delle parole, `Confidence = null` (il motore non la fornisce). Parole vuote e righe senza parole vengono scartate. Coordinate: `(X - margine) / fattore + origineRitaglio`.
+- **Inclinazione stimata dal motore** (revisione del 22/09/2026): quando `OcrResult.TextAngle` non è zero (capita anche con 3 gradi spuri su schermate d'interfaccia) i riquadri delle parole sono nel sistema raddrizzato; il centro di ogni riquadro viene ruotato di nuovo di `TextAngle` attorno al centro dell'immagine preparata (`WindowsOcrEngine.UndoTextAngle`). Senza questa correzione, in `affinity-lowcontrast-normal.png` le righe risultavano spostate di 9-24 px secondo la posizione del punto e il puntatore finiva sulla riga sbagliata; con la correzione le coordinate sono uguali in tutte le 36 posizioni provate. Sulle immagini della ricerca senza inclinazione i risultati del primo passaggio sono identici a prima.
 - Eccezioni: verso il chiamante esce solo `OperationCanceledException` (token annullato, anche in coda sul semaforo). Ogni altro errore viene registrato (`Error`) e produce `OcrResult.Empty("windows")`. Immagine incoerente (buffer corto, lato 0) -> `Warn` + vuoto. Dopo `Dispose` -> vuoto, `IsAvailable = false`.
 - Il testo riconosciuto finisce nel log solo con `ILog.IsDebugEnabled` (una riga con tempi, dimensioni e fattore).
 
@@ -67,7 +68,7 @@ Robustezza (`winocr.exe --robustness`): token gia annullato -> `OperationCancele
 ## Limiti
 
 - Nessuna confidenza: `Confidence` e sempre `null`. Errori sistematici del motore: `l`/`I` (`CtrI`), `0`/`O` (`FFOOOO`), maiuscola/minuscola (`s: 100`, `Ctrl+p`), punti persi (`vettorialesvg`). Da compensare a valle (dizionario etichette, LabelCleaner).
-- Testo tagliato dal bordo della cattura produce frammenti: il selettore deve scartare i segmenti che toccano il bordo (gia previsto in probe-affinity.md).
+- Testo tagliato dal bordo della cattura produce frammenti: li toglie `TextResolver.DropCutText` (bordi della cattura) e, nel secondo passaggio, `DropLinesCutByCrop` (bordi della fascia).
 - Il secondo passaggio recupera bene le etichette lunghe a basso contrasto, non quelle di 3-4 caratteri (`H: 0`).
 - Il ritaglio 400x120 e il 2x del secondo passaggio sono tarati al 125%: a 100% e 200% non misurati.
 - `RecognizeLowContrastAsync` non fa parte di `IOcrEngine`: il chiamante deve conoscere il tipo concreto (o fare un cast). **Proposta per il Core** (non applicata, Core congelato): interfaccia opzionale `IOcrEngineSecondPass { Task<OcrResult> RecognizeLowContrastAsync(CapturedImage, double x, double y, CancellationToken); }` oppure un parametro `ImagePoint? focus` in `RecognizeAsync`.

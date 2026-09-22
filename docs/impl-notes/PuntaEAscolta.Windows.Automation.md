@@ -85,3 +85,9 @@ Console usa-e-getta in `C:\Users\Angelo\AppData\Local\Temp\claude\C--Users-Angel
 ```
 
 Risultati osservati: orologio della barra applicazioni -> `Button "Orologio 10:03 22/09/2026"` (colpito il `Text`, normalizzato al genitore, XAML, explorer, 10-13 ms); Chrome (5,5) -> `Pane HorizontalTabStripRegionViewOld` senza nome (-> OCR); anteprima Word Online -> `Image "Pagina 3"` con contesto di testo dal Document radice; nessun tooltip, nessuna selezione, Dispose pulito con il thread terminato.
+
+## Revisione del 22/09/2026
+
+- **Valore e stato di spunta erano sempre vuoti**: `AddPattern` mette in cache solo l'oggetto pattern; `CachedValue` e `CachedToggleState` lanciano `E_INVALIDARG` se non sono in cache anche le proprietà `ValueValue` (30045) e `ToggleToggleState` (30086). L'eccezione veniva assorbita da `ElementSnapshot.Safe`: `UiElementInfo.Value` era sempre null e `ToggleState` sempre None (celle di Excel "Cella vuota", caselle combinate senza valore, file di Esplora file letti "Nome"). Le due proprietà sono ora in `UiaIds.CachedProperties`; `ElementReader.ReadValue`/`ReadToggle` ripiegano su `CurrentValue`/`CurrentToggleState` (un giro in più, solo se il pattern esiste) quando la cache non le contiene.
+- Verifica automatica in `tests/PuntaEAscolta.Windows.Tests` (`UiaCacheTests`): EDIT e casella Win32 nascoste, mai mostrate, lette con la stessa richiesta di cache della sessione.
+- Da verificare dal vivo: l'icona della barra superiore di Affinity (`ToolBar` senza nome, prove dal vivo nota 10) resta "Nessun testo": per un `ToolBar` non si cercano i figli `Text`, perché ne ha uno per icona e con rettangoli vuoti non si sa quale sia sotto il puntatore.

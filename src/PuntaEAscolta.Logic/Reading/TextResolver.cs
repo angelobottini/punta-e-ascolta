@@ -618,6 +618,10 @@ public sealed class TextResolver : ITextResolver
         catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
         {
             // TimeoutException: la fase non ha risposto in tempo; OperationCanceledException: la fase ha onorato il proprio tempo massimo.
+            // Se WaitAsync scade prima del CancelAfter, il token della fase va annullato qui: chiudere il linked (using) toglierebbe
+            // il timer e la fase (per esempio un OCR che onora l'annullamento) continuerebbe a lavorare per niente.
+            try { linked.Cancel(); }
+            catch (AggregateException) { /* errori nei gestori di annullamento della fase: la fase è comunque abbandonata */ }
             Observe(task);
             _log.Warn($"Fase '{stage}' oltre il tempo massimo di {timeout.TotalMilliseconds:0} ms");
             diag.Append(' ').Append(stage).Append(":tempo-scaduto(").Append(sw.ElapsedMilliseconds).Append("ms)");

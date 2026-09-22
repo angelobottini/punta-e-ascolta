@@ -87,3 +87,8 @@ set DOTNET_ROOT=C:\Users\Angelo\AppData\Local\Microsoft\dotnet
 ... (senza argomenti: icona di notifica)   poi   ... --exit
 powershell -ExecutionPolicy Bypass -File tools\publish.ps1 [-Runtime win-arm64] [-SkipTests] [-ArtifactsPath <cartella>]
 ```
+
+## Revisione del 22/09/2026 (vedi `revisione.md`)
+
+- Pausa: il salvataggio in `settings.json` registra lo stato ATTUALE dell'orchestratore (un solo salvataggio in coda alla volta) e non rimanda più `General.Paused` all'orchestratore quando è lui ad averlo deciso. Prima due pressioni ravvicinate potevano lasciare l'app in pausa, in silenzio e anche dopo il riavvio, subito dopo che la voce aveva detto "Lettura riattivata". "Pausa" dal menu dell'icona passa ora dal worker dell'orchestratore come la scorciatoia (con conferma a voce).
+- Finestra impostazioni: le scorciatoie passano anche da `WindowsInputSource.ValidateHotkey` (niente Esc, niente tasti senza Ctrl/Alt/Win salvo F1-F24, Pausa, Bloc Scorr e tasti multimediali).
