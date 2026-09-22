@@ -49,6 +49,34 @@ public sealed unsafe class GdiScreenCapture : IScreenCapture
         return GetDpiScale(monitor);
     }
 
+    /// <summary>
+    /// Rettangolo visibile della finestra di primo livello sotto il punto (pixel fisici), senza i bordi invisibili di
+    /// ridimensionamento di Windows 10 e 11 (DWMWA_EXTENDED_FRAME_BOUNDS; ripiego su GetWindowRect). Serve a non far leggere
+    /// all'OCR il testo di un'altra finestra che sta dietro. null se sotto il punto non c'è una finestra o il rettangolo non
+    /// si legge. Sola lettura: non attiva né tocca la finestra.
+    /// </summary>
+    public ScreenRect? GetTopLevelWindowBounds(ScreenPoint point)
+    {
+        try
+        {
+            nint hwnd = WindowFromPoint(new POINT { X = point.X, Y = point.Y });
+            if (hwnd == 0) return null;
+            nint root = GetAncestor(hwnd, GA_ROOT);
+            if (root == 0) root = hwnd;
+
+            ScreenRect bounds = default;
+            if (DwmGetWindowAttribute(root, DWMWA_EXTENDED_FRAME_BOUNDS, out RECT frame, sizeof(RECT)) == 0)
+                bounds = ScreenRect.FromLtrb(frame.Left, frame.Top, frame.Right, frame.Bottom);
+            if (bounds.IsEmpty && GetWindowRect(root, out RECT rect))
+                bounds = ScreenRect.FromLtrb(rect.Left, rect.Top, rect.Right, rect.Bottom);
+            return bounds.IsEmpty ? null : bounds;
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
+        {
+            return null;
+        }
+    }
+
     // ---- interno ---------------------------------------------------------------------------
 
     private static double GetDpiScale(nint monitor)

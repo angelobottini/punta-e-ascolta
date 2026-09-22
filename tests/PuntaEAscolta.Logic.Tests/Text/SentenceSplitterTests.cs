@@ -178,6 +178,24 @@ public class SentenceSplitterMonthTests
         Assert.Equal(text, SentenceSplitter.ExtractSentence(text, 2));
     }
 
+    /// <summary>Rifinitura, voce 3: "set" e "ago" sono anche parole comuni e chiudono la frase davanti a una maiuscola.</summary>
+    [Theory]
+    [InlineData("Ho comprato un set. Poi sono uscito.", "Ho comprato un set.")]
+    [InlineData("Siamo arrivati sul set. Il regista ci aspettava.", "Siamo arrivati sul set.")]
+    [InlineData("Ho perso l'ago. Poi l'ho ritrovato.", "Ho perso l'ago.")]
+    public void MonthThatIsACommonWord_BeforeUppercase_EndsTheSentence(string text, string expected)
+    {
+        Assert.Equal(expected, SentenceSplitter.ExtractSentence(text, 2));
+    }
+
+    [Theory]
+    [InlineData("Un set. di pentole nuove è arrivato.")]
+    [InlineData("Il 3 set. 2026 si parte.")]
+    public void MonthThatIsACommonWord_BeforeLowercaseOrDigit_DoesNotEnd(string text)
+    {
+        Assert.Equal(text, SentenceSplitter.ExtractSentence(text, 2));
+    }
+
     [Fact]
     public void SplitSentences_KeepsTitleButSplitsDate()
     {

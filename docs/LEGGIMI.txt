@@ -11,6 +11,9 @@ Come si usa
 1. Porta il puntatore sopra una voce di menu, un pulsante, una frase o un cartello in una foto.
 2. Premi la ROTELLINA del mouse (clic centrale). L'app legge il testo.
 3. Per interrompere la voce premi di nuovo la rotellina, oppure Esc.
+4. Se premi di nuovo la rotellina mentre l'app sta ancora cercando il testo (prima che parli), la lettura si annulla
+   e l'app non dice niente. Anche Esc la annulla. Se invece sposti il puntatore su un'altra cosa e premi, legge la cosa nuova.
+5. L'app legge solo la finestra che sta sotto il puntatore, non le finestre che stanno dietro.
 
 Altre funzioni:
 - Testo selezionato: seleziona il testo e premi la rotellina dentro la selezione, oppure Win+Maiusc+F9.
@@ -32,6 +35,8 @@ Prima configurazione (per l'assistente)
 4. Scheda Dettatura: attivala se serve e scegli il microfono delle cuffie.
 5. Le impostazioni sono nel file settings.json accanto al programma. La chiave API è cifrata e vale solo su questo PC
    e per questo utente di Windows: se copi la cartella su un altro PC va reinserita.
+6. Se all'avvio il file settings.json era bloccato (per esempio da OneDrive o dall'antivirus), la finestra Impostazioni
+   lo dice e non lascia salvare, per non cancellare le impostazioni vere. Chiudi l'app (Esci) e riaprila.
 
 Cartelle
 --------

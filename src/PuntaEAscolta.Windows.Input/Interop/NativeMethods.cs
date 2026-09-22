@@ -229,6 +229,24 @@ internal static unsafe partial class NativeMethods
     [LibraryImport("shcore.dll")]
     internal static partial int GetDpiForMonitor(nint hMonitor, int dpiType, out uint dpiX, out uint dpiY);
 
+    // ---- user32 e dwmapi: finestra sotto il punto (sola lettura) ---------------------------
+
+    internal const uint GA_ROOT = 2;
+    internal const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
+
+    [LibraryImport("user32.dll")]
+    internal static partial nint WindowFromPoint(POINT point);
+
+    [LibraryImport("user32.dll")]
+    internal static partial nint GetAncestor(nint hwnd, uint gaFlags);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool GetWindowRect(nint hWnd, out RECT lpRect);
+
+    [LibraryImport("dwmapi.dll")]
+    internal static partial int DwmGetWindowAttribute(nint hwnd, int dwAttribute, out RECT pvAttribute, int cbAttribute);
+
     // ---- user32: notifiche di sistema -----------------------------------------------------
 
     [LibraryImport("user32.dll", SetLastError = true)]

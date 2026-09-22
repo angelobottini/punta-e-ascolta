@@ -224,6 +224,65 @@ public class TextResolverTests
     }
 
     // ---------------------------------------------------------------------------------------------
+    // Rifinitura, BUG A delle prove dal vivo: l'OCR resta nella finestra sotto il puntatore
+    // ---------------------------------------------------------------------------------------------
+
+    [Fact]
+    public async Task ZoneOcr_StaysInsideTheWindowUnderThePointer()
+    {
+        var rig = new Rig();
+        // Word in finestra da x=900: la zona (550, 320, 900, 360) usciva a sinistra sulla finestra che sta dietro.
+        rig.Resolver.WindowBoundsAtPoint = _ => new ScreenRect(900, 40, 1400, 1000);
+        // Immagine (900, 320, 550, 360), puntatore a (100, 180). La riga tocca il bordo sinistro dell'immagine, che è la fine
+        // della finestra e non un taglio della zona: "Salva" non va scartata come frammento.
+        rig.Primary.Returns(Ocr.Line("Salva documento", 0, 172));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal(new ScreenRect(900, 320, 550, 360), rig.Capture.Requests.Single());
+        Assert.Equal("Salva documento", outcome.Text);
+        Assert.Contains("finestra=550x360", outcome.Diagnostics, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ZoneOcr_WindowUnknownOrFailing_UsesTheWholeZone()
+    {
+        var rig = new Rig();
+        rig.Resolver.WindowBoundsAtPoint = _ => throw new InvalidOperationException("finestra sparita");
+        rig.Primary.Returns(AtPointer("Salva"));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal(new ScreenRect(550, 320, 900, 360), rig.Capture.Requests.Single());
+        Assert.Equal("Salva", outcome.Text);
+    }
+
+    [Fact]
+    public async Task ZoneAroundPointer_IsAlsoLimitedToTheWindow()
+    {
+        var rig = new Rig();
+        rig.Resolver.WindowBoundsAtPoint = _ => new ScreenRect(700, 400, 800, 200);
+        rig.Primary.Returns(Ocr.Line("Titolo", 250, 50));
+
+        await rig.Resolve(ReadRequestKind.ZoneAroundPointer);
+
+        Assert.Equal(new ScreenRect(700, 400, 750, 200), rig.Capture.Requests.Single());
+    }
+
+    [Theory]
+    [InlineData(900, 40, 1400, 1000, 900, 320, 550, 360)]    // finestra a destra: tolto il lato sinistro
+    [InlineData(0, 0, 1920, 1200, 550, 320, 900, 360)]       // finestra più grande della zona: zona intera
+    [InlineData(0, 0, 400, 300, 550, 320, 900, 360)]         // finestra che non contiene il puntatore (bordo invisibile): zona intera
+    [InlineData(990, 490, 30, 20, 990, 490, 30, 20)]         // finestra minuscola sotto il puntatore: solo lei
+    [InlineData(0, 0, 0, 0, 550, 320, 900, 360)]             // rettangolo vuoto: zona intera
+    public void ClipZoneToWindow_Geometry(int wx, int wy, int ww, int wh, int ex, int ey, int ew, int eh)
+    {
+        var zone = new ScreenRect(550, 320, 900, 360);
+        Assert.Equal(new ScreenRect(ex, ey, ew, eh), TextResolver.ClipZoneToWindow(zone, P, new ScreenRect(wx, wy, ww, wh)));
+        Assert.Equal(zone, TextResolver.ClipZoneToWindow(zone, P, null));
+    }
+
+    // ---------------------------------------------------------------------------------------------
     // Motori OCR
     // ---------------------------------------------------------------------------------------------
 
@@ -469,6 +528,34 @@ public class TextResolverTests
 
         Assert.True(sw.ElapsedMilliseconds < 3000, $"troppo lento: {sw.ElapsedMilliseconds} ms");
         Assert.False(rig.Calls.Contains("onnx"));
+    }
+
+    /// <summary>
+    /// Rifinitura (prove dal vivo, osservazione 1): annullata la lettura, anche la fase in corso (l'OCR ONNX) deve ricevere
+    /// l'annullamento. Prima la continuazione eseguita dentro Cancel chiudeva il token della fase prima che fosse annullato
+    /// e il motore lavorava fino in fondo.
+    /// </summary>
+    [Fact]
+    public async Task RequestCancellation_AlsoCancelsTheRunningStageToken()
+    {
+        var rig = new Rig();
+        rig.Resolver.OcrTimeout = TimeSpan.FromSeconds(30);
+        var stageToken = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
+        rig.Primary.Handler = (_, ct) =>
+        {
+            stageToken.TrySetResult(ct);
+            return new TaskCompletionSource<OcrResult>().Task; // lavora "a lungo" e controlla il token solo fra le fasi
+        };
+        using var cts = new CancellationTokenSource();
+        var resolving = rig.Resolve(ct: cts.Token);
+        var token = await stageToken.Task.WaitAsync(TimeSpan.FromSeconds(10));
+
+        // Come nell'app: Cancel dal thread del worker, senza contesto di sincronizzazione, dove le continuazioni girano
+        // dentro Cancel (il thread del test di xUnit ha un contesto e le rimanderebbe, nascondendo il difetto).
+        await Task.Run(cts.Cancel);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => resolving);
+        Assert.True(token.IsCancellationRequested, "il token della fase OCR non è stato annullato");
     }
 
     // ---------------------------------------------------------------------------------------------

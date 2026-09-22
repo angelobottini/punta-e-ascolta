@@ -321,7 +321,72 @@ public sealed class JsonSettingsStoreTests : IDisposable
         Assert.True(reloaded.General.Paused);
         Assert.Equal(500, store.Current.Input.DebounceMs);
         Assert.False(store.BackupPending);
-        Assert.False(File.Exists(SettingsFile + JsonSettingsStore.BackupSuffix));
+        // La copia del file vero si fa comunque (Rifinitura, voce 1): Update non sa se chi chiama scrive predefiniti.
+        Assert.Equal("{ \"Input\": { \"DebounceMs\": 500 } }", File.ReadAllText(SettingsFile + JsonSettingsStore.BackupSuffix));
+    }
+
+    /// <summary>
+    /// Rifinitura, voce 1: file bloccato all'avvio, poi la finestra impostazioni (che mostra i predefiniti) salva con Update
+    /// scrivendo TUTTI i suoi campi. Il file vero deve finire intero in settings.json.bak.
+    /// </summary>
+    [Fact]
+    public void LockedFileAtStartup_ThenUpdateWritingAllDefaults_BacksUpTheRealFile()
+    {
+        const string real = "{ \"Input\": { \"DebounceMs\": 500, \"HotkeyStop\": \"Ctrl+Alt+F12\" }, \"Speech\": { \"Volume\": 0.4 } }";
+        WriteFile(real);
+        JsonSettingsStore store;
+        using (LockFile())
+        {
+            store = Create();
+        }
+        Assert.True(store.BackupPending);
+        var shownByTheWindow = JsonSettingsStore.Clone(store.Current); // predefiniti
+
+        store.Update(s =>
+        {
+            // come CollectInto: ogni campo della finestra sovrascrive quello del file riletto
+            s.Input = JsonSettingsStore.Clone(shownByTheWindow).Input;
+            s.Speech = JsonSettingsStore.Clone(shownByTheWindow).Speech;
+            s.General = JsonSettingsStore.Clone(shownByTheWindow).General;
+        });
+
+        Assert.Equal(real, File.ReadAllText(SettingsFile + JsonSettingsStore.BackupSuffix));
+        Assert.False(store.BackupPending);
+        Assert.Equal(350, new JsonSettingsStore(AppDir, FallbackDir, _log).Current.Input.DebounceMs);
+    }
+
+    /// <summary>Rifinitura, voce 4: mentre Update aspetta un file bloccato, Current (letto a ogni clic e dalla voce) non aspetta.</summary>
+    [Fact]
+    public async Task Update_WaitingForALockedFile_DoesNotBlockCurrent()
+    {
+        WriteFile("{ \"Input\": { \"DebounceMs\": 500 } }");
+        var store = Create();
+        var locked = LockFile();
+        Task updating;
+        try
+        {
+            updating = Task.Run(() => store.Update(s => s.General.Paused = true));
+            var deadline = DateTime.UtcNow.AddSeconds(5);
+            while (!_log.Entries.Any(e => e.Message.Contains("nuovo tentativo", StringComparison.Ordinal)) && DateTime.UtcNow < deadline)
+                await Task.Delay(5);
+            Assert.Contains(_log.Entries, e => e.Message.Contains("nuovo tentativo", StringComparison.Ordinal));
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var current = store.Current;
+            sw.Stop();
+
+            Assert.Equal(500, current.Input.DebounceMs);
+            // Con il lock tenuto durante i tentativi l'attesa sarebbe di almeno 300 ms (resto dei 100 ms più i 250 successivi).
+            Assert.True(sw.ElapsedMilliseconds < 200, $"Current ha aspettato {sw.ElapsedMilliseconds} ms");
+        }
+        finally
+        {
+            locked.Dispose();
+        }
+
+        await updating.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.True(store.Current.General.Paused);
+        Assert.Equal(500, store.Current.Input.DebounceMs);
     }
 
     [Fact]

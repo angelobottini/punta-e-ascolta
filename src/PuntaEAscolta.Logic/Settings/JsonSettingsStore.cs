@@ -60,7 +60,10 @@ public sealed class JsonSettingsStore : ISettingsStore
 
     /// <summary>
     /// Vero se il file esiste ma non è stato letto (o interpretato, in <see cref="Update"/>): il prossimo salvataggio lo copia
-    /// prima in <c>settings.json.bak</c>. Si azzera con una lettura riuscita o dopo la copia. Protetto da <c>_gate</c>.
+    /// prima in <c>settings.json.bak</c>. Si azzera con una lettura riuscita di <see cref="Load"/> o dopo la copia; una
+    /// lettura riuscita dentro <see cref="Update"/> NON lo azzera: chi chiama Update può scrivere valori presi dai predefiniti
+    /// in memoria (la finestra impostazioni aperta dopo un avvio senza file), quindi il file vero va comunque copiato.
+    /// Protetto da <c>_gate</c>.
     /// </summary>
     private bool _backupBeforeSave;
 
@@ -93,7 +96,7 @@ public sealed class JsonSettingsStore : ISettingsStore
 
         DataDirectory = baseDirectory;
         FilePath = Path.Combine(baseDirectory, FileName);
-        _current = LoadCore() ?? new AppSettings();
+        _current = LoadCore(retry: true) ?? new AppSettings();
     }
 
     public string FilePath { get; }
@@ -122,10 +125,12 @@ public sealed class JsonSettingsStore : ISettingsStore
     /// </summary>
     public AppSettings Load()
     {
+        // Le attese per un file bloccato si fanno fuori dal lock: chi legge Current (ogni clic, la voce) non aspetta.
+        WaitUntilReadable();
         AppSettings loaded;
         lock (_gate)
         {
-            loaded = LoadCore() ?? _current;
+            loaded = LoadCore(retry: false) ?? _current;
             _current = loaded;
         }
         RaiseChanged(loaded);
@@ -150,22 +155,27 @@ public sealed class JsonSettingsStore : ISettingsStore
     /// <paramref name="mutate"/> e salva. Così i valori cambiati da fuori mentre l'app è aperta (modifica a mano, un'altra
     /// copia dell'app) non vengono riscritti con quelli vecchi in memoria. Se il file manca si parte da <see cref="Current"/>;
     /// se c'è ma non si legge o non si interpreta si parte da <see cref="Current"/> e il file viene prima copiato in
-    /// <c>settings.json.bak</c>. Restituisce la copia salvata; <see cref="Changed"/> la notifica (con gli eventuali valori
-    /// cambiati da fuori, che così vengono anche applicati).
+    /// <c>settings.json.bak</c>. Se all'avvio il file non si era letto (<see cref="BackupPending"/>) la copia si fa anche
+    /// quando ora si legge: <paramref name="mutate"/> potrebbe scriverci sopra valori presi dai predefiniti in memoria.
+    /// Le attese per un file bloccato (fino a 850 ms) avvengono prima di prendere il lock, così <see cref="Current"/> non
+    /// aspetta. Restituisce la copia salvata; <see cref="Changed"/> la notifica (con gli eventuali valori cambiati da fuori,
+    /// che così vengono anche applicati).
     /// </summary>
     public AppSettings Update(Action<AppSettings> mutate)
     {
         ArgumentNullException.ThrowIfNull(mutate);
+        WaitUntilReadable();
         AppSettings copy;
         lock (_gate)
         {
-            var (status, fromDisk, error) = ReadFile(retry: true);
+            // Una sola lettura, senza attese: il file è appena risultato leggibile (o non lo diventerà a breve).
+            var (status, fromDisk, error) = ReadFile(retry: false);
             AppSettings target;
             switch (status)
             {
                 case ReadStatus.Ok:
+                    // _backupBeforeSave resta com'è: SaveCore lo azzera dopo aver copiato il file vero.
                     target = fromDisk!;
-                    _backupBeforeSave = false;
                     break;
                 case ReadStatus.Missing:
                     target = Clone(_current);
@@ -229,11 +239,12 @@ public sealed class JsonSettingsStore : ISettingsStore
     /// <summary>
     /// Lettura all'avvio e in <see cref="Load"/> (sotto il lock o nel costruttore). File mancante: predefiniti. File corrotto:
     /// rinominato <c>.bad</c>, predefiniti. File presente ma illeggibile anche dopo i nuovi tentativi: null (chi chiama decide
-    /// che cosa tenere) e copia di sicurezza al prossimo salvataggio.
+    /// che cosa tenere) e copia di sicurezza al prossimo salvataggio. Sotto il lock si chiama con <paramref name="retry"/>
+    /// falso, dopo <see cref="WaitUntilReadable"/>.
     /// </summary>
-    private AppSettings? LoadCore()
+    private AppSettings? LoadCore(bool retry)
     {
-        var (status, settings, error) = ReadFile(retry: true);
+        var (status, settings, error) = ReadFile(retry);
         switch (status)
         {
             case ReadStatus.Ok:
@@ -256,6 +267,13 @@ public sealed class JsonSettingsStore : ISettingsStore
     }
 
     private enum ReadStatus { Missing, Ok, Unreadable, Corrupt }
+
+    /// <summary>
+    /// Fuori dal lock: se il file è bloccato (antivirus, sincronizzazione) aspetta con i nuovi tentativi di
+    /// <see cref="ReadRetryDelays"/> che torni leggibile, senza tenere fermi i lettori di <see cref="Current"/>. L'esito non
+    /// si usa: la lettura che conta si rifà sotto il lock, senza attese.
+    /// </summary>
+    private void WaitUntilReadable() => _ = ReadFile(retry: true);
 
     /// <summary>
     /// Legge e interpreta il file senza rinominare né modificare nulla. Un file bloccato (IOException, accesso negato) viene

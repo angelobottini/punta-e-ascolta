@@ -68,6 +68,31 @@ internal static class NativeMethods
     [DllImport("dwmapi.dll")]
     public static extern int DwmGetWindowAttribute(IntPtr hWnd, int attribute, out int value, int size);
 
+    public const uint MonitorDefaultToNearest = 2;
+    public const int MdtEffectiveDpi = 0;
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromPoint(Point pt, uint flags);
+
+    [DllImport("shcore.dll")]
+    public static extern int GetDpiForMonitor(IntPtr monitor, int dpiType, out uint dpiX, out uint dpiY);
+
+    /// <summary>Scala del monitor che contiene il punto (1.25 = 125%); 1.0 se non si legge.</summary>
+    public static double GetDpiScaleAt(int x, int y)
+    {
+        try
+        {
+            IntPtr monitor = MonitorFromPoint(new Point { X = x, Y = y }, MonitorDefaultToNearest);
+            if (monitor != IntPtr.Zero && GetDpiForMonitor(monitor, MdtEffectiveDpi, out uint dpiX, out _) == 0 && dpiX > 0)
+                return dpiX / 96.0;
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
+        {
+            // shcore assente: scala 1
+        }
+        return 1.0;
+    }
+
     /// <summary>Nome di classe della finestra, o stringa vuota in caso di errore.</summary>
     public static string GetClassNameSafe(IntPtr hWnd)
     {

@@ -163,7 +163,11 @@ internal sealed class AppServices : IDisposable
         Dictation = new DictationService(Recorder, SpeechToText, Injector, Speech, settings, Log);
         Own("Dettatura", Dictation);
 
-        Resolver = new TextResolver(Uia, Capture, WindowsOcr, OnnxOcr, Clipboard, settings, Log);
+        Resolver = new TextResolver(Uia, Capture, WindowsOcr, OnnxOcr, Clipboard, settings, Log)
+        {
+            // L'OCR della zona resta dentro la finestra sotto il puntatore (niente testo delle finestre dietro).
+            WindowBoundsAtPoint = Capture.GetTopLevelWindowBounds,
+        };
     }
 
     /// <summary>

@@ -35,12 +35,13 @@ Stato al 22/09/2026: modulo completo, compila con 0 errori e 0 avvisi (`net10.0-
 - Nei messaggi di `LastProblems` la scorciatoia è ripetuta come l'ha scritta l'assistente ("Win+Shift+A"), non nella forma canonica di `HotkeyGesture.ToString()` ("Shift+Win+A").
 - Sotto debugger l'hook viene installato comunque (con avviso nel log): un punto di interruzione blocca il mouse di tutto il sistema finché Windows non rimuove l'hook.
 - Anti-rimbalzo, pressione lunga e "secondo clic = stop" NON sono qui: stanno nell'orchestratore (`PuntaEAscolta.Logic`), come da DESIGN.md 3.1. Questo modulo emette eventi grezzi.
-- Nessuna modifica proposta al contratto di `PuntaEAscolta.Core`.
+- Proposta per il Core (Rifinitura, non applicata: Core congelato): `ScreenRect? GetWindowBoundsAt(ScreenPoint)` in `IScreenCapture`, al posto di `GetTopLevelWindowBounds` passato a mano a `TextResolver.WindowBoundsAtPoint` dalla radice di composizione.
 
 ## GdiScreenCapture
 
 - `Capture(desired, anchor)`: monitor di `anchor` (`MonitorFromPoint` + `GetMonitorInfoW`), `desired` intersecato con il monitor; se non lo tocca affatto viene spostato al suo interno mantenendo le dimensioni. Rettangolo vuoto -> immagine 0x0 senza eccezioni. `BitBlt` da `GetDC(NULL)`; alfa forzato a 255. Errori GDI -> `Win32Exception` (il chiamante registra e prosegue).
 - `DpiScale` = `GetDpiForMonitor(MDT_EFFECTIVE_DPI) / 96`, ripiego `GetDpiForSystem`.
+- `GetTopLevelWindowBounds(point)` (fuori da `IScreenCapture`, Core congelato): `WindowFromPoint` -> `GetAncestor(GA_ROOT)` -> `DwmGetWindowAttribute(DWMWA_EXTENDED_FRAME_BOUNDS)` (senza i bordi invisibili di ridimensionamento), ripiego `GetWindowRect`; null se non c'è finestra. Sola lettura. Lo usa `TextResolver` per limitare l'OCR alla finestra sotto il puntatore.
 - Misurato su questa macchina: 900x300 in 25-35 ms, scala 1,25, contenuto corretto (menu e testo), nessun cursore.
 - Le coordinate sono fisiche solo se il processo è Per-Monitor V2 (manifest dell'App). `WindowsInputSource.Start` scrive un avviso nel log se non lo è.
 

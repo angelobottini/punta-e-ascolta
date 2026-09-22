@@ -86,6 +86,14 @@ public sealed class TextResolver : ITextResolver
     /// <summary>Scarta le parole OCR tagliate dal bordo della zona catturata (frammenti come "mento" per "Documento").</summary>
     internal bool DiscardCutText { get; set; } = true;
 
+    /// <summary>
+    /// Rettangolo visibile della finestra di primo livello sotto il punto (pixel fisici), o null se non si conosce. Se c'è,
+    /// la zona dell'OCR viene limitata a quella finestra: il testo di un'altra finestra che sta dietro non si legge (prove dal
+    /// vivo, BUG A: Word in una finestra, area grigia, lette le righe della finestra dietro). Impostato dalla radice di
+    /// composizione (sul Core congelato non c'è un contratto per questo); null nei test che non lo usano.
+    /// </summary>
+    public Func<ScreenPoint, ScreenRect?>? WindowBoundsAtPoint { get; set; }
+
     // Punti di innesto verso le funzioni pure della parte A: nel prodotto sono le classi statiche reali,
     // nei test possono essere sostituiti. Ogni chiamata è comunque protetta (una NotImplementedException = "nessun testo").
     internal Func<UiElementInfo, ReadingSettings, UiResolution?> ResolveUiElement { get; set; } = UiTextResolver.Resolve;
@@ -274,6 +282,8 @@ public sealed class TextResolver : ITextResolver
     /// <see cref="TooltipMaxAbovePx"/> sopra e <see cref="TooltipMaxBelowPx"/> sotto il puntatore, bordo sinistro al massimo
     /// <see cref="TooltipMaxRightOfPointerPx"/> a destra e bordo destro al massimo <see cref="TooltipMaxLeftOfPointerPx"/> a
     /// sinistra (valori al 100%, scalati). Un rettangolo vuoto non si può verificare: non è un suggerimento.
+    /// La stessa regola (copiata in <c>ElementReader.IsPlacedLikeTooltip</c>, un test le confronta) filtra già le finestre
+    /// candidate nello strato UIA; qui resta come controllo per qualunque sorgente.
     /// </summary>
     internal static bool IsPlacedLikeTooltip(ScreenRect bounds, ScreenPoint point, double dpi)
     {
@@ -289,7 +299,18 @@ public sealed class TextResolver : ITextResolver
         double dpi = SafeDpi(point);
 
         var zone = ZoneAround(point, settings.Ocr, dpi);
-        var image = Safe("cattura zona", () => _capture.Capture(zone, point));
+        // Solo la finestra sotto il puntatore. I lati tolti così non contano come tagli (DropCutText riceve la zona intera):
+        // lì finisce la finestra, come al bordo del monitor.
+        var request = zone;
+        if (WindowBoundsAtPoint is { } windowAt)
+        {
+            ScreenRect? window = null;
+            try { window = windowAt(point); }
+            catch (Exception ex) { LogStageFailure("finestra sotto il punto", ex); }
+            request = ClipZoneToWindow(zone, point, window);
+            if (request != zone) diag.Append(" finestra=").Append(request.Width).Append('x').Append(request.Height);
+        }
+        var image = Safe("cattura zona", () => _capture.Capture(request, point));
         if (!IsUsable(image))
         {
             diag.Append(" cattura:fallita");
@@ -655,6 +676,12 @@ public sealed class TextResolver : ITextResolver
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
+            // Il token della fase va annullato esplicitamente. Quando Cancel arriva dal worker (nessun contesto di
+            // sincronizzazione) le registrazioni su ct girano dall'ultima alla prima: quella di WaitAsync riprende questo
+            // metodo dentro Cancel stesso, e chiudere il linked (using) toglierebbe la sua registrazione prima che scatti.
+            // La fase (OCR ONNX, UIA) continuerebbe a lavorare per niente fino in fondo (prove dal vivo, 230-380 ms di CPU).
+            try { linked.Cancel(); }
+            catch (AggregateException) { /* errori nei gestori di annullamento della fase: la fase è comunque abbandonata */ }
             Observe(task);
             throw;
         }
@@ -754,6 +781,17 @@ public sealed class TextResolver : ITextResolver
         int width = Math.Max(16, (int)Math.Round(ocr.ZoneWidth * dpi));
         int height = Math.Max(16, (int)Math.Round(ocr.ZoneHeight * dpi));
         return ScreenRect.Around(point, width, height);
+    }
+
+    /// <summary>
+    /// Zona limitata alla finestra sotto il puntatore. La zona resta intera se la finestra non si conosce, è vuota o non
+    /// contiene il puntatore (bordo invisibile di ridimensionamento), o se l'intersezione è vuota.
+    /// </summary>
+    internal static ScreenRect ClipZoneToWindow(ScreenRect zone, ScreenPoint point, ScreenRect? window)
+    {
+        if (window is not { IsEmpty: false } w || !w.Contains(point)) return zone;
+        var clipped = zone.Intersect(w);
+        return clipped.IsEmpty ? zone : clipped;
     }
 
     /// <summary>Elemento "piccolo" (sotto 300x120 px al 100%, scalati): senza testo, il suo rettangolo delimita l'OCR.</summary>

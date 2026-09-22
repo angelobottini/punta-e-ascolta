@@ -32,6 +32,16 @@ internal sealed partial class SettingsWindow : Window
     private TextBlock? _problemsText;
     private CancellationTokenSource? _operationCts;
 
+    /// <summary>
+    /// Vero se all'apertura <c>settings.json</c> non era stato letto (<see cref="JsonSettingsStore.BackupPending"/>): i campi
+    /// mostrano i predefiniti e Salva li scriverebbe tutti sopra le impostazioni vere, quindi è disattivato.
+    /// </summary>
+    private readonly bool _openedWithUnreadFile;
+
+    private const string UnreadFileMessage =
+        "Le impostazioni non erano state lette all'avvio (file bloccato): qui ci sono i valori predefiniti e Salva è disattivato " +
+        "per non cancellare quelle vere. Chiudere e riaprire l'app, poi riaprire le impostazioni.";
+
     public SettingsWindow(ISettingsHost host)
     {
         _host = host;
@@ -47,6 +57,17 @@ internal sealed partial class SettingsWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         FontSize = 13;
         TrySetIcon();
+
+        // Avvio con settings.json illeggibile (bloccato da antivirus o sincronizzazione): l'app usa i predefiniti. Se ora il
+        // file si legge lo si ricarica (e l'app applica i valori veri); se no la finestra mostrerebbe i predefiniti e Salva
+        // li scriverebbe sopra quelli veri: il salvataggio resta disattivato.
+        if (_store.BackupPending)
+        {
+            try { _store.Load(); }
+            catch (Exception ex) { _log.Warn($"Nuova lettura delle impostazioni non riuscita: {ex.Message}"); }
+        }
+        _openedWithUnreadFile = _store.BackupPending;
+        if (_openedWithUnreadFile) _log.Warn("Finestra impostazioni aperta senza aver letto settings.json: Salva disattivato");
 
         var initial = JsonSettingsStore.Clone(_store.Current);
 
@@ -68,6 +89,11 @@ internal sealed partial class SettingsWindow : Window
         var close = new Button { Content = "Chiudi", IsCancel = true, MinWidth = 100, Padding = new Thickness(10, 4, 10, 4) };
         save.Click += (_, _) => Save();
         close.Click += (_, _) => Close();
+        if (_openedWithUnreadFile)
+        {
+            save.IsEnabled = false;
+            ShowStatus(UnreadFileMessage, error: true);
+        }
 
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
         buttons.Children.Add(save);
@@ -160,6 +186,12 @@ internal sealed partial class SettingsWindow : Window
 
     private void Save()
     {
+        if (_openedWithUnreadFile)
+        {
+            ShowStatus(UnreadFileMessage, error: true);
+            return;
+        }
+
         var target = JsonSettingsStore.Clone(_store.Current);
         var errors = CollectInto(target);
         if (errors.Count > 0)

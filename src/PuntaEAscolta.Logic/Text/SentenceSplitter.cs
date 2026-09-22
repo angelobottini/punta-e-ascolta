@@ -47,6 +47,9 @@ public static class SentenceSplitter
         "gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "sett", "ott", "nov", "dic",
     };
 
+    /// <summary>Mesi abbreviati che sono anche parole comuni ("un set.", "l'ago."): chiudono la frase davanti a una maiuscola anche senza giorno.</summary>
+    private static readonly HashSet<string> MonthsThatAreCommonWords = new(StringComparer.OrdinalIgnoreCase) { "set", "ago" };
+
     /// <summary>Restituisce la frase di <paramref name="paragraph"/> che contiene il carattere in posizione <paramref name="offset"/>, già ripulita dai caratteri di controllo.</summary>
     public static string ExtractSentence(string paragraph, int offset)
     {
@@ -174,7 +177,13 @@ public static class SentenceSplitter
         if (word.Length <= 2 && char.IsDigit(word[0]) && NextIsLower(text, i + 1)) return false;
 
         string lookup = word.ToString();
-        if (MonthAbbreviations.Contains(lookup)) return PrecededByDayNumber(text, i - word.Length) && NextIsUpperLetter(text, i + 1);
+        if (MonthAbbreviations.Contains(lookup))
+        {
+            // Dopo il numero del giorno è una data; "set" e "ago" sono anche parole comuni ("un set.", "l'ago."), che chiudono
+            // la frase davanti a una maiuscola come le abbreviazioni ambigue; gli altri mesi senza giorno sono titoli ("gen.", "mar.").
+            if (PrecededByDayNumber(text, i - word.Length) || MonthsThatAreCommonWords.Contains(lookup)) return NextIsUpperLetter(text, i + 1);
+            return false;
+        }
         if (AmbiguousAbbreviations.Contains(lookup)) return NextIsUpperLetter(text, i + 1);
         if (Abbreviations.Contains(lookup)) return false;
 

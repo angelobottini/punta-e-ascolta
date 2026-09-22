@@ -182,34 +182,72 @@ internal sealed partial class ElementReader
 
         if (IsBadName(name) && ControlTypeMap.IsLabelledControl(target.Kind))
         {
-            string? fromText = FindDescendantTextName(target.Element);
-            if (fromText is not null) name = fromText;
+            var names = FindDescendantTextNames(target.Element);
+            if (names.Count > 0)
+            {
+                name = names[0];
+                if (names.Distinct(StringComparer.Ordinal).Skip(1).Any() && _log.IsDebugEnabled)
+                    _log.Debug("UIA: i Text discendenti hanno nomi diversi; uso il primo");
+            }
+        }
+        else if (IsBadName(name) && target.Kind == UiElementKind.ToolBar && IsIconSizedToolbar(target.Bounds))
+        {
+            // Affinity, barra superiore: ogni icona è una ToolBar a sé, senza nome, e FromPoint restituisce la ToolBar
+            // stessa; il nome dell'icona sta nei Text figli (fuori schermo, rettangolo vuoto). Prove dal vivo, BUG 10.
+            var names = FindDescendantTextNames(target.Element);
+            string? iconName = IconToolbarName(names);
+            if (iconName is not null) name = iconName;
+            else if (names.Count > 0 && _log.IsDebugEnabled)
+                _log.Debug($"UIA: ToolBar piccola con {names.Distinct(StringComparer.Ordinal).Count()} nomi diversi nei Text figli e nessun rettangolo per sceglierne uno; nessun nome");
         }
 
         return (target, name, parent);
     }
 
-    /// <summary>Nome dei Text discendenti (vista raw: anche fuori schermo e con rettangolo vuoto). Il primo non vuoto.</summary>
-    private string? FindDescendantTextName(UIA.IUIAutomationElement element)
+    /// <summary>Altezza massima (pixel fisici) di una ToolBar che è una sola icona: 34 px al 125% nella barra di Affinity, margine fino a circa il 280%.</summary>
+    internal const int IconToolbarMaxHeightPx = 96;
+
+    /// <summary>Rapporto massimo larghezza/altezza di una ToolBar che è una sola icona (Affinity: 46x34, 64x34 con la freccia della tendina).</summary>
+    internal const double IconToolbarMaxAspect = 3.0;
+
+    /// <summary>ToolBar grande quanto un'icona (non una barra intera con tanti pulsanti o lo spazio vuoto fra i gruppi).</summary>
+    internal static bool IsIconSizedToolbar(ScreenRect bounds) =>
+        !bounds.IsEmpty && bounds.Height <= IconToolbarMaxHeightPx && bounds.Width <= IconToolbarMaxAspect * bounds.Height;
+
+    /// <summary>
+    /// Nome di un'icona che è una ToolBar a sé: il nome comune a tutti i Text discendenti (Affinity lo ripete due volte). Con
+    /// nomi diversi (la ToolBar di sinistra con "Vettore" e "Pixel": due icone e nessun rettangolo per sapere quale è sotto il
+    /// puntatore) null: meglio il silenzio di un nome sbagliato. Senza nomi null.
+    /// </summary>
+    internal static string? IconToolbarName(IReadOnlyList<string> descendantTextNames)
     {
+        string? single = null;
+        foreach (var n in descendantTextNames)
+        {
+            if (string.IsNullOrWhiteSpace(n)) continue;
+            var trimmed = n.Trim();
+            if (single is null) single = trimmed;
+            else if (!string.Equals(single, trimmed, StringComparison.Ordinal)) return null;
+        }
+        return single;
+    }
+
+    /// <summary>Nomi non vuoti dei Text discendenti in ordine (vista raw: anche fuori schermo e con rettangolo vuoto), al massimo <see cref="MaxDescendantTexts"/>.</summary>
+    private List<string> FindDescendantTextNames(UIA.IUIAutomationElement element)
+    {
+        var names = new List<string>();
         var found = ElementSnapshot.Safe(
             () => element.FindAllBuildCache(UIA.TreeScope.TreeScope_Descendants, _s.TextCondition, _s.ElementCache), null);
-        if (found is null) return null;
+        if (found is null) return names;
         int count = ElementSnapshot.Safe(() => found.Length, 0);
-        string? first = null;
-        bool allSame = true;
         for (int i = 0; i < count && i < MaxDescendantTexts; i++)
         {
             var child = ElementSnapshot.Safe(() => found.GetElement(i), null);
             if (child is null) continue;
             string? n = ElementSnapshot.Clean(ElementSnapshot.Safe(() => child.CachedName, null));
-            if (n is null) continue;
-            if (first is null) first = n;
-            else if (!string.Equals(first, n, StringComparison.Ordinal)) allSame = false;
+            if (n is not null) names.Add(n);
         }
-        if (first is not null && !allSame && _log.IsDebugEnabled)
-            _log.Debug("UIA: i Text discendenti hanno nomi diversi; uso il primo");
-        return first;
+        return names;
     }
 
     private static bool IsBadName(string? name) => string.IsNullOrWhiteSpace(name) || TypeNameRegex().IsMatch(name);
@@ -269,7 +307,9 @@ internal sealed partial class ElementReader
     /// <summary>
     /// Contesto di testo protetto: le chiamate sugli intervalli (Clone, ExpandToEnclosingUnit, GetText...) possono fallire
     /// con COMException su una pagina che si ridisegna (Chromium) o un provider che rifiuta; allora l'elemento resta con
-    /// nome e valore e senza testo (Text = null), invece di perdere tutto e finire all'OCR.
+    /// nome e valore invece di perdere tutto e finire all'OCR. Se l'elemento ha il TextPattern il guasto vale "puntatore
+    /// fuori dal testo" (come quando RangeFromPoint fallisce): per il risolutore Text = null significherebbe "elemento senza
+    /// testo" e una pagina di Word o un'area di testo grande direbbe il proprio nome ("Contenuto pagina 1").
     /// </summary>
     private UiTextContext? TryReadTextContext(ElementSnapshot snap, ScreenPoint point)
     {
@@ -280,9 +320,13 @@ internal sealed partial class ElementReader
         catch (Exception ex)
         {
             _log.Debug($"UIA: contesto di testo non leggibile ({ex.GetType().Name} 0x{ex.HResult:X8}); elemento tenuto senza testo");
-            return null;
+            return TextContextAfterFailure(snap.HasTextPattern);
         }
     }
+
+    /// <summary>Contesto da usare quando le chiamate sugli intervalli falliscono: "fuori dal testo" se l'elemento ha il TextPattern, altrimenti nessuno.</summary>
+    internal static UiTextContext? TextContextAfterFailure(bool hasTextPattern) =>
+        hasTextPattern ? new UiTextContext(string.Empty, 0, PointerOverText: false) : null;
 
     /// <summary>
     /// Paragrafo e offset sotto il punto (algoritmo validato 17/17 su Word): RangeFromPoint -> verifica sui rettangoli
@@ -508,14 +552,37 @@ internal sealed partial class ElementReader
         return (exStyle & required) == required;
     }
 
+    // Posizione di un vero suggerimento rispetto al puntatore (al 100%, scalati): stessi valori di
+    // TextResolver.IsPlacedLikeTooltip nella logica, che questo progetto non riferisce; un test li confronta.
+    internal const int TooltipMaxAbovePx = 10;
+    internal const int TooltipMaxBelowPx = 100;
+    internal const int TooltipMaxRightOfPointerPx = 60;
+    internal const int TooltipMaxLeftOfPointerPx = 300;
+
     /// <summary>
-    /// Finestre di primo livello visibili, piccole, con aspetto da suggerimento, entro 400 px dal punto (più vicine prima).
-    /// Si saltano quelle di app bloccate: interrogarle con UIA terrebbe occupato il thread fino al tempo massimo.
+    /// Vero se il rettangolo è dove si mette un suggerimento per il punto (bordo superiore fra 10 px sopra e 100 px sotto il
+    /// puntatore, sinistro non oltre 60 px a destra, destro non oltre 300 px a sinistra, valori al 100% per la scala). Filtra
+    /// le candidate prima di interrogarle: una tendina o un pannello vicino non nasconde più il suggerimento vero dietro.
+    /// </summary>
+    internal static bool IsPlacedLikeTooltip(ScreenRect bounds, ScreenPoint point, double dpi)
+    {
+        if (bounds.IsEmpty) return false;
+        if (dpi <= 0 || double.IsNaN(dpi) || double.IsInfinity(dpi)) dpi = 1.0;
+        bool vertical = bounds.Y >= point.Y - TooltipMaxAbovePx * dpi && bounds.Y <= point.Y + TooltipMaxBelowPx * dpi;
+        bool horizontal = bounds.X <= point.X + TooltipMaxRightOfPointerPx * dpi && bounds.Right >= point.X - TooltipMaxLeftOfPointerPx * dpi;
+        return vertical && horizontal;
+    }
+
+    /// <summary>
+    /// Finestre di primo livello visibili, piccole, con aspetto da suggerimento e messe dove si mette un suggerimento per il
+    /// punto (<see cref="IsPlacedLikeTooltip"/>), più vicine prima. Si saltano quelle di app bloccate: interrogarle con UIA
+    /// terrebbe occupato il thread fino al tempo massimo.
     /// </summary>
     private static List<TooltipWindow> EnumerateTooltipWindows(ScreenPoint point)
     {
         var list = new List<TooltipWindow>();
         uint ownPid = (uint)Environment.ProcessId;
+        double dpi = NativeMethods.GetDpiScaleAt(point.X, point.Y);
 
         NativeMethods.EnumWindowsProc callback = (hwnd, _) =>
         {
@@ -528,6 +595,7 @@ internal sealed partial class ElementReader
 
                 double distance = bounds.DistanceTo(point);
                 if (distance > TooltipMaxDistancePx) return true;
+                if (!IsPlacedLikeTooltip(bounds, point, dpi)) return true;
 
                 long exStyle = NativeMethods.GetWindowLongPtr(hwnd, NativeMethods.GwlExStyle).ToInt64();
                 bool toolWindow = (exStyle & NativeMethods.WsExToolWindow) != 0;
