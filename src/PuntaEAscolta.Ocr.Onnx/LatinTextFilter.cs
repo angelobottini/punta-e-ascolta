@@ -22,7 +22,7 @@ public static class LatinTextFilter
         {
             case "ﬁ": return "fi";
             case "ﬂ": return "fl";
-            case " ": return " ";   // spazio unificatore -> spazio
+            case "\u00A0": return " ";   // spazio unificatore -> spazio
             case "­": return null;  // trattino morbido: invisibile
             case "⁄": return "/";   // barra di frazione
             case "−": return "-";   // segno meno matematico

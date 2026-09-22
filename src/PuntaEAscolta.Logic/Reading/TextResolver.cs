@@ -283,7 +283,7 @@ public sealed class TextResolver : ITextResolver
         OcrResult? primaryResult = null;
         if (primary is not null)
         {
-            primaryResult = await GuardAsync("ocr:" + primary.Name, t => primary.RecognizeAsync(image, t), OcrTimeout, diag, ct).ConfigureAwait(false);
+            primaryResult = await GuardAsync("ocr:" + primary.Name, async t => (OcrResult?)await primary.RecognizeAsync(image, t).ConfigureAwait(false), OcrTimeout, diag, ct).ConfigureAwait(false);
             if (primaryResult is not null)
             {
                 diag.Append(" righe=").Append(primaryResult.Lines?.Count ?? 0);
@@ -298,7 +298,7 @@ public sealed class TextResolver : ITextResolver
         bool useSecondary = primary is null || best is null || (imageLike && primaryFoundLittle);
         if (useSecondary && secondary is not null)
         {
-            var secondaryResult = await GuardAsync("ocr:" + secondary.Name, t => secondary.RecognizeAsync(image, t), OcrTimeout, diag, ct).ConfigureAwait(false);
+            var secondaryResult = await GuardAsync("ocr:" + secondary.Name, async t => (OcrResult?)await secondary.RecognizeAsync(image, t).ConfigureAwait(false), OcrTimeout, diag, ct).ConfigureAwait(false);
             if (secondaryResult is not null)
             {
                 diag.Append(" righe=").Append(secondaryResult.Lines?.Count ?? 0);
