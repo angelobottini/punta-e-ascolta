@@ -155,4 +155,22 @@ public sealed class ElevenLabsSpeechToTextTests
         Assert.True(log.Contains("proxy error"));
         Assert.False(log.Contains(TestKeys.ApiKey));
     }
+
+    [Theory]
+    [InlineData(100)]
+    [InlineData(170)]
+    [InlineData(190)]
+    [InlineData(1990)]
+    public async Task Api_key_split_by_truncation_never_reaches_log_or_exception(int offset)
+    {
+        // Revisione del 22/09/2026: il corpo veniva troncato a 200 caratteri PRIMA di togliere la chiave, che restava a pezzi.
+        var (stt, _, log) = Create((request, _) =>
+            FakeHttpHandler.Json(HttpStatusCode.BadGateway, new string('.', offset) + request.Header("xi-api-key") + new string('.', 100)));
+
+        var ex = await Assert.ThrowsAsync<SpeechToTextException>(() => stt.TranscribeAsync(OneSecond, "it", CancellationToken.None));
+
+        string prefix = TestKeys.ApiKey[..10];
+        Assert.DoesNotContain(prefix, ex.Message);
+        Assert.False(log.Contains(prefix));
+    }
 }

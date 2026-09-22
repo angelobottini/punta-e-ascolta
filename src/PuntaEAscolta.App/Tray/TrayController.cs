@@ -27,6 +27,11 @@ internal sealed class TrayController : ISettingsHost, IDisposable
     private readonly CancellationTokenSource _shutdown = new();
     private readonly object _outcomeGate = new();
     private readonly object _settingsGate = new();
+    private readonly object _pauseSaveGate = new();
+
+    /// <summary>Vero sul thread che sta salvando lo stato di pausa deciso dall'orchestratore (Changed arriva sincrono lì).</summary>
+    [ThreadStatic] private static bool t_persistingPause;
+    private int _pausePersistQueued;
 
     private ReadOrchestrator? _orchestrator;
     private WindowsInputSource? _input;
@@ -200,23 +205,38 @@ internal sealed class TrayController : ISettingsHost, IDisposable
 
         BeginOnUi(UpdateTrayState);
 
-        // Il salvataggio non deve bloccare il worker dell'orchestratore.
-        if (Store.Current.General.Paused != paused)
+        // Il salvataggio non deve bloccare il worker dell'orchestratore. Si salva lo stato ATTUALE dell'orchestratore, non
+        // quello catturato qui: con due pressioni ravvicinate un salvataggio in ritardo del valore vecchio rimetteva
+        // l'app in pausa in silenzio (e nel file) proprio dopo che la voce aveva detto "Lettura riattivata".
+        if (Interlocked.Exchange(ref _pausePersistQueued, 1) == 0) _ = Task.Run(PersistPause);
+    }
+
+    private void PersistPause()
+    {
+        Interlocked.Exchange(ref _pausePersistQueued, 0);
+        try
         {
-            _ = Task.Run(() =>
+            lock (_pauseSaveGate)
             {
+                if (_orchestrator is not { } orchestrator) return;
+                bool paused = orchestrator.Paused;
+                var copy = JsonSettingsStore.Clone(Store.Current);
+                if (copy.General.Paused == paused) return;
+                copy.General.Paused = paused;
+                t_persistingPause = true;
                 try
                 {
-                    var copy = JsonSettingsStore.Clone(Store.Current);
-                    if (copy.General.Paused == paused) return;
-                    copy.General.Paused = paused;
-                    Store.Save(copy);
+                    Store.Save(copy);   // Changed arriva su questo thread: ApplySettings sa che non deve toccare la pausa
                 }
-                catch (Exception ex)
+                finally
                 {
-                    Log.Error("Salvataggio dello stato di pausa non riuscito", ex);
+                    t_persistingPause = false;
                 }
-            });
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Salvataggio dello stato di pausa non riuscito", ex);
         }
     }
 
@@ -252,7 +272,8 @@ internal sealed class TrayController : ISettingsHost, IDisposable
                 else Log.Info("Attivazione aggiornata");
             }
 
-            if (_orchestrator is { } orchestrator && orchestrator.Paused != settings.General.Paused)
+            // Solo i salvataggi della finestra impostazioni decidono la pausa; quelli che la registrano soltanto no.
+            if (!t_persistingPause && _orchestrator is { } orchestrator && orchestrator.Paused != settings.General.Paused)
                 orchestrator.Paused = settings.General.Paused;
 
             if (_input is not null && Services.Speech.IsSpeaking)
@@ -345,10 +366,13 @@ internal sealed class TrayController : ISettingsHost, IDisposable
         _settingsWindow?.OnPausedChangedExternally(paused);
     }
 
+    /// <summary>
+    /// Pausa dal menu dell'icona: passa dal worker dell'orchestratore come la scorciatoia, così un solo thread cambia lo
+    /// stato (niente letture e scritture incrociate) e la voce conferma "Lettura in pausa" o "Lettura riattivata".
+    /// </summary>
     private void TogglePause()
     {
-        if (_orchestrator is null) return;
-        _orchestrator.Paused = !_orchestrator.Paused;
+        _orchestrator?.HandleInput(new HotkeyEvent(HotkeyAction.TogglePause, NativePointer.GetPhysicalPosition(), Environment.TickCount64));
     }
 
     public void ShowSettings()

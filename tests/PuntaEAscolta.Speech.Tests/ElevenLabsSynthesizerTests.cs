@@ -256,4 +256,31 @@ public sealed class ElevenLabsSynthesizerTests
         Assert.False(ElevenLabsErrors.IsOutputFormatRejection(new ElevenLabsError(401, "invalid_api_key", "pcm", null)));
         Assert.False(ElevenLabsErrors.IsOutputFormatRejection(new ElevenLabsError(500, null, "pcm", null)));
     }
+
+    [Theory]
+    [InlineData(1000)]
+    [InlineData(1970)]
+    [InlineData(1995)]
+    public async Task Api_key_split_by_truncation_never_reaches_log_or_exception(int offset)
+    {
+        // Revisione del 22/09/2026: il corpo non JSON veniva troncato a 2000 caratteri PRIMA di togliere la chiave.
+        var (synth, _, _, log) = Create((request, _) =>
+            FakeHttpHandler.Json(HttpStatusCode.BadGateway, new string('.', offset) + request.Header("xi-api-key") + new string('.', 100)));
+
+        var ex = await Assert.ThrowsAsync<SpeechProviderException>(() =>
+            synth.SynthesizeAsync(new SpeechRequest("Ciao", SpeechKind.Label, "it"), CancellationToken.None));
+
+        string prefix = TestKeys.ApiKey[..10];
+        Assert.DoesNotContain(prefix, ex.Message);
+        Assert.False(log.Contains(prefix));
+    }
+
+    [Fact]
+    public void Redact_TruncatesLongMessagesAfterRemovingTheKey()
+    {
+        var error = ElevenLabsErrors.Parse(502, new string('x', 5000));
+        Assert.Equal(5000, error.Message!.Length);
+        Assert.Equal(2000, ElevenLabsErrors.Redact(error, TestKeys.ApiKey).Message!.Length);
+        Assert.Equal(2000, ElevenLabsErrors.Redact(error, null).Message!.Length);
+    }
 }

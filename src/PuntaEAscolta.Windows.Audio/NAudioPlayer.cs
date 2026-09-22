@@ -78,6 +78,9 @@ public sealed class NAudioPlayer : IAudioPlayer
             return;
         }
 
+        // Una lettura già annullata (rimasta indietro mentre ne partiva un'altra) non deve interrompere quella nuova.
+        if (ct.IsCancellationRequested) return;
+
         Session session;
         Session? previous;
         lock (_gate)
@@ -87,6 +90,7 @@ public sealed class NAudioPlayer : IAudioPlayer
                 _log.Warn("Riproduzione richiesta dopo la chiusura del lettore: ignorata.");
                 return;
             }
+            if (ct.IsCancellationRequested) return;
 
             previous = _current;
             session = new Session(_log, _keepWarm);

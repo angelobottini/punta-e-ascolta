@@ -257,7 +257,8 @@ public sealed partial class ElevenLabsSpeechToText : ISpeechToText
         }
         catch (JsonException)
         {
-            message = Truncate(body);
+            // Corpo intero: si tronca solo dopo Redact (nel log e nell'eccezione), altrimenti un taglio può spezzare la chiave.
+            message = body;
         }
         return new ScribeError(status, code, message);
 

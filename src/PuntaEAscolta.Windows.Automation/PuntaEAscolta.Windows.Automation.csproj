@@ -9,4 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Interop.UIAutomationClient" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="PuntaEAscolta.Windows.Tests" />
+  </ItemGroup>
 </Project>

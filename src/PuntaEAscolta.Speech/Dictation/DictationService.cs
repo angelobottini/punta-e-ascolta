@@ -758,6 +758,8 @@ public sealed class DictationService : IDictationService
     /// </summary>
     private sealed class Session : IDisposable
     {
+        private const int CancelWaitMs = 1000;
+
         private readonly CancellationTokenSource _cts = new();
         private readonly object _lock = new();
         private bool _cancelling;
@@ -797,11 +799,24 @@ public sealed class DictationService : IDictationService
 
         public void Cancel(bool announce)
         {
+            bool otherThreadCancelling;
             lock (_lock)
             {
-                if (_ctsDisposed || _cancelling || Token.IsCancellationRequested) return;
-                _cancelling = true;
-                Announce = announce;
+                if (_ctsDisposed || Token.IsCancellationRequested) return;
+                otherThreadCancelling = _cancelling;
+                if (!otherThreadCancelling)
+                {
+                    _cancelling = true;
+                    Announce = announce;
+                }
+            }
+            if (otherThreadCancelling)
+            {
+                // Un altro thread ha appena deciso l'annullamento ma non ha ancora annullato il token: chi chiama controlla
+                // il token subito dopo (rilettura fermata -> ThrowIfCancellationRequested) e senza questa attesa inserirebbe
+                // il testo che l'utente ha appena annullato. Il token risulta annullato già all'inizio di _cts.Cancel().
+                SpinWait.SpinUntil(() => Token.IsCancellationRequested, CancelWaitMs);
+                return;
             }
             try
             {

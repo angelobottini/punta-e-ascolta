@@ -69,7 +69,9 @@ internal static class ElevenLabsErrors
             }
             catch (JsonException)
             {
-                message = body.Length > MaxBodyChars ? body[..MaxBodyChars] : body;
+                // Corpo intero: si tronca solo DOPO aver tolto la chiave (Redact), altrimenti il taglio può spezzarla
+                // e lasciarne una parte nel log.
+                message = body;
             }
         }
         if (string.IsNullOrWhiteSpace(message)) message = null;
@@ -83,19 +85,21 @@ internal static class ElevenLabsErrors
 
     /// <summary>
     /// Toglie un segreto (la chiave API) dal messaggio d'errore del server: un proxy o un server che rimanda le intestazioni
-    /// nel corpo non deve farla arrivare nei log attraverso il messaggio dell'eccezione.
+    /// nel corpo non deve farla arrivare nei log attraverso il messaggio dell'eccezione. Poi tronca il messaggio a 2000
+    /// caratteri: sempre in quest'ordine, perché un taglio fatto prima può spezzare la chiave e lasciarne un pezzo.
     /// </summary>
     public static ElevenLabsError Redact(ElevenLabsError error, string? secret)
     {
-        if (string.IsNullOrEmpty(secret)) return error;
-        bool inMessage = error.Message?.Contains(secret, StringComparison.Ordinal) == true;
-        bool inCode = error.Code?.Contains(secret, StringComparison.OrdinalIgnoreCase) == true;
-        if (!inMessage && !inCode) return error;
-        return error with
+        string? message = error.Message;
+        string? code = error.Code;
+        if (!string.IsNullOrEmpty(secret))
         {
-            Message = inMessage ? error.Message!.Replace(secret, "***", StringComparison.Ordinal) : error.Message,
-            Code = inCode ? "***" : error.Code
-        };
+            if (message?.Contains(secret, StringComparison.Ordinal) == true) message = message.Replace(secret, "***", StringComparison.Ordinal);
+            if (code?.Contains(secret, StringComparison.OrdinalIgnoreCase) == true) code = "***";
+        }
+        if (message is not null && message.Length > MaxBodyChars) message = message[..MaxBodyChars];
+        if (ReferenceEquals(message, error.Message) && ReferenceEquals(code, error.Code)) return error;
+        return error with { Message = message, Code = code };
     }
 
     public static SpeechProviderReason Map(ElevenLabsError error)

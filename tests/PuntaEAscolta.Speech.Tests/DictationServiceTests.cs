@@ -405,6 +405,34 @@ public sealed class DictationServiceTests
         Assert.Equal(["Registro"], rig.Speech.Texts);
     }
 
+    [Fact]
+    public async Task Cancel_racing_with_stopped_read_back_never_inserts_the_rejected_text()
+    {
+        // Revisione del 22/09/2026: il thread dell'annullamento ha già deciso (_cancelling) ma non ha ancora annullato il
+        // token quando la rilettura, fermata, risveglia la pipeline. Prima il testo annullato veniva inserito lo stesso.
+        using var rig = new Rig();
+        rig.Speech.BlockSentences = true;
+        rig.Stt.Script("testo rifiutato");
+        await rig.ToggleAsync();
+        await rig.ToggleAsync();
+        await TestUtil.WaitUntilAsync(() => rig.Service.State == DictationState.ReadingBack && rig.Speech.IsBlocking, what: "rilettura");
+
+        var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+        object session = typeof(DictationService).GetField("_session", flags)!.GetValue(rig.Service)!;
+        var sessionType = session.GetType();
+        sessionType.GetField("_cancelling", flags)!.SetValue(session, true);
+        var cts = (CancellationTokenSource)sessionType.GetField("_cts", flags)!.GetValue(session)!;
+
+        rig.Speech.Stop();                 // passo 1 dell'annullamento: la voce si ferma, la pipeline riparte
+        await Task.Delay(100);
+        cts.Cancel();                      // passo 2, in ritardo: il token si annulla
+        sessionType.GetField("_cancelling", flags)!.SetValue(session, false);
+        await rig.Service.PipelineTask.Bounded();
+
+        Assert.Empty(rig.Injector.Actions);
+        Assert.Equal(DictationState.Idle, rig.Service.State);
+    }
+
     private sealed class ThrowingInjector : ITextInjector
     {
         public Task TypeTextAsync(string text, CancellationToken ct) => throw new InvalidOperationException("finestra protetta");

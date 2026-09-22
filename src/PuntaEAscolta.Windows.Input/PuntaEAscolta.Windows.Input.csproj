@@ -7,4 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PuntaEAscolta.Core\PuntaEAscolta.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="PuntaEAscolta.Windows.Tests" />
+  </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/PuntaEAscolta.Logic.Tests/PuntaEAscolta.Logic.Tests.csproj" />
     <Project Path="tests/PuntaEAscolta.Speech.Tests/PuntaEAscolta.Speech.Tests.csproj" />
+    <Project Path="tests/PuntaEAscolta.Windows.Tests/PuntaEAscolta.Windows.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/PuntaEAscolta.OcrBench/PuntaEAscolta.OcrBench.csproj" />

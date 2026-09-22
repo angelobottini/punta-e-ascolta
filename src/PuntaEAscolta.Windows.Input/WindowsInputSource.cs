@@ -751,6 +751,35 @@ public sealed class WindowsInputSource : IInputSource
 
     // ---- utilità -------------------------------------------------------------------------------
 
+    private enum LogLevel { Debug, Info, Warn, Error }
+
+    /// <summary>
+    /// Scrive nel log da un thread del pool: sull'InputThread la scrittura su file (lock, flush, nuovo file e pulizia al
+    /// cambio di giorno) ritarderebbe ogni evento del mouse di tutto il sistema e avvicinerebbe il limite oltre il quale
+    /// Windows toglie l'hook.
+    /// </summary>
+    private void LogOffThread(LogLevel level, string message, Exception? exception = null)
+    {
+        if (level == LogLevel.Debug && !_log.IsDebugEnabled) return;
+        ThreadPool.UnsafeQueueUserWorkItem(static s =>
+        {
+            try
+            {
+                switch (s.level)
+                {
+                    case LogLevel.Debug: s.log.Debug(s.message); break;
+                    case LogLevel.Info: s.log.Info(s.message); break;
+                    case LogLevel.Warn: s.log.Warn(s.message); break;
+                    default: s.log.Error(s.message, s.exception); break;
+                }
+            }
+            catch (Exception)
+            {
+                // Il log non deve mai far cadere il processo.
+            }
+        }, (log: _log, level, message, exception), preferLocal: false);
+    }
+
     /// <summary>HIWORD(mouseData) di WM_XBUTTON*: 1 = XBUTTON1, 2 = XBUTTON2; altri valori non sono pulsanti nostri.</summary>
     private static int XButtonIndex(uint mouseData) => (mouseData >> 16) switch
     {

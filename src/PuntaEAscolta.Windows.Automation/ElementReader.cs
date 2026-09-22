@@ -228,7 +228,7 @@ internal sealed partial class ElementReader
     /// Valore (ValuePattern) dalla cache; se la cache non lo contiene (elemento letto con un'altra richiesta, provider che
     /// rifiuta) si chiede il valore corrente, un solo giro in più e solo se il pattern esiste.
     /// </summary>
-    private static string? ReadValue(UIA.IUIAutomationElement element)
+    internal static string? ReadValue(UIA.IUIAutomationElement element)
     {
         var pattern = ElementSnapshot.Safe(() => element.GetCachedPattern(UiaIds.ValuePattern) as UIA.IUIAutomationValuePattern, null);
         if (pattern is null) return null;
@@ -242,7 +242,7 @@ internal sealed partial class ElementReader
         }
     }
 
-    private static UiToggleState ReadToggle(UIA.IUIAutomationElement element)
+    internal static UiToggleState ReadToggle(UIA.IUIAutomationElement element)
     {
         var toggle = ElementSnapshot.Safe(() => element.GetCachedPattern(UiaIds.TogglePattern) as UIA.IUIAutomationTogglePattern, null);
         if (toggle is null) return UiToggleState.None;
