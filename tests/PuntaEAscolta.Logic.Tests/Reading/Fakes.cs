@@ -287,7 +287,7 @@ internal sealed class FakeDictation : IDictationService
     private int _toggles;
 
     public int Toggles => Volatile.Read(ref _toggles);
-    public DictationState State => DictationState.Idle;
+    public DictationState State { get; set; } = DictationState.Idle;
     public event Action<DictationState>? StateChanged;
 
     public Task ToggleAsync(CancellationToken ct)

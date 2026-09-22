@@ -13,14 +13,14 @@ Come si usa
 3. Per interrompere la voce premi di nuovo la rotellina, oppure Esc.
 
 Altre funzioni:
-- Testo selezionato: seleziona il testo e premi la rotellina dentro la selezione, oppure Win+Maiusc+A.
+- Testo selezionato: seleziona il testo e premi la rotellina dentro la selezione, oppure Win+Maiusc+F9.
 - Dettatura (se attivata dall'assistente): premi la scorciatoia (predefinita Win+Maiusc+D), parla, premi di nuovo.
   L'app rilegge quello che ha capito e poi lo scrive nel programma aperto.
 
 Avvio
 -----
 Fai doppio clic su PuntaEAscolta.exe. Compare un'icona vicino all'orologio.
-Con il tasto destro sull'icona: Pausa/Riprendi, Impostazioni, Apri cartella dei log, Esci.
+Con il tasto destro sull'icona: Pausa/Riprendi, Impostazioni, Leggi la selezione, Apri cartella dei log, Esci.
 Se vuoi che parta da sola con Windows: Impostazioni > Generale > "Avvia con Windows".
 
 Prima configurazione (per l'assistente)

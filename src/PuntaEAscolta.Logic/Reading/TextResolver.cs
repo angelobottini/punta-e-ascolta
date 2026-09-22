@@ -327,7 +327,27 @@ public sealed class TextResolver : ITextResolver
         bool useFallback = fallback is not null && (best is null || (imageLike && firstLines < 2));
         if (useFallback)
         {
-            var fallbackResult = await RecognizeAsync(fallback!, image, desired, px, py, diag, ct).ConfigureAwait(false);
+            // Interfaccia (menu, pannelli): il passaggio mirato del secondo motore costa 100-180 ms contro 1,4-1,5 s del
+            // passaggio completo su una zona densa (docs/impl-notes/ocr-onnx.md). Immagini e cartelli: passaggio completo,
+            // perché il blocco di testo può estendersi oltre la finestra mirata.
+            OcrResult? fallbackResult;
+            if (!wholeZone && !imageLike && fallback is IPointOcrEngine fallbackPoint)
+            {
+                fallbackResult = await GuardAsync(
+                    "ocr-mirato:" + SafeName(fallback),
+                    async t => (OcrResult?)await fallbackPoint.RecognizeAroundPointAsync(image, px, py, t).ConfigureAwait(false),
+                    OcrTimeout, diag, ct).ConfigureAwait(false);
+                if (fallbackResult is not null)
+                {
+                    fallbackResult = Normalize(fallbackResult);
+                    if (DiscardCutText && desired is { } d) fallbackResult = DropCutText(fallbackResult, image, d, px, py, diag);
+                    diag.Append(" righe=").Append(fallbackResult.Lines.Count);
+                }
+            }
+            else
+            {
+                fallbackResult = await RecognizeAsync(fallback!, image, desired, px, py, diag, ct).ConfigureAwait(false);
+            }
             var fromFallback = Select(fallbackResult, px, py, settings, wholeZone, clipTo);
             if (fromFallback is not null)
             {

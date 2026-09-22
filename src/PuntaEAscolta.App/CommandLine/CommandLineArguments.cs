@@ -3,7 +3,7 @@ using PuntaEAscolta.Core;
 
 namespace PuntaEAscolta.App.CommandLine;
 
-internal enum CliCommand { Help, ReadAt, ReadSelection, OcrFile, Speak, Voices, SelfTest, SetKey }
+internal enum CliCommand { Help, ReadAt, ReadSelection, OcrFile, Speak, Voices, SelfTest, SetKey, Exit, PreviewSettings }
 
 /// <summary>Argomenti già interpretati della riga di comando.</summary>
 internal sealed class CommandLineArguments
@@ -192,6 +192,23 @@ internal sealed class CommandLineArguments
                 case "--set-key":
                 case "--imposta-chiave":
                     if (!SetCommand(CliCommand.SetKey, out error)) return null;
+                    break;
+
+                case "--exit":
+                case "--esci":
+                    if (!SetCommand(CliCommand.Exit, out error)) return null;
+                    break;
+
+                case "--preview-settings":
+                case "--anteprima-impostazioni":
+                    if (!SetCommand(CliCommand.PreviewSettings, out error)) return null;
+                    if (!nextIsValue)
+                    {
+                        error = "--anteprima-impostazioni richiede la cartella dove salvare le immagini.";
+                        return null;
+                    }
+                    result.File = next;
+                    i++;
                     break;
 
                 case "--verify":

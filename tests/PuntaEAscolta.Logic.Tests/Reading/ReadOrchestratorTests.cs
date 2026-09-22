@@ -483,6 +483,29 @@ public sealed class ReadOrchestratorTests : IDisposable
     }
 
     [Fact]
+    public async Task ReadActivations_AreIgnored_WhileDictationIsRecording()
+    {
+        var dictation = new FakeDictation { State = DictationState.Recording };
+        var o = Create(dictation);
+
+        o.HandleInput(Down(1000));
+        o.HandleInput(Up(1080));
+        o.HandleInput(Hotkey(HotkeyAction.ReadSelection, 2000));
+        o.HandleInput(Hotkey(HotkeyAction.ReadAtPointer, 3000));
+        await Idle(o);
+
+        Assert.Empty(_resolver.Calls);
+        Assert.Empty(_speech.Requests);
+        Assert.Equal(0, _speech.StopCount);
+
+        // Finita la registrazione si legge di nuovo.
+        dictation.State = DictationState.Idle;
+        o.HandleInput(Down(5000));
+        await Idle(o);
+        Assert.Single(_resolver.Calls);
+    }
+
+    [Fact]
     public async Task ToggleDictation_StopsOurOwnReadingFirst()
     {
         _speech.BlockUntilStopped = true;

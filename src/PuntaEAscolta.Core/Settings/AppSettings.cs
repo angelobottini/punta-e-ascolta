@@ -45,7 +45,7 @@ public sealed class InputSettings
 
     /// <summary>Scorciatoie da tastiera globali, in forma "Win+Shift+A". Stringa vuota = nessuna. Evitare Ctrl+Alt (è AltGr sulla tastiera italiana).</summary>
     public string HotkeyReadAtPointer { get; set; } = "";
-    public string HotkeyReadSelection { get; set; } = "Win+Shift+A";
+    public string HotkeyReadSelection { get; set; } = "Win+Shift+F9";
     public string HotkeyStop { get; set; } = "";
     public string HotkeyTogglePause { get; set; } = "";
 

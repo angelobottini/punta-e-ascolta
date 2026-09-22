@@ -233,6 +233,12 @@ public sealed class ReadOrchestrator : IReadOrchestrator
     /// <summary>Attivazione di lettura: se la voce sta parlando la ferma e basta, altrimenti avvia una lettura nuova.</summary>
     private void Trigger(ReadRequestKind kind, ScreenPoint point, string origin)
     {
+        // Durante la registrazione della dettatura la voce finirebbe nel microfono: l'attivazione si ignora.
+        if (IsDictationRecording())
+        {
+            _log.Info($"Attivazione ({origin}) ignorata: dettatura in registrazione");
+            return;
+        }
         if (IsSpeakingNow())
         {
             _log.Info($"Attivazione ({origin}) mentre la voce parla: stop");
@@ -291,6 +297,17 @@ public sealed class ReadOrchestrator : IReadOrchestrator
     // ---------------------------------------------------------------------------------------------
     // Letture
     // ---------------------------------------------------------------------------------------------
+
+    private bool IsDictationRecording()
+    {
+        if (_dictation is null) return false;
+        try { return _dictation.State == DictationState.Recording; }
+        catch (Exception ex)
+        {
+            _log.Error("Il servizio di dettatura non risponde a State", ex);
+            return false;
+        }
+    }
 
     private bool IsSpeakingNow()
     {

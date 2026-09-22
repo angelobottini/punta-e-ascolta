@@ -23,6 +23,9 @@
     <!-- WPF e Windows Forms hanno tipi omonimi (Button, TextBox, Application...): niente using impliciti di Windows Forms e GDI+. -->
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
+    <!-- WPF toglie questi due dagli using impliciti (Path di System.Windows.Shapes): qui non si usa Shapes. -->
+    <Using Include="System.IO" />
+    <Using Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PuntaEAscolta.Core\PuntaEAscolta.Core.csproj" />
