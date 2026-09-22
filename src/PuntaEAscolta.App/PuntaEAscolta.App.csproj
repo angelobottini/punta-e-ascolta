@@ -20,6 +20,11 @@
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
   </PropertyGroup>
   <ItemGroup>
+    <!-- WPF e Windows Forms hanno tipi omonimi (Button, TextBox, Application...): niente using impliciti di Windows Forms e GDI+. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PuntaEAscolta.Core\PuntaEAscolta.Core.csproj" />
     <ProjectReference Include="..\PuntaEAscolta.Logic\PuntaEAscolta.Logic.csproj" />
     <ProjectReference Include="..\PuntaEAscolta.Speech\PuntaEAscolta.Speech.csproj" />

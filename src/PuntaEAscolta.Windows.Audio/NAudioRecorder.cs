@@ -1,6 +1,5 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using PuntaEAscolta.Core.Abstractions;
 
 namespace PuntaEAscolta.Windows.Audio;
@@ -8,24 +7,21 @@ namespace PuntaEAscolta.Windows.Audio;
 /// <summary>
 /// Registrazione dal microfono con WASAPI (modalità condivisa, formato di missaggio del dispositivo) e
 /// conversione al volo in PCM 16 kHz mono 16 bit (media dei canali, ricampionatore WDL). La memoria è
-/// limitata a cinque minuti: oltre, l'audio in eccesso viene scartato e si registra un avviso nel log.
+/// limitata a cinque minuti (9,6 MB): oltre, l'audio in eccesso viene scartato e si registra un avviso nel log.
+/// Il limite di durata della dettatura (DictationSettings.MaxSeconds) lo applica il servizio di dettatura.
 /// </summary>
 public sealed class NAudioRecorder : IAudioRecorder
 {
-    private const int TargetSampleRate = 16000;
     private const int MaxSeconds = 300;
-    private const int MaxOutputBytes = TargetSampleRate * 2 * MaxSeconds;
+    private const int MaxOutputBytes = Pcm16kMonoConverter.TargetSampleRate * 2 * MaxSeconds;
     private const int CaptureBufferMs = 100;
 
     private readonly ILog _log;
     private readonly object _lock = new();
-    private readonly byte[] _pullBuffer = new byte[32 * 1024];
 
     private WasapiCapture? _capture;
     private MMDevice? _device;
-    private BufferedWaveProvider? _input;
-    private IWaveProvider? _converter;
-    private MemoryStream? _output;
+    private Pcm16kMonoConverter? _converter;
     private bool _limitReported;
     private bool _disposed;
 
@@ -72,7 +68,7 @@ public sealed class NAudioRecorder : IAudioRecorder
     /// <summary>
     /// Avvia la registrazione dal dispositivo indicato (Id WASAPI) o da quello predefinito se null, vuoto o
     /// non trovato. Se la registrazione è già in corso non fa nulla. Lancia InvalidOperationException se non
-    /// esiste alcun microfono utilizzabile.
+    /// esiste alcun microfono utilizzabile (o ObjectDisposedException dopo Dispose).
     /// </summary>
     public void Start(string? deviceId)
     {
@@ -88,43 +84,41 @@ public sealed class NAudioRecorder : IAudioRecorder
 
         MMDevice? device = null;
         WasapiCapture? capture = null;
+        bool subscribed = false;
         try
         {
             device = ResolveDevice(deviceId);
             capture = new WasapiCapture(device, true, CaptureBufferMs);
             WaveFormat sourceFormat = capture.WaveFormat;
+            var converter = new Pcm16kMonoConverter(sourceFormat, MaxOutputBytes);
 
-            var input = new BufferedWaveProvider(sourceFormat, TimeSpan.FromSeconds(2))
-            {
-                ReadFully = false,
-                DiscardOnBufferOverflow = true,
-            };
-            ISampleProvider samples = input.ToSampleProvider();
-            if (sourceFormat.Channels > 1)
-            {
-                samples = new MonoMixSampleProvider(samples);
-            }
-
-            if (sourceFormat.SampleRate != TargetSampleRate)
-            {
-                samples = new WdlResamplingSampleProvider(samples, TargetSampleRate);
-            }
-
-            var converter = new SampleToWaveProvider16(samples);
-
+            bool disposedMeanwhile;
+            bool alreadyRecording;
             lock (_lock)
             {
-                ObjectDisposedException.ThrowIf(_disposed, this);
-                _device = device;
-                _capture = capture;
-                _input = input;
-                _converter = converter;
-                _output = new MemoryStream(TargetSampleRate * 2 * 30);
-                _limitReported = false;
+                disposedMeanwhile = _disposed;
+                alreadyRecording = _capture is not null;
+                if (!disposedMeanwhile && !alreadyRecording)
+                {
+                    _device = device;
+                    _capture = capture;
+                    _converter = converter;
+                    _limitReported = false;
+                }
+            }
+
+            if (disposedMeanwhile || alreadyRecording)
+            {
+                // Chiusura o secondo Start concorrente: questo avvio non serve.
+                SafeDispose(capture);
+                SafeDispose(device);
+                _log.Warn("Microfono: avvio ignorato (registrazione già in corso o registratore chiuso).");
+                return;
             }
 
             capture.DataAvailable += OnDataAvailable;
             capture.RecordingStopped += OnRecordingStopped;
+            subscribed = true;
             capture.StartRecording();
             _log.Info($"Microfono: registrazione avviata da '{device.FriendlyName}' ({sourceFormat.SampleRate} Hz, {sourceFormat.Channels} canali, {sourceFormat.Encoding}).");
         }
@@ -132,7 +126,7 @@ public sealed class NAudioRecorder : IAudioRecorder
         {
             lock (_lock)
             {
-                if (ReferenceEquals(_capture, capture))
+                if (capture is not null && ReferenceEquals(_capture, capture))
                 {
                     ClearSessionState();
                 }
@@ -140,8 +134,12 @@ public sealed class NAudioRecorder : IAudioRecorder
 
             if (capture is not null)
             {
-                capture.DataAvailable -= OnDataAvailable;
-                capture.RecordingStopped -= OnRecordingStopped;
+                if (subscribed)
+                {
+                    capture.DataAvailable -= OnDataAvailable;
+                    capture.RecordingStopped -= OnRecordingStopped;
+                }
+
                 SafeDispose(capture);
             }
 
@@ -190,12 +188,20 @@ public sealed class NAudioRecorder : IAudioRecorder
                 return Array.Empty<byte>();
             }
 
-            Drain();
-            result = _output?.ToArray() ?? Array.Empty<byte>();
+            try
+            {
+                result = _converter?.ToArray() ?? Array.Empty<byte>();
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Microfono: errore nella conversione finale dell'audio.", ex);
+                result = Array.Empty<byte>();
+            }
+
             ClearSessionState();
         }
 
-        _log.Info($"Microfono: registrazione terminata, {result.Length / (TargetSampleRate * 2.0):0.0} s di audio.");
+        _log.Info($"Microfono: registrazione terminata, {result.Length / (Pcm16kMonoConverter.TargetSampleRate * 2.0):0.0} s di audio.");
         return result;
     }
 
@@ -227,13 +233,17 @@ public sealed class NAudioRecorder : IAudioRecorder
         {
             lock (_lock)
             {
-                if (!ReferenceEquals(sender, _capture) || _input is null || e.BytesRecorded <= 0)
+                if (!ReferenceEquals(sender, _capture) || _converter is null || e.BytesRecorded <= 0)
                 {
                     return;
                 }
 
-                _input.AddSamples(e.Buffer, 0, e.BytesRecorded);
-                Drain();
+                _converter.Write(e.Buffer, e.BytesRecorded);
+                if (_converter.LimitReached && !_limitReported)
+                {
+                    _limitReported = true;
+                    _log.Warn($"Microfono: raggiunto il limite di {MaxSeconds} secondi, l'audio successivo viene scartato.");
+                }
             }
         }
         catch (Exception ex)
@@ -251,46 +261,11 @@ public sealed class NAudioRecorder : IAudioRecorder
         }
     }
 
-    /// <summary>Svuota il buffer d'ingresso attraverso la catena di conversione (da chiamare con il lock).</summary>
-    private void Drain()
-    {
-        if (_converter is null || _output is null)
-        {
-            return;
-        }
-
-        while (true)
-        {
-            int read = _converter.Read(_pullBuffer, 0, _pullBuffer.Length);
-            if (read <= 0)
-            {
-                break;
-            }
-
-            int room = MaxOutputBytes - (int)_output.Length;
-            if (room <= 0)
-            {
-                if (!_limitReported)
-                {
-                    _limitReported = true;
-                    _log.Warn($"Microfono: raggiunto il limite di {MaxSeconds} secondi, l'audio successivo viene scartato.");
-                }
-
-                continue;
-            }
-
-            _output.Write(_pullBuffer, 0, Math.Min(read, room));
-        }
-    }
-
     private void ClearSessionState()
     {
         _capture = null;
         _device = null;
-        _input = null;
         _converter = null;
-        _output?.Dispose();
-        _output = null;
     }
 
     private MMDevice ResolveDevice(string? deviceId)

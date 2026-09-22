@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Banco di prova del motore OCR ONNX (non fa parte della soluzione).
+    Uso: OcrBench immagine.png [x y] [opzioni], oppure OcrBench con l'opzione "genera" seguita da una cartella (vedi Program.cs).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>PuntaEAscolta.OcrBench</RootNamespace>
+    <AssemblyName>OcrBench</AssemblyName>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PuntaEAscolta.Ocr.Onnx\PuntaEAscolta.Ocr.Onnx.csproj" />
+    <ProjectReference Include="..\..\src\PuntaEAscolta.Core\PuntaEAscolta.Core.csproj" />
+  </ItemGroup>
+</Project>

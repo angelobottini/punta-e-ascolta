@@ -52,7 +52,8 @@ internal sealed class GestureRecognizer : IDisposable
         var s = _settings();
         if (ev.IsDown)
         {
-            if (_lastActivationMs is { } last && ev.TimestampMs - last < s.DebounceMs)
+            // Un orologio che torna indietro (sorgenti diverse) non deve bloccare i clic: si applica solo a intervalli positivi.
+            if (_lastActivationMs is { } last && ev.TimestampMs >= last && ev.TimestampMs - last < s.DebounceMs)
             {
                 _log.Debug($"Clic ignorato dall'anti-rimbalzo ({ev.TimestampMs - last} ms dal precedente)");
                 return;
@@ -75,7 +76,7 @@ internal sealed class GestureRecognizer : IDisposable
             _longFired = false;
             long id = ++_pendingId;
             var due = TimeSpan.FromMilliseconds(Math.Max(50, s.LongPressMs));
-            _timer = _time.CreateTimer(_ => _onLongPressElapsed(id), null, due, Timeout.InfiniteTimeSpan);
+            _timer = _time.CreateTimer(_ => NotifyLongPress(id), null, due, Timeout.InfiniteTimeSpan);
         }
         else
         {
@@ -100,6 +101,13 @@ internal sealed class GestureRecognizer : IDisposable
     }
 
     public void Dispose() => ClearPending();
+
+    /// <summary>Richiamato dal thread del timer: nessuna eccezione deve uscire (farebbe cadere il processo).</summary>
+    private void NotifyLongPress(long id)
+    {
+        try { _onLongPressElapsed(id); }
+        catch (Exception ex) { _log.Error("Notifica della pressione lunga fallita", ex); }
+    }
 
     private void Activate(TriggerButtonEvent down, bool isLong)
     {

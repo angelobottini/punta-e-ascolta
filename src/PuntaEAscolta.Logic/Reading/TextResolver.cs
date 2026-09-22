@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using PuntaEAscolta.Core;
 using PuntaEAscolta.Core.Abstractions;
@@ -26,6 +27,9 @@ public sealed class TextResolver : ITextResolver
 
     /// <summary>Una riga OCR fino a questa lunghezza è pronunciata come etichetta, oltre come frase.</summary>
     public const int MaxLabelChars = 60;
+
+    /// <summary>Distanza (pixel immagine) entro la quale una parola OCR "tocca" il bordo della cattura.</summary>
+    internal const double CutEdgeTolerancePx = 2.0;
 
     private readonly IUiTextSource _ui;
     private readonly IScreenCapture _capture;
@@ -62,6 +66,9 @@ public sealed class TextResolver : ITextResolver
     /// <summary>Tempo massimo per il ripiego sugli appunti.</summary>
     internal TimeSpan ClipboardTimeout { get; set; } = TimeSpan.FromMilliseconds(2000);
 
+    /// <summary>Scarta le parole OCR tagliate dal bordo della zona catturata (frammenti come "mento" per "Documento").</summary>
+    internal bool DiscardCutText { get; set; } = true;
+
     // Punti di innesto verso le funzioni pure della parte A: nel prodotto sono le classi statiche reali,
     // nei test possono essere sostituiti. Ogni chiamata è comunque protetta (una NotImplementedException = "nessun testo").
     internal Func<UiElementInfo, ReadingSettings, UiResolution?> ResolveUiElement { get; set; } = UiTextResolver.Resolve;
@@ -90,8 +97,8 @@ public sealed class TextResolver : ITextResolver
             var outcome = Finish(candidate, settings, stopwatch, diag);
             if (outcome.HasText)
             {
-                _log.Info($"Testo trovato da {outcome.Source} in {outcome.ElapsedMs} ms ({outcome.Text.Length} caratteri)");
-                if (_log.IsDebugEnabled) _log.Debug($"Testo: \"{outcome.Text}\" | {outcome.Diagnostics}");
+                _log.Info($"Testo trovato da {outcome.Source} in {outcome.ElapsedMs} ms ({outcome.Text.Length} caratteri) | {outcome.Diagnostics}");
+                if (_log.IsDebugEnabled) _log.Debug($"Testo: \"{outcome.Text}\"");
             }
             else
             {
@@ -108,6 +115,7 @@ public sealed class TextResolver : ITextResolver
         {
             _log.Error("Errore imprevisto nella risoluzione del testo", ex);
             diag.Append(" errore:").Append(ex.GetType().Name);
+            AppendTotal(diag, stopwatch);
             return ReadOutcome.Nothing((int)stopwatch.ElapsedMilliseconds, diag.ToString());
         }
     }
@@ -209,16 +217,19 @@ public sealed class TextResolver : ITextResolver
     {
         var rect = bounds.Inflate(TooltipInflatePx, TooltipInflatePx);
         var image = Safe("cattura suggerimento", () => _capture.Capture(rect, anchor));
-        if (image is null || image.Width <= 0 || image.Height <= 0 || image.Bgra is null)
+        if (!IsUsable(image))
         {
             diag.Append(" cattura-suggerimento:fallita");
             return null;
         }
-        diag.Append(" ocr-suggerimento");
-        var candidate = await RunOcrAsync(image, image.Width / 2.0, image.Height / 2.0, settings, wholeZone: true, clipTo: null, UiElementKind.ToolTip, diag, ct).ConfigureAwait(false);
+        diag.Append(" ocr-suggerimento=").Append(image!.Width).Append('x').Append(image.Height);
+        // Il margine di 8 px garantisce che il testo del suggerimento non tocchi il bordo: niente filtro dei tagli.
+        var candidate = await RunOcrAsync(image, image.Width / 2.0, image.Height / 2.0, settings, wholeZone: true, clipTo: null, UiElementKind.ToolTip, desired: null, diag, ct).ConfigureAwait(false);
         if (candidate is null) return null;
         diag.Append(" -> TooltipOcr");
-        return candidate with { Source = ReadSource.TooltipOcr };
+        // Un suggerimento breve è un'etichetta (cache e modello veloce), anche se letto come zona intera.
+        var kind = candidate.Text.Length <= MaxLabelChars ? SpeechKind.Label : SpeechKind.Sentence;
+        return candidate with { Source = ReadSource.TooltipOcr, Kind = kind };
     }
 
     private async Task<Candidate?> OcrZoneAsync(ScreenPoint point, AppSettings settings, bool wholeZone, UiElementInfo? element, bool clipToElement, StringBuilder diag, CancellationToken ct)
@@ -226,17 +237,14 @@ public sealed class TextResolver : ITextResolver
         double dpi = Safe("scala DPI", () => _capture.GetDpiScale(point), fallback: 1.0);
         if (dpi <= 0 || double.IsNaN(dpi) || double.IsInfinity(dpi)) dpi = 1.0;
 
-        int width = Math.Max(16, (int)Math.Round(settings.Ocr.ZoneWidth * dpi));
-        int height = Math.Max(16, (int)Math.Round(settings.Ocr.ZoneHeight * dpi));
-        var zone = ScreenRect.Around(point, width, height);
-
+        var zone = ZoneAround(point, settings.Ocr, dpi);
         var image = Safe("cattura zona", () => _capture.Capture(zone, point));
-        if (image is null || image.Width <= 0 || image.Height <= 0 || image.Bgra is null)
+        if (!IsUsable(image))
         {
             diag.Append(" cattura:fallita");
             return null;
         }
-        diag.Append(" zona=").Append(image.Width).Append('x').Append(image.Height).Append(" dpi=").Append(dpi.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
+        diag.Append(" zona=").Append(image!.Width).Append('x').Append(image.Height).Append(" dpi=").Append(dpi.ToString("0.##", CultureInfo.InvariantCulture));
 
         var (px, py) = ToImageSpace(image, point);
         ImageRect? clip = null;
@@ -246,68 +254,85 @@ public sealed class TextResolver : ITextResolver
             diag.Append(" ritaglio-elemento");
         }
 
-        return await RunOcrAsync(image, px, py, settings, wholeZone, clip, element?.Kind, diag, ct).ConfigureAwait(false);
+        return await RunOcrAsync(image, px, py, settings, wholeZone, clip, element?.Kind, zone, diag, ct).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Riconoscimento con scelta del motore: primario (Windows) e poi secondario (ONNX) se il primario non trova nulla vicino al puntatore,
-    /// oppure, in modalità Auto, se l'elemento è un'immagine o un'area di disegno e il primario ha trovato meno di due righe.
+    /// Riconoscimento con scelta del motore (DESIGN.md 3.1 parte B).
+    /// Auto: primario (Windows); se non trova nulla vicino al puntatore e il motore sa farlo, passaggio mirato attorno al punto
+    /// (<see cref="IPointOcrEngine"/>, recupera il testo a basso contrasto); poi secondario (ONNX) se ancora nulla, oppure se
+    /// l'elemento è un'immagine o un'area di disegno e il primario ha trovato meno di due righe.
+    /// WindowsOnly: solo il primario. OnnxOnly: solo il secondario (il primario se ONNX non è disponibile).
     /// </summary>
-    private async Task<Candidate?> RunOcrAsync(CapturedImage image, double px, double py, AppSettings settings, bool wholeZone, ImageRect? clipTo, UiElementKind? elementKind, StringBuilder diag, CancellationToken ct)
+    /// <param name="desired">Rettangolo richiesto alla cattura: serve a capire quali bordi tagliano il testo. Null = nessun filtro.</param>
+    private async Task<Candidate?> RunOcrAsync(CapturedImage image, double px, double py, AppSettings settings, bool wholeZone, ImageRect? clipTo, UiElementKind? elementKind, ScreenRect? desired, StringBuilder diag, CancellationToken ct)
     {
         var mode = settings.Ocr.Mode;
         IOcrEngine? primary = IsAvailable(_primaryOcr) ? _primaryOcr : null;
         IOcrEngine? secondary = _secondaryOcr is not null && IsAvailable(_secondaryOcr) ? _secondaryOcr : null;
 
+        IOcrEngine? first;
+        IOcrEngine? fallback;
         switch (mode)
         {
             case OcrMode.WindowsOnly:
-                secondary = null;
-                break;
-            case OcrMode.OnnxOnly when secondary is not null:
-                primary = null;
+                first = primary;
+                fallback = null;
                 break;
             case OcrMode.OnnxOnly:
-                diag.Append(" (ONNX non disponibile: uso il motore primario)");
+                first = secondary ?? primary;
+                fallback = null;
+                if (secondary is null && primary is not null) diag.Append(" (ONNX non disponibile: uso il motore primario)");
+                break;
+            default:
+                first = primary ?? secondary;
+                fallback = primary is not null ? secondary : null;
                 break;
         }
 
-        if (primary is null && secondary is null)
+        if (first is null)
         {
             diag.Append(" ocr:nessun-motore");
             _log.Warn("Nessun motore OCR disponibile");
             return null;
         }
 
-        OcrSelection? best = null;
-        OcrResult? primaryResult = null;
-        if (primary is not null)
-        {
-            primaryResult = await GuardAsync("ocr:" + primary.Name, async t => (OcrResult?)await primary.RecognizeAsync(image, t).ConfigureAwait(false), OcrTimeout, diag, ct).ConfigureAwait(false);
-            if (primaryResult is not null)
-            {
-                diag.Append(" righe=").Append(primaryResult.Lines?.Count ?? 0);
-                best = Safe("PointerTextSelector", () => SelectOcrText(primaryResult, px, py, settings.Ocr, wholeZone, clipTo));
-                if (best is not null && string.IsNullOrWhiteSpace(best.Text)) best = null;
-            }
-        }
+        // Primo motore, passaggio normale.
+        var firstResult = await RecognizeAsync(first, image, desired, px, py, diag, ct).ConfigureAwait(false);
+        int firstLines = firstResult?.Lines.Count ?? 0;
+        var best = Select(firstResult, px, py, settings, wholeZone, clipTo);
         ct.ThrowIfCancellationRequested();
 
-        bool imageLike = elementKind is UiElementKind.Image or UiElementKind.Pane or UiElementKind.Custom or UiElementKind.Document;
-        bool primaryFoundLittle = (primaryResult?.Lines?.Count ?? 0) < 2;
-        bool useSecondary = primary is null || best is null || (imageLike && primaryFoundLittle);
-        if (useSecondary && secondary is not null)
+        // Passaggio mirato attorno al punto: solo se il passaggio normale è riuscito ma non ha trovato nulla vicino al puntatore.
+        if (best is null && firstResult is not null && first is IPointOcrEngine pointEngine)
         {
-            var secondaryResult = await GuardAsync("ocr:" + secondary.Name, async t => (OcrResult?)await secondary.RecognizeAsync(image, t).ConfigureAwait(false), OcrTimeout, diag, ct).ConfigureAwait(false);
-            if (secondaryResult is not null)
+            var pointResult = await GuardAsync(
+                "ocr-mirato:" + SafeName(first),
+                async t => (OcrResult?)await pointEngine.RecognizeAroundPointAsync(image, px, py, t).ConfigureAwait(false),
+                OcrTimeout, diag, ct).ConfigureAwait(false);
+            if (pointResult is not null)
             {
-                diag.Append(" righe=").Append(secondaryResult.Lines?.Count ?? 0);
-                var fromSecondary = Safe("PointerTextSelector", () => SelectOcrText(secondaryResult, px, py, settings.Ocr, wholeZone, clipTo));
-                if (fromSecondary is not null && !string.IsNullOrWhiteSpace(fromSecondary.Text))
-                {
-                    best = fromSecondary;
-                    diag.Append(" scelto=").Append(secondary.Name);
-                }
+                pointResult = Normalize(pointResult);
+                if (DiscardCutText && desired is { } d) pointResult = DropCutText(pointResult, image, d, px, py, diag);
+                diag.Append(" righe=").Append(pointResult.Lines.Count);
+                firstLines = Math.Max(firstLines, pointResult.Lines.Count);
+                best = Select(pointResult, px, py, settings, wholeZone, clipTo);
+                if (best is not null) diag.Append(" scelto=mirato");
+            }
+            ct.ThrowIfCancellationRequested();
+        }
+
+        // Secondo motore (solo in Auto).
+        bool imageLike = elementKind is UiElementKind.Image or UiElementKind.Pane or UiElementKind.Custom or UiElementKind.Document;
+        bool useFallback = fallback is not null && (best is null || (imageLike && firstLines < 2));
+        if (useFallback)
+        {
+            var fallbackResult = await RecognizeAsync(fallback!, image, desired, px, py, diag, ct).ConfigureAwait(false);
+            var fromFallback = Select(fallbackResult, px, py, settings, wholeZone, clipTo);
+            if (fromFallback is not null)
+            {
+                best = fromFallback;
+                diag.Append(" scelto=").Append(SafeName(fallback!));
             }
         }
 
@@ -322,6 +347,120 @@ public sealed class TextResolver : ITextResolver
         return new Candidate(best.Source, best.Text, kind, Sensitive: false);
     }
 
+    private async Task<OcrResult?> RecognizeAsync(IOcrEngine engine, CapturedImage image, ScreenRect? desired, double px, double py, StringBuilder diag, CancellationToken ct)
+    {
+        var result = await GuardAsync(
+            "ocr:" + SafeName(engine),
+            async t => (OcrResult?)await engine.RecognizeAsync(image, t).ConfigureAwait(false),
+            OcrTimeout, diag, ct).ConfigureAwait(false);
+        if (result is null) return null;
+        result = Normalize(result);
+        if (DiscardCutText && desired is { } d) result = DropCutText(result, image, d, px, py, diag);
+        diag.Append(" righe=").Append(result.Lines.Count);
+        return result;
+    }
+
+    private OcrSelection? Select(OcrResult? result, double px, double py, AppSettings settings, bool wholeZone, ImageRect? clipTo)
+    {
+        if (result is null || result.Lines.Count == 0) return null;
+        var selection = Safe("PointerTextSelector", () => SelectOcrText(result, px, py, settings.Ocr, wholeZone, clipTo));
+        return selection is null || string.IsNullOrWhiteSpace(selection.Text) ? null : selection;
+    }
+
+    /// <summary>Un motore che restituisce Lines null o righe null non deve far cadere la lettura.</summary>
+    private static OcrResult Normalize(OcrResult result)
+    {
+        if (result.Lines is null) return result with { Lines = Array.Empty<OcrLine>() };
+        if (result.Lines.Any(l => l is null)) return result with { Lines = result.Lines.Where(l => l is not null).ToList() };
+        return result;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Testo tagliato dal bordo della cattura
+    // ---------------------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Toglie il testo tagliato dal bordo della zona catturata (docs/impl-notes/windows-ocr.md, "Limiti").
+    /// Un bordo "taglia" solo se coincide con il rettangolo richiesto: se la cattura è stata ristretta dal bordo del monitor,
+    /// quel lato è la fine dello schermo e il testo lì è intero.
+    /// Bordi sinistro e destro: si tolgono le parole che li toccano (non quella sotto il puntatore); la riga resta con le altre.
+    /// Bordi superiore e inferiore: si toglie la riga che li tocca, a meno che contenga il puntatore.
+    /// </summary>
+    internal static OcrResult DropCutText(OcrResult result, CapturedImage image, ScreenRect desired, double px, double py, StringBuilder? diag = null)
+    {
+        if (result.Lines.Count == 0 || image.Width <= 0 || image.Height <= 0) return result;
+
+        var sb = image.ScreenBounds;
+        bool cutLeft = sb.X <= desired.X;
+        bool cutRight = sb.Right >= desired.Right;
+        bool cutTop = sb.Y <= desired.Y;
+        bool cutBottom = sb.Bottom >= desired.Bottom;
+        if (!cutLeft && !cutRight && !cutTop && !cutBottom) return result;
+
+        double tol = CutEdgeTolerancePx;
+        double maxX = image.Width - tol;
+        double maxY = image.Height - tol;
+        int removedWords = 0, removedLines = 0;
+        var kept = new List<OcrLine>(result.Lines.Count);
+
+        foreach (var line in result.Lines)
+        {
+            var box = line.Box;
+            bool pointerInRow = py >= box.Y && py <= box.Bottom;
+            if (!pointerInRow && ((cutTop && box.Y <= tol) || (cutBottom && box.Bottom >= maxY)))
+            {
+                removedLines++;
+                continue;
+            }
+
+            bool touchesSide = (cutLeft && box.X <= tol) || (cutRight && box.Right >= maxX);
+            if (!touchesSide)
+            {
+                kept.Add(line);
+                continue;
+            }
+
+            if (line.Words is not { Count: > 0 })
+            {
+                // Senza parole non si può ritagliare: si scarta la riga solo se non passa sotto il puntatore.
+                if (px >= box.X && px <= box.Right) kept.Add(line);
+                else removedLines++;
+                continue;
+            }
+
+            var words = new List<OcrWord>(line.Words.Count);
+            foreach (var word in line.Words)
+            {
+                if (word is null) continue;
+                var wb = word.Box;
+                bool underPointer = px >= wb.X && px <= wb.Right && pointerInRow;
+                bool cut = (cutLeft && wb.X <= tol) || (cutRight && wb.Right >= maxX);
+                if (cut && !underPointer) { removedWords++; continue; }
+                words.Add(word);
+            }
+
+            if (words.Count == line.Words.Count)
+            {
+                kept.Add(line);
+                continue;
+            }
+            if (words.Count == 0)
+            {
+                removedLines++;
+                continue;
+            }
+
+            double left = words.Min(w => w.Box.X);
+            double right = words.Max(w => w.Box.Right);
+            var text = string.Join(' ', words.Select(w => w.Text));
+            kept.Add(new OcrLine(text, new ImageRect(left, box.Y, right - left, box.Height), words, line.Confidence));
+        }
+
+        if (removedWords == 0 && removedLines == 0) return result;
+        diag?.Append(" tagliati=").Append(removedWords).Append('p').Append(removedLines).Append('r');
+        return result with { Lines = kept };
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Rifinitura del testo
     // ---------------------------------------------------------------------------------------------
@@ -329,7 +468,10 @@ public sealed class TextResolver : ITextResolver
     private ReadOutcome Finish(Candidate? candidate, AppSettings settings, Stopwatch stopwatch, StringBuilder diag)
     {
         if (candidate is null || string.IsNullOrWhiteSpace(candidate.Text))
+        {
+            AppendTotal(diag, stopwatch);
             return ReadOutcome.Nothing((int)stopwatch.ElapsedMilliseconds, diag.ToString());
+        }
 
         var text = NormalizeWhitespace(candidate.Text);
 
@@ -341,6 +483,7 @@ public sealed class TextResolver : ITextResolver
         if (string.IsNullOrWhiteSpace(text))
         {
             diag.Append(" solo-emoji");
+            AppendTotal(diag, stopwatch);
             return ReadOutcome.Nothing((int)stopwatch.ElapsedMilliseconds, diag.ToString());
         }
 
@@ -351,22 +494,33 @@ public sealed class TextResolver : ITextResolver
             diag.Append(" troncato=").Append(text.Length);
         }
 
+        // La lingua forzata dalle impostazioni vale per le etichette; frasi e blocchi sono sempre riconosciuti dal testo.
         var languageMode = candidate.Kind == SpeechKind.Label ? settings.Speech.LabelLanguage : LabelLanguageMode.Auto;
         var language = Safe("LanguageGuesser", () => GuessLanguage(text, languageMode));
         if (language is not null) diag.Append(" lingua=").Append(language);
 
+        AppendTotal(diag, stopwatch);
         return new ReadOutcome(candidate.Source, text, candidate.Kind, language, candidate.Sensitive, (int)stopwatch.ElapsedMilliseconds, diag.ToString());
     }
 
-    /// <summary>Caratteri di controllo (Word: \r, \a, \v, \f, U+FFFC) e tabulazioni diventano spazi o a capo; gli spazi multipli si riducono a uno.</summary>
+    private static void AppendTotal(StringBuilder diag, Stopwatch stopwatch) =>
+        diag.Append(" totale=").Append(stopwatch.ElapsedMilliseconds).Append("ms");
+
+    private const char LineSeparator = (char)0x2028;
+    private const char ParagraphSeparator = (char)0x2029;
+    private const char ObjectReplacement = (char)0xFFFC;
+    private const char ZeroWidthSpace = (char)0x200B;
+    private const char NoBreakSpace = (char)0x00A0;
+
+    /// <summary>Caratteri di controllo (Word: CR, BEL, VT, FF, sostituto di oggetto) e tabulazioni diventano spazi o a capo; gli spazi multipli si riducono a uno.</summary>
     internal static string NormalizeWhitespace(string text)
     {
         var sb = new StringBuilder(text.Length);
         bool pendingSpace = false, pendingNewLine = false;
         foreach (var c in text)
         {
-            bool newLine = c is '\n' or '\r' or '\v' or '\f' or '\u2028' or '\u2029';
-            bool space = !newLine && (char.IsWhiteSpace(c) || char.IsControl(c) || c is '\uFFFC' or '\u200B' or '\u00A0');
+            bool newLine = c is '\n' or '\r' or '\v' or '\f' or LineSeparator or ParagraphSeparator;
+            bool space = !newLine && (char.IsWhiteSpace(c) || char.IsControl(c) || c is ObjectReplacement or ZeroWidthSpace or NoBreakSpace);
             if (newLine) { pendingNewLine = true; continue; }
             if (space) { pendingSpace = true; continue; }
             if (sb.Length > 0)
@@ -402,7 +556,7 @@ public sealed class TextResolver : ITextResolver
 
     /// <summary>
     /// Esegue una fase asincrona con tempo massimo. Scaduto il tempo la fase vale "nessun risultato" anche se il Task sottostante
-    /// non onora l'annullamento; l'annullamento della richiesta intera viene invece propagato.
+    /// non onora l'annullamento (non lo si aspetta); l'annullamento della richiesta intera viene invece propagato subito.
     /// </summary>
     private async Task<T?> GuardAsync<T>(string stage, Func<CancellationToken, Task<T?>> action, TimeSpan timeout, StringBuilder diag, CancellationToken ct) where T : class
     {
@@ -424,24 +578,21 @@ public sealed class TextResolver : ITextResolver
 
         try
         {
-            var completed = await Task.WhenAny(task, Task.Delay(Timeout.InfiniteTimeSpan, linked.Token)).ConfigureAwait(false);
-            if (completed != task)
-            {
-                Observe(task);
-                if (ct.IsCancellationRequested) throw new OperationCanceledException(ct);
-                _log.Warn($"Fase '{stage}' oltre il tempo massimo di {timeout.TotalMilliseconds:0} ms");
-                diag.Append(' ').Append(stage).Append(":tempo-scaduto");
-                return null;
-            }
-            var result = await task.ConfigureAwait(false);
+            var result = await task.WaitAsync(timeout, ct).ConfigureAwait(false);
             diag.Append(' ').Append(stage).Append(result is null ? ":no(" : ":ok(").Append(sw.ElapsedMilliseconds).Append("ms)");
             return result;
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
+            Observe(task);
+            throw;
+        }
+        catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+        {
+            // TimeoutException: la fase non ha risposto in tempo; OperationCanceledException: la fase ha onorato il proprio tempo massimo.
+            Observe(task);
             _log.Warn($"Fase '{stage}' oltre il tempo massimo di {timeout.TotalMilliseconds:0} ms");
-            diag.Append(' ').Append(stage).Append(":tempo-scaduto");
+            diag.Append(' ').Append(stage).Append(":tempo-scaduto(").Append(sw.ElapsedMilliseconds).Append("ms)");
             return null;
         }
         catch (Exception ex)
@@ -482,7 +633,7 @@ public sealed class TextResolver : ITextResolver
     private static void Observe(Task task)
     {
         // Evita eccezioni non osservate di un Task che finirà più tardi.
-        _ = task.ContinueWith(static t => _ = t.Exception, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+        _ = task.ContinueWith(static t => _ = t.Exception, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
     }
 
     private bool IsAvailable(IOcrEngine engine)
@@ -500,6 +651,9 @@ public sealed class TextResolver : ITextResolver
         try { return engine.Name ?? engine.GetType().Name; }
         catch { return engine.GetType().Name; }
     }
+
+    private static bool IsUsable(CapturedImage? image) =>
+        image is not null && image.Width > 0 && image.Height > 0 && image.Bgra is not null;
 
     // ---------------------------------------------------------------------------------------------
     // Geometria
@@ -519,8 +673,17 @@ public sealed class TextResolver : ITextResolver
         static string StripExe(string s) => s.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? s[..^4] : s;
     }
 
+    /// <summary>Zona di cattura: ZoneWidth x ZoneHeight (al 100%) moltiplicate per la scala del monitor, centrata sul puntatore.</summary>
+    internal static ScreenRect ZoneAround(ScreenPoint point, OcrSettings ocr, double dpi)
+    {
+        int width = Math.Max(16, (int)Math.Round(ocr.ZoneWidth * dpi));
+        int height = Math.Max(16, (int)Math.Round(ocr.ZoneHeight * dpi));
+        return ScreenRect.Around(point, width, height);
+    }
+
+    /// <summary>Elemento "piccolo" (sotto 300x120 px al 100%, scalati): senza testo, il suo rettangolo delimita l'OCR.</summary>
     internal static bool IsSmallElement(ScreenRect bounds, double dpi) =>
-        bounds.Width <= SmallElementWidth * dpi && bounds.Height <= SmallElementHeight * dpi;
+        bounds.Width < SmallElementWidth * dpi && bounds.Height < SmallElementHeight * dpi;
 
     /// <summary>Coordinate del puntatore nello spazio dell'immagine catturata (con eventuale scala fra rettangolo di schermo e pixel dell'immagine).</summary>
     internal static (double X, double Y) ToImageSpace(CapturedImage image, ScreenPoint point)

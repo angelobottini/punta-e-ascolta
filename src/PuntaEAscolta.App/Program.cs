@@ -1,12 +1,31 @@
+using PuntaEAscolta.App.CommandLine;
+using PuntaEAscolta.App.Hosting;
+using PuntaEAscolta.App.Tray;
+
 namespace PuntaEAscolta.App;
 
-/// <summary>Punto di ingresso provvisorio: viene sostituito dal modulo App (composizione, icona di notifica, riga di comando).</summary>
+/// <summary>
+/// Punto di ingresso. Senza argomenti: icona nell'area di notifica (uso normale). Con argomenti: modalità di prova a riga
+/// di comando, senza interfaccia, con esito JSON su stdout e codice di uscita 0 (riuscito) o 1 (errore).
+/// </summary>
 public static class Program
 {
     [STAThread]
     public static int Main(string[] args)
     {
-        Console.WriteLine("Punta e Ascolta: scheletro in costruzione.");
-        return 0;
+        if (args.Length > 0)
+        {
+            ConsoleSetup.Initialize();
+            try
+            {
+                return CommandLineRunner.Run(args);
+            }
+            finally
+            {
+                ConsoleSetup.Restore();
+            }
+        }
+
+        return TrayHost.Run();
     }
 }

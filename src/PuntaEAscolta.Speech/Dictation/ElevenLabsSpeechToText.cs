@@ -117,7 +117,7 @@ public sealed partial class ElevenLabsSpeechToText : ISpeechToText
                     return text;
                 }
 
-                var error = await ReadErrorAsync(response, ct).ConfigureAwait(false);
+                var error = (await ReadErrorAsync(response, ct).ConfigureAwait(false)).Redact(apiKey);
                 _log.Warn($"Trascrizione: Scribe ha risposto HTTP {status}" +
                           (error.Code is null ? "" : $" ({error.Code})") +
                           (error.Message is null ? "" : $": {Truncate(error.Message)}") + ".");
@@ -275,6 +275,17 @@ public sealed partial class ElevenLabsSpeechToText : ISpeechToText
 
     private sealed record ScribeError(int Status, string? Code, string? Message)
     {
+        /// <summary>Toglie la chiave API da un corpo d'errore che la rimanda indietro (proxy, server di prova): mai nei log.</summary>
+        public ScribeError Redact(string secret)
+        {
+            if (string.IsNullOrEmpty(secret)) return this;
+            return this with
+            {
+                Code = Code?.Contains(secret, StringComparison.OrdinalIgnoreCase) == true ? "***" : Code,
+                Message = Message?.Replace(secret, "***", StringComparison.Ordinal)
+            };
+        }
+
         public bool Mentions(string word) =>
             (Code?.Contains(word, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (Message?.Contains(word, StringComparison.OrdinalIgnoreCase) ?? false);

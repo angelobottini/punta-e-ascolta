@@ -12,11 +12,13 @@ internal static class WavHeader
 
     /// <summary>
     /// Analizza l'intestazione. Restituisce false se il contenuto non è un WAV PCM riconoscibile.
-    /// <paramref name="dataOffset"/> e <paramref name="dataLength"/> delimitano i campioni grezzi.
+    /// <paramref name="isFloat"/> è vero per campioni IEEE float a 32 bit (PcmFormat non lo distingue: vanno convertiti).
+    /// <paramref name="dataOffset"/> e <paramref name="dataLength"/> delimitano i campioni grezzi (solo frame interi).
     /// </summary>
-    public static bool TryParse(ReadOnlySpan<byte> wav, out PcmFormat format, out int dataOffset, out int dataLength)
+    public static bool TryParse(ReadOnlySpan<byte> wav, out PcmFormat format, out bool isFloat, out int dataOffset, out int dataLength)
     {
         format = new PcmFormat(0);
+        isFloat = false;
         dataOffset = 0;
         dataLength = 0;
 
@@ -60,7 +62,13 @@ internal static class WavHeader
                     return false;
                 }
 
+                if (tag == FormatIeeeFloat && bitsPerSample != 32)
+                {
+                    return false;
+                }
+
                 format = new PcmFormat(sampleRate, channels, bitsPerSample);
+                isFloat = tag == FormatIeeeFloat;
                 haveFormat = true;
             }
             else if (Tag(wav, position, "data"))
@@ -77,6 +85,10 @@ internal static class WavHeader
                 {
                     dataLength = 0;
                 }
+
+                // Solo frame interi: un eventuale byte finale spaiato si scarta.
+                int blockAlign = Math.Max(1, format.Channels * format.BitsPerSample / 8);
+                dataLength -= dataLength % blockAlign;
 
                 return true;
             }

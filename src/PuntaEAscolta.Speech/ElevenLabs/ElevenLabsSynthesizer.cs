@@ -156,7 +156,7 @@ public sealed class ElevenLabsSynthesizer : ISpeechSynthesizer, IDisposable
             ElevenLabsError error;
             try
             {
-                error = await ElevenLabsErrors.ReadAsync(response, ct).ConfigureAwait(false);
+                error = ElevenLabsErrors.Redact(await ElevenLabsErrors.ReadAsync(response, ct).ConfigureAwait(false), apiKey);
             }
             finally
             {

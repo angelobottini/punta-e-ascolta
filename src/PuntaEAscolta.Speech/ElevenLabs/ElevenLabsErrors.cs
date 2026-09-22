@@ -81,6 +81,23 @@ internal static class ElevenLabsErrors
                 : null;
     }
 
+    /// <summary>
+    /// Toglie un segreto (la chiave API) dal messaggio d'errore del server: un proxy o un server che rimanda le intestazioni
+    /// nel corpo non deve farla arrivare nei log attraverso il messaggio dell'eccezione.
+    /// </summary>
+    public static ElevenLabsError Redact(ElevenLabsError error, string? secret)
+    {
+        if (string.IsNullOrEmpty(secret)) return error;
+        bool inMessage = error.Message?.Contains(secret, StringComparison.Ordinal) == true;
+        bool inCode = error.Code?.Contains(secret, StringComparison.OrdinalIgnoreCase) == true;
+        if (!inMessage && !inCode) return error;
+        return error with
+        {
+            Message = inMessage ? error.Message!.Replace(secret, "***", StringComparison.Ordinal) : error.Message,
+            Code = inCode ? "***" : error.Code
+        };
+    }
+
     public static SpeechProviderReason Map(ElevenLabsError error)
     {
         switch (error.Code)

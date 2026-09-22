@@ -8,7 +8,8 @@ namespace PuntaEAscolta.Windows.Audio;
 
 /// <summary>
 /// Voce locale di Windows (OneCore) tramite Windows.Media.SpeechSynthesis. La sintesi non è in streaming:
-/// il WAV completo arriva in memoria, se ne legge l'intestazione e si espone il solo blocco dati come PCM.
+/// il WAV completo arriva in memoria, se ne legge l'intestazione e si espone il solo blocco dati come PCM
+/// (senza il silenzio iniziale inudibile che le voci OneCore antepongono, 100-190 ms).
 /// La voce si sceglie da Speech.WindowsVoiceName (Id o nome visualizzato, anche parziale); in mancanza la
 /// prima voce it-IT, poi quella predefinita di Windows. Velocità da Speech.WindowsRate tramite SSML.
 /// </summary>
@@ -19,10 +20,17 @@ public sealed class WindowsVoiceSynthesizer : ISpeechSynthesizer, IDisposable
     private const double MinRate = 0.5;
     private const double MaxRate = 3.0;
 
+    /// <summary>Soglia del silenzio iniziale da togliere (campione 16 bit, circa -60 dBFS).</summary>
+    private const int SilenceThreshold = 32;
+
+    /// <summary>Silenzio lasciato prima del primo suono, per non intaccare l'attacco delle consonanti.</summary>
+    private const int LeadingMarginMs = 20;
+
     private readonly ISettingsStore _settings;
     private readonly ILog _log;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private SpeechSynthesizer? _synthesizer;
+    private string? _missingVoiceReported;
     private bool _disposed;
 
     public WindowsVoiceSynthesizer(ISettingsStore settings, ILog log)
@@ -86,6 +94,8 @@ public sealed class WindowsVoiceSynthesizer : ISpeechSynthesizer, IDisposable
             byte[] wav;
             try
             {
+                // La velocità è nell'SSML: l'opzione globale resta neutra (un ripiego precedente può averla cambiata).
+                TrySetSpeakingRate(synthesizer, 1.0);
                 string ssml = BuildSsml(text, language, rate);
                 wav = await SynthesizeToBytesAsync(synthesizer.SynthesizeSsmlToStreamAsync(ssml), ct).ConfigureAwait(false);
             }
@@ -101,14 +111,28 @@ public sealed class WindowsVoiceSynthesizer : ISpeechSynthesizer, IDisposable
                 wav = await SynthesizeToBytesAsync(synthesizer.SynthesizeTextToStreamAsync(text), ct).ConfigureAwait(false);
             }
 
-            if (!WavHeader.TryParse(wav, out PcmFormat format, out int dataOffset, out int dataLength))
+            if (!WavHeader.TryParse(wav, out PcmFormat format, out bool isFloat, out int dataOffset, out int dataLength))
             {
                 throw new InvalidOperationException("Voce di Windows: il flusso restituito non è un WAV PCM riconoscibile.");
+            }
+
+            if (isFloat)
+            {
+                // Mai visto con le voci OneCore, ma PcmFormat descrive solo interi: si converte a 16 bit.
+                byte[] pcm16 = FloatToPcm16(wav.AsSpan(dataOffset, dataLength));
+                return new SpeechAudio(new MemoryStream(pcm16, writable: false), new PcmFormat(format.SampleRate, format.Channels, 16));
             }
 
             if (format.BitsPerSample != 16)
             {
                 _log.Warn($"Voce di Windows: formato inatteso {format.SampleRate} Hz, {format.Channels} canali, {format.BitsPerSample} bit.");
+            }
+            else
+            {
+                // Le voci OneCore iniziano con 100-190 ms di silenzio (misurato): si toglie, è latenza percepita.
+                int skip = LeadingSilenceBytes(wav.AsSpan(dataOffset, dataLength), format);
+                dataOffset += skip;
+                dataLength -= skip;
             }
 
             return new SpeechAudio(new MemoryStream(wav, dataOffset, dataLength, writable: false), format);
@@ -208,7 +232,7 @@ public sealed class WindowsVoiceSynthesizer : ISpeechSynthesizer, IDisposable
     /// Voce da usare: quella impostata (Id, nome esatto o parte del nome), altrimenti la prima it-IT, poi la
     /// predefinita. Con indizio di lingua "en" e una voce inglese installata si usa quella.
     /// </summary>
-    private static VoiceInformation? SelectVoice(string configuredName, string? languageHint)
+    private VoiceInformation? SelectVoice(string configuredName, string? languageHint)
     {
         IReadOnlyList<VoiceInformation> all;
         try
@@ -245,6 +269,12 @@ public sealed class WindowsVoiceSynthesizer : ISpeechSynthesizer, IDisposable
             {
                 return match;
             }
+
+            if (!string.Equals(_missingVoiceReported, wanted, StringComparison.Ordinal))
+            {
+                _missingVoiceReported = wanted;
+                _log.Warn($"Voce di Windows: la voce impostata '{wanted}' non è installata, uso quella italiana predefinita.");
+            }
         }
 
         return all.FirstOrDefault(v => string.Equals(v.Language, ItalianLanguage, StringComparison.OrdinalIgnoreCase))
@@ -275,6 +305,48 @@ public sealed class WindowsVoiceSynthesizer : ISpeechSynthesizer, IDisposable
         return voice.Language.StartsWith("it", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(voice.Language)
             ? ItalianLanguage
             : voice.Language;
+    }
+
+    /// <summary>
+    /// Byte di silenzio iniziale da saltare in PCM 16 bit: tutto ciò che precede di oltre <see cref="LeadingMarginMs"/>
+    /// il primo campione sopra <see cref="SilenceThreshold"/> (circa -60 dBFS, inudibile). Zero se è tutto silenzio.
+    /// </summary>
+    internal static int LeadingSilenceBytes(ReadOnlySpan<byte> pcm16, PcmFormat format)
+    {
+        int blockAlign = Math.Max(2, format.Channels * 2);
+        int samples = pcm16.Length / 2;
+        for (int i = 0; i < samples; i++)
+        {
+            int value = System.Buffers.Binary.BinaryPrimitives.ReadInt16LittleEndian(pcm16.Slice(i * 2, 2));
+            if (Math.Abs(value) > SilenceThreshold)
+            {
+                int firstByte = i * 2 / blockAlign * blockAlign;
+                int margin = format.SampleRate * LeadingMarginMs / 1000 * blockAlign;
+                return Math.Max(0, firstByte - margin);
+            }
+        }
+
+        return 0;
+    }
+
+    /// <summary>Converte campioni IEEE float 32 bit little endian in PCM 16 bit, con saturazione.</summary>
+    internal static byte[] FloatToPcm16(ReadOnlySpan<byte> source)
+    {
+        int samples = source.Length / 4;
+        byte[] result = new byte[samples * 2];
+        for (int i = 0; i < samples; i++)
+        {
+            float value = System.Buffers.Binary.BinaryPrimitives.ReadSingleLittleEndian(source.Slice(i * 4, 4));
+            if (!float.IsFinite(value))
+            {
+                value = 0f;
+            }
+
+            short pcm = (short)Math.Round(Math.Clamp(value, -1f, 1f) * short.MaxValue);
+            System.Buffers.Binary.BinaryPrimitives.WriteInt16LittleEndian(result.AsSpan(i * 2, 2), pcm);
+        }
+
+        return result;
     }
 
     private static void TrySetSpeakingRate(SpeechSynthesizer synthesizer, double rate)

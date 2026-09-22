@@ -3,6 +3,19 @@ using SkiaSharp;
 
 namespace PuntaEAscolta.Ocr.Onnx;
 
+/// <summary>
+/// Sistema di riferimento di un ritaglio: il pixel (u, v) del ritaglio corrisponde al punto
+/// Origin + u * AxisU + v * AxisV dell'immagine da cui è stato preso.
+/// </summary>
+internal readonly record struct CropFrame(SKPoint Origin, SKPoint AxisU, SKPoint AxisV)
+{
+    public SKPoint Map(double u, double v) =>
+        new((float)(Origin.X + u * AxisU.X + v * AxisV.X), (float)(Origin.Y + u * AxisU.Y + v * AxisV.Y));
+}
+
+/// <summary>Bordi (in pixel del ritaglio, estremi esclusi a destra e in basso) della zona che contiene il testo.</summary>
+internal readonly record struct InkBox(int Left, int Top, int Right, int Bottom);
+
 /// <summary>Operazioni SkiaSharp sulle immagini catturate (BGRA32 dall'alto in basso), senza System.Drawing.</summary>
 internal static class BitmapUtils
 {
@@ -48,6 +61,31 @@ internal static class BitmapUtils
         catch
         {
             bitmap.Dispose();
+            throw;
+        }
+    }
+
+    /// <summary>Copia indipendente del rettangolo richiesto (già interno all'immagine).</summary>
+    internal static SKBitmap CopyRegion(SKBitmap src, SKRectI region)
+    {
+        var info = new SKImageInfo(region.Width, region.Height, src.ColorType, src.AlphaType);
+        var copy = new SKBitmap(info);
+        try
+        {
+            var from = src.GetPixelSpan();
+            var to = copy.GetPixelSpan();
+            int bpp = src.BytesPerPixel;
+            int rowLen = region.Width * bpp;
+            for (int y = 0; y < region.Height; y++)
+            {
+                from.Slice((region.Top + y) * src.RowBytes + region.Left * bpp, rowLen).CopyTo(to.Slice(y * copy.RowBytes, rowLen));
+            }
+
+            return copy;
+        }
+        catch
+        {
+            copy.Dispose();
             throw;
         }
     }
@@ -107,11 +145,12 @@ internal static class BitmapUtils
 
     /// <summary>
     /// Ritaglia il quadrilatero (ordine: alto-sinistra, alto-destra, basso-destra, basso-sinistra) raddrizzandolo.
-    /// Per i riquadri allineati agli assi è un semplice sottoinsieme; per quelli inclinati si applica una trasformazione affine.
-    /// Restituisce null se il ritaglio è degenere.
+    /// Per i riquadri allineati agli assi è un semplice sottoinsieme; per quelli inclinati si applica una rotazione.
+    /// Restituisce null se il ritaglio è degenere; frame permette di riportare i pixel del ritaglio sull'immagine.
     /// </summary>
-    internal static SKBitmap? CropQuad(SKBitmap src, SKPointI[] quad)
+    internal static SKBitmap? CropQuad(SKBitmap src, SKPointI[] quad, out CropFrame frame)
     {
+        frame = default;
         if (quad.Length != 4)
         {
             return null;
@@ -128,8 +167,6 @@ internal static class BitmapUtils
         bool axisAligned = Math.Abs(p0.Y - p1.Y) <= 1 && Math.Abs(p3.Y - p2.Y) <= 1
                         && Math.Abs(p0.X - p3.X) <= 1 && Math.Abs(p1.X - p2.X) <= 1;
 
-        var info = new SKImageInfo(width, height, src.ColorType, src.AlphaType);
-
         if (axisAligned)
         {
             int left = Math.Min(p0.X, p3.X), top = Math.Min(p0.Y, p1.Y);
@@ -140,28 +177,17 @@ internal static class BitmapUtils
                 return null;
             }
 
-            info.Width = rect.Width;
-            info.Height = rect.Height;
-            var crop = new SKBitmap(info);
-            if (!src.ExtractSubset(crop, rect))
-            {
-                crop.Dispose();
-                return null;
-            }
-
-            // ExtractSubset condivide i pixel con l'origine: se ne fa una copia indipendente.
-            var copy = crop.Copy();
-            crop.Dispose();
-            return copy;
+            frame = new CropFrame(new SKPoint(rect.Left, rect.Top), new SKPoint(1, 0), new SKPoint(0, 1));
+            return CopyRegion(src, rect);
         }
 
-        // Trasformazione: porta p0 nell'origine e ruota così che il lato p0->p1 diventi orizzontale.
-        float angle = MathF.Atan2(p1.Y - p0.Y, p1.X - p0.X) * 180f / MathF.PI;
+        // Rotazione: porta p0 nell'origine e ruota così che il lato p0->p1 diventi orizzontale.
+        float angleRad = MathF.Atan2(p1.Y - p0.Y, p1.X - p0.X);
         var translate = SKMatrix.CreateTranslation(-p0.X, -p0.Y);
-        var rotate = SKMatrix.CreateRotationDegrees(-angle);
+        var rotate = SKMatrix.CreateRotation(-angleRad);
         var matrix = SKMatrix.Concat(rotate, translate);
 
-        var result = new SKBitmap(info);
+        var result = new SKBitmap(new SKImageInfo(width, height, src.ColorType, src.AlphaType));
         using (var canvas = new SKCanvas(result))
         {
             canvas.Clear(SKColors.Black);
@@ -170,7 +196,172 @@ internal static class BitmapUtils
             canvas.DrawImage(srcImage, 0, 0, Sampling);
         }
 
+        float cos = MathF.Cos(angleRad), sin = MathF.Sin(angleRad);
+        frame = new CropFrame(new SKPoint(p0.X, p0.Y), new SKPoint(cos, sin), new SKPoint(-sin, cos));
         return result;
+    }
+
+    /// <summary>Restituisce una nuova bitmap larga factor volte l'originale, stessa altezza.</summary>
+    internal static SKBitmap StretchHorizontally(SKBitmap src, double factor)
+    {
+        int w = Math.Max(1, (int)Math.Round(src.Width * factor));
+        return src.Resize(new SKImageInfo(w, src.Height, src.ColorType, src.AlphaType), Sampling);
+    }
+
+    /// <summary>
+    /// Trova i bordi del testo dentro il ritaglio di una riga (il riquadro del rilevatore è più largo del testo):
+    /// sfondo = mediana della luminanza sul bordo del ritaglio, "inchiostro" = pixel che se ne discostano. Delle fasce
+    /// orizzontali di inchiostro si tiene la principale più quelle vicine (accenti, puntini); si scartano le code delle
+    /// righe adiacenti che toccano il bordo. Null se il contrasto è insufficiente.
+    /// </summary>
+    internal static InkBox? FindInk(SKBitmap crop)
+    {
+        int w = crop.Width, h = crop.Height;
+        if (w < 4 || h < 4 || crop.BytesPerPixel != 4)
+        {
+            return null;
+        }
+
+        ReadOnlySpan<byte> px = crop.GetPixelSpan();
+        int rowBytes = crop.RowBytes;
+        var lum = new byte[w * h];
+        for (int y = 0; y < h; y++)
+        {
+            int row = y * rowBytes;
+            for (int x = 0; x < w; x++)
+            {
+                int i = row + x * 4;
+                // Ordine BGRA: B = i, G = i + 1, R = i + 2.
+                lum[y * w + x] = (byte)((px[i + 2] * 77 + px[i + 1] * 150 + px[i] * 29) >> 8);
+            }
+        }
+
+        // Sfondo: mediana dei pixel di bordo.
+        var border = new List<byte>(2 * (w + h));
+        for (int x = 0; x < w; x++)
+        {
+            border.Add(lum[x]);
+            border.Add(lum[(h - 1) * w + x]);
+        }
+
+        for (int y = 0; y < h; y++)
+        {
+            border.Add(lum[y * w]);
+            border.Add(lum[y * w + w - 1]);
+        }
+
+        border.Sort();
+        int bg = border[border.Count / 2];
+
+        int maxDiff = 0;
+        foreach (byte v in lum)
+        {
+            maxDiff = Math.Max(maxDiff, Math.Abs(v - bg));
+        }
+
+        if (maxDiff < 16)
+        {
+            return null;
+        }
+
+        int threshold = Math.Max(10, (int)(maxDiff * 0.4));
+        int minPerRow = Math.Max(1, w / 200);
+        var rowInk = new int[h];
+        for (int y = 0; y < h; y++)
+        {
+            int count = 0;
+            for (int x = 0; x < w; x++)
+            {
+                if (Math.Abs(lum[y * w + x] - bg) > threshold)
+                {
+                    count++;
+                }
+            }
+
+            rowInk[y] = count >= minPerRow ? count : 0;
+        }
+
+        // Fasce di righe con inchiostro.
+        var runs = new List<(int Start, int End, long Sum)>();
+        for (int y = 0; y < h;)
+        {
+            if (rowInk[y] == 0)
+            {
+                y++;
+                continue;
+            }
+
+            int start = y;
+            long sum = 0;
+            while (y < h && rowInk[y] > 0)
+            {
+                sum += rowInk[y];
+                y++;
+            }
+
+            runs.Add((start, y, sum));
+        }
+
+        if (runs.Count == 0)
+        {
+            return null;
+        }
+
+        int main = 0;
+        for (int i = 1; i < runs.Count; i++)
+        {
+            if (runs[i].Sum > runs[main].Sum)
+            {
+                main = i;
+            }
+        }
+
+        int top = runs[main].Start, bottom = runs[main].End;
+        int mainHeight = bottom - top;
+        int maxGap = Math.Max(2, (int)Math.Round(mainHeight * 0.2));
+
+        bool Acceptable((int Start, int End, long Sum) r)
+        {
+            bool touchesBorder = r.Start == 0 || r.End == h;
+            return !(touchesBorder && r.End - r.Start < mainHeight * 0.4);
+        }
+
+        for (int i = main - 1; i >= 0 && top - runs[i].End <= maxGap && Acceptable(runs[i]); i--)
+        {
+            top = runs[i].Start;
+        }
+
+        for (int i = main + 1; i < runs.Count && runs[i].Start - bottom <= maxGap && Acceptable(runs[i]); i++)
+        {
+            bottom = runs[i].End;
+        }
+
+        // Colonne con inchiostro dentro la fascia scelta.
+        int left = -1, right = -1;
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = top; y < bottom; y++)
+            {
+                if (Math.Abs(lum[y * w + x] - bg) > threshold)
+                {
+                    if (left < 0)
+                    {
+                        left = x;
+                    }
+
+                    right = x + 1;
+                    break;
+                }
+            }
+        }
+
+        if (left < 0)
+        {
+            return null;
+        }
+
+        // Un pixel di margine, come i riquadri di Windows.Media.Ocr.
+        return new InkBox(Math.Max(0, left - 1), Math.Max(0, top - 1), Math.Min(w, right + 1), Math.Min(h, bottom + 1));
     }
 
     internal static double Distance(SKPointI a, SKPointI b)

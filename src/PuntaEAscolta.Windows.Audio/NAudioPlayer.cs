@@ -1,4 +1,3 @@
-using System.Buffers;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -7,23 +6,33 @@ using PuntaEAscolta.Core.Abstractions;
 namespace PuntaEAscolta.Windows.Audio;
 
 /// <summary>
-/// Riproduzione di PCM grezzo con NAudio. Per ogni enunciato si apre un nuovo dispositivo WASAPI condiviso
-/// (il predefinito, riletto ogni volta) e si alimenta un BufferedWaveProvider da un'attività di lettura.
-/// La riproduzione parte dopo un piccolo pre-buffer o a fine stream; termina da sola quando i dati finiscono.
-/// Stop() e l'annullamento fermano il dispositivo subito (decine di ms) e PlayAsync ritorna senza attendere
-/// lo stream di rete. Se WASAPI fallisce si ripiega una volta su WaveOutEvent; se fallisce anche quello
-/// PlayAsync termina senza eccezioni (l'errore va nel log).
+/// Riproduzione di PCM grezzo con NAudio. Per ogni enunciato si apre un nuovo dispositivo WASAPI condiviso sul
+/// dispositivo predefinito (riletto ogni volta) e lo si alimenta con un BufferedWaveProvider riempito da
+/// un'attività di lettura a blocchi da 8 KB, con contropressione quando il buffer è quasi pieno.
+/// La riproduzione parte dopo circa 120 ms di pre-buffer oppure a fine stream e termina da sola quando lo
+/// stream è finito e il buffer si è svuotato. Stop() e l'annullamento fermano il dispositivo subito
+/// (misurati: Stop ritorna in 2-5 ms, l'ultimo campione entra nel mix 30-40 ms dopo) e PlayAsync ritorna senza
+/// attendere lo stream di rete: una nuova PlayAsync può partire immediatamente. Uno stream senza dati per 10 s
+/// si considera finito. Se WASAPI fallisce si ripiega una volta su WaveOutEvent.
+/// <para>
+/// Contratto sulle eccezioni: PlayAsync NON lancia mai (salvo ArgumentNullException per argomenti null, errore di
+/// programmazione). Fine naturale, Stop(), annullamento del token, formato non valido, stream illeggibile o
+/// nessun dispositivo audio: in tutti i casi il Task si completa normalmente e gli errori vanno nel log.
+/// Chi riproduce più pezzi in sequenza deve quindi controllare il proprio token dopo ogni PlayAsync.
+/// </para>
 /// </summary>
 public sealed class NAudioPlayer : IAudioPlayer
 {
     private readonly ILog _log;
     private readonly object _gate = new();
+    private readonly AudioEngineKeepWarm _keepWarm;
     private Session? _current;
     private bool _disposed;
 
     public NAudioPlayer(ILog log)
     {
         _log = log ?? throw new ArgumentNullException(nameof(log));
+        _keepWarm = new AudioEngineKeepWarm(_log, TimeSpan.FromMinutes(3));
     }
 
     /// <summary>Vero dall'avvio di PlayAsync (pre-buffer incluso) fino alla fine dell'audio, allo Stop o all'errore.</summary>
@@ -38,6 +47,20 @@ public sealed class NAudioPlayer : IAudioPlayer
         }
     }
 
+    /// <summary>
+    /// Per quanto tempo dopo l'ultima lettura si tiene aperto (inizializzato, mai avviato, muto) uno stream WASAPI
+    /// che mantiene pronto il motore audio: l'apertura del dispositivo scende da 200-300 ms a circa 20 ms.
+    /// Predefinito 3 minuti; TimeSpan.Zero lo disattiva.
+    /// </summary>
+    public TimeSpan KeepWarmDuration
+    {
+        get => _keepWarm.Duration;
+        set => _keepWarm.Duration = value;
+    }
+
+    /// <summary>Vero se lo stream di mantenimento è aperto (diagnostica).</summary>
+    public bool IsEngineWarm => _keepWarm.IsActive;
+
     public async Task PlayAsync(Stream pcm, PcmFormat format, double volume, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(pcm);
@@ -46,6 +69,12 @@ public sealed class NAudioPlayer : IAudioPlayer
         if (!IsValid(format))
         {
             _log.Warn($"Riproduzione: formato PCM non valido ({format.SampleRate} Hz, {format.Channels} canali, {format.BitsPerSample} bit).");
+            return;
+        }
+
+        if (!pcm.CanRead)
+        {
+            _log.Warn("Riproduzione: lo stream audio non è leggibile.");
             return;
         }
 
@@ -60,7 +89,7 @@ public sealed class NAudioPlayer : IAudioPlayer
             }
 
             previous = _current;
-            session = new Session(_log);
+            session = new Session(_log, _keepWarm);
             _current = session;
         }
 
@@ -71,6 +100,12 @@ public sealed class NAudioPlayer : IAudioPlayer
         {
             // Task.Run: nessun SynchronizationContext catturato da NAudio (gli eventi arrivano su thread propri).
             await Task.Run(() => session.RunAsync(pcm, format, volume, ct), CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            // Non dovrebbe mai accadere: RunAsync gestisce i propri errori. Per contratto PlayAsync non lancia.
+            _log.Error("Riproduzione: errore inatteso.", ex);
+            session.Stop();
         }
         finally
         {
@@ -84,6 +119,7 @@ public sealed class NAudioPlayer : IAudioPlayer
         }
     }
 
+    /// <summary>Ferma subito la riproduzione in corso (se c'è). Non blocca: ritorna in pochi millisecondi.</summary>
     public void Stop()
     {
         Session? session;
@@ -96,9 +132,9 @@ public sealed class NAudioPlayer : IAudioPlayer
     }
 
     /// <summary>
-    /// Paga in anticipo il costo del primo avvio del percorso audio (COM, ricampionatore, JIT), misurato in
-    /// circa 1,5 s a freddo su ARM64: riproduce 20 ms di silenzio a volume zero su un dispositivo proprio.
-    /// Facoltativo; da chiamare all'avvio dell'app fuori dal thread dell'interfaccia. Non lancia eccezioni.
+    /// Paga in anticipo il costo del primo avvio del percorso audio (COM, ricampionatore, JIT; a freddo fino a
+    /// 1,5 s su ARM64) riproducendo 20 ms di silenzio su un dispositivo proprio, poi apre lo stream di mantenimento.
+    /// Facoltativo; da chiamare all'avvio dell'app. Non lancia eccezioni e non tocca IsPlaying.
     /// </summary>
     public Task WarmUpAsync(CancellationToken ct = default) => Task.Run(() => WarmUp(ct), CancellationToken.None);
 
@@ -113,20 +149,27 @@ public sealed class NAudioPlayer : IAudioPlayer
         }
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        MMDevice? endpoint = null;
         try
         {
+            endpoint = Session.OpenDefaultEndpoint();
+            string endpointId = endpoint.ID;
             var waveFormat = new WaveFormat(16000, 16, 1);
             var buffer = new BufferedWaveProvider(waveFormat, TimeSpan.FromSeconds(1)) { ReadFully = false };
             var output = new SampleToWaveProvider16(new VolumeSampleProvider(buffer.ToSampleProvider()) { Volume = 0f });
             // Nessun using sull'evento: il gestore gira sul thread di riproduzione e non deve mai lanciare.
             var done = new ManualResetEventSlim(false);
-            using var device = new WasapiOut(AudioClientShareMode.Shared, true, Session.LatencyMs);
-            device.PlaybackStopped += (_, _) => done.Set();
-            device.Init(output);
-            buffer.AddSamples(new byte[waveFormat.AverageBytesPerSecond / 50], 0, waveFormat.AverageBytesPerSecond / 50);
-            device.Play();
-            done.Wait(TimeSpan.FromSeconds(3), ct);
-            device.Stop();
+            using (var device = new WasapiOut(endpoint, AudioClientShareMode.Shared, true, Session.LatencyMs))
+            {
+                device.PlaybackStopped += (_, _) => done.Set();
+                device.Init(output);
+                _keepWarm.Touch(endpointId);
+                buffer.AddSamples(new byte[waveFormat.AverageBytesPerSecond / 50], 0, waveFormat.AverageBytesPerSecond / 50);
+                device.Play();
+                done.Wait(TimeSpan.FromSeconds(3), ct);
+                device.Stop();
+            }
+
             _log.Info($"Audio: preriscaldamento del percorso di riproduzione in {stopwatch.ElapsedMilliseconds} ms.");
         }
         catch (OperationCanceledException)
@@ -136,6 +179,17 @@ public sealed class NAudioPlayer : IAudioPlayer
         catch (Exception ex)
         {
             _log.Warn($"Audio: preriscaldamento non riuscito ({ex.GetType().Name}: {ex.Message}).");
+        }
+        finally
+        {
+            try
+            {
+                endpoint?.Dispose();
+            }
+            catch (Exception)
+            {
+                // Rilascio del dispositivo: nulla da segnalare.
+            }
         }
     }
 
@@ -155,6 +209,7 @@ public sealed class NAudioPlayer : IAudioPlayer
         }
 
         session?.Stop();
+        _keepWarm.Dispose();
     }
 
     private static bool IsValid(PcmFormat format) =>
@@ -169,33 +224,52 @@ public sealed class NAudioPlayer : IAudioPlayer
         private const int PreBufferMs = 120;
         private const int ChunkSize = 8 * 1024;
         private const int BackpressureDelayMs = 20;
-        private static readonly TimeSpan BufferCapacity = TimeSpan.FromSeconds(30);
+
+        /// <summary>Silenzio aggiunto in coda allo stream: protegge gli ultimi ~30 ms dal taglio a fine naturale (margine 20 ms).</summary>
+        private const int EndPaddingMs = 50;
+        private static readonly TimeSpan BufferCapacity = TimeSpan.FromSeconds(10);
+
+        /// <summary>Oltre questo tempo senza dati da uno stream ancora aperto si considera finito (rete bloccata).</summary>
+        private static readonly TimeSpan StallTimeout = TimeSpan.FromSeconds(10);
+
+        /// <summary>Attesa massima perché il dispositivo parta dopo la fine dei dati (apertura a freddo inclusa).</summary>
+        private static readonly TimeSpan StartTimeout = TimeSpan.FromSeconds(10);
 
         private readonly ILog _log;
+        private readonly AudioEngineKeepWarm _keepWarm;
         private readonly object _lock = new();
         private readonly TaskCompletionSource<bool> _finished = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource<bool> _started = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly CancellationTokenSource _readerCts = new();
         private readonly System.Diagnostics.Stopwatch _clock = System.Diagnostics.Stopwatch.StartNew();
 
         private IWavePlayer? _device;
+        private MMDevice? _endpoint;
         private IWaveProvider? _output;
         private bool _usingFallback;
         private bool _playRequested;
-        private bool _started;
+        private bool _playing;
         private bool _stopRequested;
 
-        public Session(ILog log)
+        public Session(ILog log, AudioEngineKeepWarm keepWarm)
         {
             _log = log;
+            _keepWarm = keepWarm;
         }
 
         public bool IsActive => !_finished.Task.IsCompleted;
+
+        public static MMDevice OpenDefaultEndpoint()
+        {
+            using var enumerator = new MMDeviceEnumerator();
+            return enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+        }
 
         public async Task RunAsync(Stream pcm, PcmFormat format, double volume, CancellationToken ct)
         {
             if (_log.IsDebugEnabled)
             {
-                _log.Debug($"Riproduzione: sessione avviata a {_clock.ElapsedMilliseconds} ms ({format.SampleRate} Hz, {format.Channels} canali, {format.BitsPerSample} bit).");
+                _log.Debug($"Riproduzione: sessione avviata ({format.SampleRate} Hz, {format.Channels} canali, {format.BitsPerSample} bit).");
             }
 
             var waveFormat = new WaveFormat(format.SampleRate, format.BitsPerSample, format.Channels);
@@ -224,7 +298,7 @@ public sealed class NAudioPlayer : IAudioPlayer
 
             using CancellationTokenRegistration registration = ct.Register(static state => ((Session)state!).Stop(), this);
 
-            // La lettura parte subito: il pre-buffer si riempie mentre il dispositivo si inizializza (30-100 ms misurati).
+            // La lettura parte subito: il pre-buffer si riempie mentre il dispositivo si inizializza.
             _ = Task.Run(() => ReadLoopAsync(pcm, buffer, format), CancellationToken.None);
 
             // Anche l'apertura del dispositivo è concorrente: uno Stop durante Init completa PlayAsync subito
@@ -239,6 +313,7 @@ public sealed class NAudioPlayer : IAudioPlayer
 
             await _finished.Task.ConfigureAwait(false);
             CloseDevice();
+            _keepWarm.Renew();
 
             if (_log.IsDebugEnabled)
             {
@@ -261,8 +336,6 @@ public sealed class NAudioPlayer : IAudioPlayer
                 device = _device;
             }
 
-            // Fuori dal lock: Stop() di WasapiOut attende il thread di riproduzione, il cui ultimo atto
-            // (PlaybackStopped) prende a sua volta il lock.
             try
             {
                 _readerCts.Cancel();
@@ -272,6 +345,8 @@ public sealed class NAudioPlayer : IAudioPlayer
                 _log.Warn($"Riproduzione: errore nell'annullamento della lettura ({ex.InnerException?.GetType().Name}).");
             }
 
+            // Fuori dal lock: Stop() del dispositivo può attendere il suo thread, il cui ultimo atto
+            // (PlaybackStopped) prende a sua volta il lock. Con NAudio 2.4 ritorna in 1-10 ms.
             try
             {
                 device?.Stop();
@@ -302,14 +377,20 @@ public sealed class NAudioPlayer : IAudioPlayer
                 _log.Debug($"Riproduzione: apertura del dispositivo iniziata a {_clock.ElapsedMilliseconds} ms.");
             }
 
+            MMDevice? endpoint = null;
             try
             {
-                IWavePlayer device = new WasapiOut(AudioClientShareMode.Shared, true, LatencyMs);
-                Attach(device, output);
+                endpoint = OpenDefaultEndpoint();
+                string endpointId = endpoint.ID;
+                IWavePlayer device = new WasapiOut(endpoint, AudioClientShareMode.Shared, true, LatencyMs);
+                Attach(device, output, endpoint);
+                endpoint = null; // ora appartiene alla sessione
+                _keepWarm.Touch(endpointId);
                 return true;
             }
             catch (Exception ex)
             {
+                DisposeEndpoint(endpoint);
                 _log.Warn($"Riproduzione: WASAPI non disponibile ({ex.GetType().Name}: {ex.Message}), ripiego su WaveOut.");
             }
 
@@ -319,17 +400,13 @@ public sealed class NAudioPlayer : IAudioPlayer
                 {
                     return true;
                 }
+
+                _usingFallback = true;
             }
 
             try
             {
-                IWavePlayer device = new WaveOutEvent { DesiredLatency = 150, NumberOfBuffers = 3 };
-                Attach(device, output);
-                lock (_lock)
-                {
-                    _usingFallback = true;
-                }
-
+                Attach(CreateFallbackDevice(), output, null);
                 return true;
             }
             catch (Exception ex)
@@ -339,7 +416,10 @@ public sealed class NAudioPlayer : IAudioPlayer
             }
         }
 
-        private void Attach(IWavePlayer device, IWaveProvider output)
+        private static IWavePlayer CreateFallbackDevice() => new WaveOutEvent { DesiredLatency = 150, NumberOfBuffers = 3 };
+
+        /// <summary>Inizializza il dispositivo e lo rende quello della sessione; se nel frattempo è arrivato uno Stop lo scarta.</summary>
+        private void Attach(IWavePlayer device, IWaveProvider output, MMDevice? endpoint)
         {
             try
             {
@@ -348,7 +428,7 @@ public sealed class NAudioPlayer : IAudioPlayer
             }
             catch
             {
-                SafeDispose(device);
+                SafeDispose(device, null);
                 throw;
             }
 
@@ -359,13 +439,14 @@ public sealed class NAudioPlayer : IAudioPlayer
                 if (!discard)
                 {
                     _device = device;
+                    _endpoint = endpoint;
                 }
             }
 
             if (discard)
             {
                 // Arresto arrivato durante Init: il dispositivo non serve più.
-                SafeDispose(device);
+                SafeDispose(device, endpoint);
                 return;
             }
 
@@ -380,41 +461,51 @@ public sealed class NAudioPlayer : IAudioPlayer
 
         private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
         {
-            bool stale;
-            bool stopRequested;
-            lock (_lock)
+            try
             {
-                stale = !ReferenceEquals(sender, _device);
-                stopRequested = _stopRequested;
-            }
+                bool stale;
+                bool stopRequested;
+                lock (_lock)
+                {
+                    stale = !ReferenceEquals(sender, _device);
+                    stopRequested = _stopRequested;
+                }
 
-            if (stale)
+                if (stale)
+                {
+                    return;
+                }
+
+                if (e.Exception is not null && !stopRequested)
+                {
+                    // Mai eliminare il dispositivo dal suo stesso thread di riproduzione (Join su se stesso).
+                    Exception failure = e.Exception;
+                    _ = Task.Run(() => HandleDeviceFailure(failure));
+                    return;
+                }
+
+                if (_log.IsDebugEnabled)
+                {
+                    _log.Debug($"Riproduzione: PlaybackStopped a {_clock.ElapsedMilliseconds} ms.");
+                }
+
+                _finished.TrySetResult(true);
+            }
+            catch (Exception ex)
             {
-                return;
+                // Thread di riproduzione di NAudio: nessuna eccezione deve uscire.
+                _log.Error("Riproduzione: errore nella gestione della fine.", ex);
+                _finished.TrySetResult(true);
             }
-
-            if (e.Exception is not null && !stopRequested)
-            {
-                // Mai eliminare il dispositivo dal suo stesso thread di riproduzione (Join su se stesso).
-                Exception failure = e.Exception;
-                _ = Task.Run(() => HandleDeviceFailure(failure));
-                return;
-            }
-
-            if (_log.IsDebugEnabled)
-            {
-                _log.Debug($"Riproduzione: PlaybackStopped a {_clock.ElapsedMilliseconds} ms.");
-            }
-
-            _finished.TrySetResult(true);
         }
 
-        /// <summary>Guasto del dispositivo durante la riproduzione: una volta si riparte con WaveOut sui dati rimasti nel buffer.</summary>
+        /// <summary>Guasto del dispositivo durante la riproduzione: una sola volta si riparte con WaveOut sui dati rimasti nel buffer.</summary>
         private void HandleDeviceFailure(Exception failure)
         {
-            IWavePlayer? old;
-            IWaveProvider output;
-            bool started;
+            IWavePlayer? oldDevice;
+            MMDevice? oldEndpoint;
+            IWaveProvider? output;
+            bool wasPlaying;
             lock (_lock)
             {
                 if (_stopRequested || _finished.Task.IsCompleted)
@@ -422,72 +513,41 @@ public sealed class NAudioPlayer : IAudioPlayer
                     return;
                 }
 
-                if (_usingFallback)
-                {
-                    _log.Error("Riproduzione: anche il dispositivo di ripiego si è fermato con errore.", failure);
-                    _device = null;
-                    old = null;
-                    output = null!;
-                    started = false;
-                }
-                else
-                {
-                    _log.Warn($"Riproduzione: il dispositivo WASAPI si è fermato con errore ({failure.GetType().Name}: {failure.Message}), ripiego su WaveOut.");
-                    old = _device;
-                    _device = null;
-                    output = _output!;
-                    started = _started;
-                    _usingFallback = true;
-                }
+                oldDevice = _device;
+                oldEndpoint = _endpoint;
+                _device = null;
+                _endpoint = null;
+                wasPlaying = _playing;
+                _playing = false;
+                output = _usingFallback ? null : _output;
+                _usingFallback = true;
             }
+
+            SafeDispose(oldDevice, oldEndpoint);
 
             if (output is null)
             {
+                _log.Error("Riproduzione: anche il dispositivo di ripiego si è fermato con errore.", failure);
                 _finished.TrySetResult(true);
                 return;
             }
 
-            SafeDispose(old);
-
-            IWavePlayer device;
+            _log.Warn($"Riproduzione: il dispositivo si è fermato con errore ({failure.GetType().Name}: {failure.Message}), ripiego su WaveOut.");
             try
             {
-                device = new WaveOutEvent { DesiredLatency = 150, NumberOfBuffers = 3 };
-                Attach(device, output);
+                if (wasPlaying)
+                {
+                    lock (_lock)
+                    {
+                        _playRequested = true;
+                    }
+                }
+
+                Attach(CreateFallbackDevice(), output, null);
             }
             catch (Exception ex)
             {
                 _log.Error("Riproduzione: impossibile aprire il dispositivo di ripiego.", ex);
-                _finished.TrySetResult(true);
-                return;
-            }
-
-            bool discard;
-            lock (_lock)
-            {
-                discard = _stopRequested;
-                if (!discard && started)
-                {
-                    try
-                    {
-                        device.Play();
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Error("Riproduzione: impossibile avviare il dispositivo di ripiego.", ex);
-                        discard = true;
-                    }
-                }
-
-                if (discard)
-                {
-                    _device = null;
-                }
-            }
-
-            if (discard)
-            {
-                SafeDispose(device);
                 _finished.TrySetResult(true);
             }
         }
@@ -502,15 +562,18 @@ public sealed class NAudioPlayer : IAudioPlayer
                     _playRequested = true;
                 }
 
-                if (_started || _stopRequested || _device is null || !_playRequested)
+                if (_playing || _stopRequested || _device is null || !_playRequested)
                 {
                     return;
                 }
 
-                _started = true;
+                _playing = true;
                 try
                 {
+                    // Dentro il lock: uno Stop concorrente non può arrivare fra il controllo e Play() (che non
+                    // attende il thread di riproduzione e ritorna in circa 1 ms).
                     _device.Play();
+                    _started.TrySetResult(true);
                     if (_log.IsDebugEnabled)
                     {
                         _log.Debug($"Riproduzione: avvio a {_clock.ElapsedMilliseconds} ms.");
@@ -527,16 +590,18 @@ public sealed class NAudioPlayer : IAudioPlayer
         private async Task ReadLoopAsync(Stream pcm, BufferedWaveProvider buffer, PcmFormat format)
         {
             CancellationToken token = _readerCts.Token;
-            byte[] chunk = ArrayPool<byte>.Shared.Rent(ChunkSize);
+            // Array privato e non del pool: una lettura abbandonata per blocco della rete può ancora scriverci.
+            byte[] chunk = new byte[ChunkSize];
             try
             {
                 int blockAlign = Math.Max(1, format.Channels * format.BitsPerSample / 8);
                 int preBufferBytes = Math.Max(blockAlign, format.BytesPerSecond * PreBufferMs / 1000);
                 int leftover = 0;
+                long totalQueued = 0;
 
                 while (!token.IsCancellationRequested)
                 {
-                    int read = await pcm.ReadAsync(chunk.AsMemory(leftover, ChunkSize - leftover), token).ConfigureAwait(false);
+                    int read = await ReadWithStallTimeoutAsync(pcm, chunk.AsMemory(leftover, ChunkSize - leftover), token).ConfigureAwait(false);
                     if (read <= 0)
                     {
                         break;
@@ -554,6 +619,7 @@ public sealed class NAudioPlayer : IAudioPlayer
                         }
 
                         buffer.AddSamples(chunk, 0, aligned);
+                        totalQueued += aligned;
                     }
 
                     leftover = total - aligned;
@@ -568,8 +634,11 @@ public sealed class NAudioPlayer : IAudioPlayer
                     }
                 }
 
-                if (token.IsCancellationRequested)
+                token.ThrowIfCancellationRequested();
+                if (totalQueued == 0)
                 {
+                    // Stream vuoto: niente da suonare, si chiude subito senza attendere il dispositivo.
+                    Stop();
                     return;
                 }
 
@@ -578,6 +647,14 @@ public sealed class NAudioPlayer : IAudioPlayer
             catch (OperationCanceledException)
             {
                 // Arresto richiesto: nulla da fare.
+            }
+            catch (Exception ex) when (token.IsCancellationRequested)
+            {
+                // Dopo lo Stop il chiamante può chiudere lo stream mentre una lettura è in corso: non è un errore.
+                if (_log.IsDebugEnabled)
+                {
+                    _log.Debug($"Riproduzione: lettura interrotta dopo l'arresto ({ex.GetType().Name}).");
+                }
             }
             catch (Exception ex)
             {
@@ -590,19 +667,87 @@ public sealed class NAudioPlayer : IAudioPlayer
                 {
                     // Arresto richiesto durante la coda: nulla da fare.
                 }
+                catch (Exception inner)
+                {
+                    _log.Error("Riproduzione: errore nella chiusura dello stream audio.", inner);
+                    Stop();
+                }
             }
-            finally
+        }
+
+        /// <summary>Legge un blocco; se lo stream non consegna nulla per StallTimeout si considera finito.</summary>
+        private async Task<int> ReadWithStallTimeoutAsync(Stream pcm, Memory<byte> destination, CancellationToken token)
+        {
+            ValueTask<int> pending = pcm.ReadAsync(destination, token);
+            if (pending.IsCompletedSuccessfully)
             {
-                ArrayPool<byte>.Shared.Return(chunk);
+                return pending.Result;
             }
+
+            Task<int> read = pending.AsTask();
+            try
+            {
+                return await read.WaitAsync(StallTimeout, token).ConfigureAwait(false);
+            }
+            catch (TimeoutException)
+            {
+                _log.Warn($"Riproduzione: nessun dato audio da {StallTimeout.TotalSeconds:0} s, si considera finito lo stream.");
+                ObserveAbandoned(read);
+                return 0;
+            }
+            catch (OperationCanceledException)
+            {
+                ObserveAbandoned(read);
+                throw;
+            }
+        }
+
+        /// <summary>Una lettura abbandonata può fallire più tardi (stream chiuso dal chiamante): l'errore va osservato.</summary>
+        private static void ObserveAbandoned(Task<int> read)
+        {
+            _ = read.ContinueWith(static t => _ = t.Exception, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         }
 
         /// <summary>Fine dei dati: il buffer si svuota e il dispositivo segnala PlaybackStopped; un guardiano forza l'arresto se non arriva.</summary>
         private async Task FinishStreamAsync(BufferedWaveProvider buffer, PcmFormat format, CancellationToken token)
         {
+            // Alla fine naturale NAudio ferma lo stream WASAPI prima che gli ultimi ~30 ms siano suonati (misurato con
+            // toni a bordi netti: 385 ms uditi su 400). Un breve silenzio in coda fa cadere il taglio sul silenzio.
+            int blockAlign = Math.Max(1, format.Channels * format.BitsPerSample / 8);
+            int padBytes = format.BytesPerSecond * EndPaddingMs / 1000 / blockAlign * blockAlign;
+            while (buffer.BufferLength - buffer.BufferedBytes < padBytes)
+            {
+                await Task.Delay(BackpressureDelayMs, token).ConfigureAwait(false);
+            }
+
+            byte[] padding = new byte[padBytes];
+            if (format.BitsPerSample == 8)
+            {
+                // PCM a 8 bit è senza segno: il silenzio vale 128.
+                Array.Fill(padding, (byte)0x80);
+            }
+
+            buffer.AddSamples(padding, 0, padding.Length);
+
             // Da qui in avanti Read restituisce 0 quando il buffer è vuoto: il dispositivo termina da solo.
             buffer.ReadFully = false;
             StartPlaybackIfNeeded(request: true);
+
+            // Il guardiano conta dall'avvio effettivo: l'apertura a freddo del dispositivo può durare più dell'audio.
+            try
+            {
+                await _started.Task.WaitAsync(StartTimeout, token).ConfigureAwait(false);
+            }
+            catch (TimeoutException)
+            {
+                if (!_finished.Task.IsCompleted)
+                {
+                    _log.Warn("Riproduzione: il dispositivo non è partito, arresto forzato.");
+                    Stop();
+                }
+
+                return;
+            }
 
             int remainingMs = (int)Math.Min(buffer.BufferedBytes * 1000L / Math.Max(1, format.BytesPerSecond), 60_000);
             await Task.Delay(remainingMs + 3 * LatencyMs + 1000, token).ConfigureAwait(false);
@@ -617,10 +762,13 @@ public sealed class NAudioPlayer : IAudioPlayer
         private void CloseDevice()
         {
             IWavePlayer? device;
+            MMDevice? endpoint;
             lock (_lock)
             {
                 device = _device;
+                endpoint = _endpoint;
                 _device = null;
+                _endpoint = null;
             }
 
             if (!_readerCts.IsCancellationRequested)
@@ -636,29 +784,41 @@ public sealed class NAudioPlayer : IAudioPlayer
                 }
             }
 
-            if (device is not null)
+            if (device is not null || endpoint is not null)
             {
-                // Dispose costa ~65 ms (misurati): fuori dal percorso critico, così PlayAsync ritorna subito
+                // Dispose costa fino a ~70 ms: fuori dal percorso critico, così PlayAsync ritorna subito
                 // e la lettura successiva può aprire il proprio dispositivo senza attendere.
-                _ = Task.Run(() => SafeDispose(device));
+                _ = Task.Run(() => SafeDispose(device, endpoint));
             }
         }
 
-        private void SafeDispose(IWavePlayer? device)
+        private void SafeDispose(IWavePlayer? device, MMDevice? endpoint)
         {
-            if (device is null)
+            if (device is not null)
             {
-                return;
+                try
+                {
+                    device.PlaybackStopped -= OnPlaybackStopped;
+                    device.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _log.Warn($"Riproduzione: errore nella chiusura del dispositivo ({ex.GetType().Name}).");
+                }
             }
 
+            DisposeEndpoint(endpoint);
+        }
+
+        private void DisposeEndpoint(MMDevice? endpoint)
+        {
             try
             {
-                device.PlaybackStopped -= OnPlaybackStopped;
-                device.Dispose();
+                endpoint?.Dispose();
             }
             catch (Exception ex)
             {
-                _log.Warn($"Riproduzione: errore nella chiusura del dispositivo ({ex.GetType().Name}).");
+                _log.Warn($"Riproduzione: errore nel rilascio del dispositivo ({ex.GetType().Name}).");
             }
         }
     }

@@ -134,7 +134,7 @@ public sealed class ElevenLabsAccountClient
         {
             if (!response.IsSuccessStatusCode)
             {
-                var error = await ElevenLabsErrors.ReadAsync(response, ct).ConfigureAwait(false);
+                var error = ElevenLabsErrors.Redact(await ElevenLabsErrors.ReadAsync(response, ct).ConfigureAwait(false), apiKey);
                 throw ElevenLabsErrors.ToException(error);
             }
             try
