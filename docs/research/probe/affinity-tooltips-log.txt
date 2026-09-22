@@ -1,0 +1,89 @@
+﻿##### HOVER (24,172) [tool palette: Strumento Sposta]
+  FromPoint (before tooltip): Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,150,45,45) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Strumento Sposta' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 0
+   OCR 900x300@1.5x around pointer 64ms: a / 02 / > / V Vettore / O Pixel / Layout / Canva Al / Pagine Asset Stock / Pagine mastro / Pagine
+  FromPoint (tooltip visible): Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,150,45,45) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 0
+##### HOVER (24,397) [tool palette: Strumento Penna]
+  FromPoint (before tooltip): Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,375,45,45) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Strumento Penna' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 0
+   OCR 900x300@1.5x around pointer 23ms: 
+  FromPoint (tooltip visible): Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,375,45,45) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 0
+##### HOVER (24,667) [tool palette: Ritaglio Vettore]
+  FromPoint (before tooltip): Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,645,45,45) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Strumento Ritaglio Vettore' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 0
+   OCR 900x300@1.5x around pointer 23ms: 
+  FromPoint (tooltip visible): Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,645,45,45) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 0
+##### HOVER (1362,74) [toolbar: Modalita anteprima]
+  FromPoint (before tooltip): ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1341,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Modalità anteprima' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+     child: Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Modalità anteprima' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 1
+  NEW TOPWIN hwnd=0x2205C6 pid=10888 class='HwndWrapper[Affinity.exe;;d205974f-1fa8-40e7-bdd2-31776269de76]' title='' rect=(1362,91,1509,123) style=0x96000000 ex=0x080800A8 LAYERED TOPMOST NOACTIVATE cloaked=0
+    Window | Name='' | Class='Popup' | AutoId='' | Fw='WPF' | Off=False | Rect=(1362,91,147,32) | Help='' | pid=10888 | hwnd=0x2205C6
+      ToolTip | Name='Modalità anteprima' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(1362,91,147,32) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Modalità anteprima' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1370,97,130,20) | Help='' | pid=10888 | hwnd=0x0
+   OCR tooltip popup scale 1 (147x32) 0ms: 
+   OCR tooltip popup scale 2 (294x64) 5ms: Modalità anteprima
+   FromPoint at tooltip centre: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+   OCR 900x300@1.5x around pointer 34ms: Modalità anteprima / Colore Campioni Tratto
+  FromPoint (tooltip visible): ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1341,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 1
+     ToolTip | Name='Modalità anteprima' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(1362,91,147,32) | Help='' | pid=10888 | hwnd=0x0
+##### HOVER (1496,74) [toolbar: Trasforma]
+  FromPoint (before tooltip): ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1475,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Trasforma' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+     child: Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Trasforma' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 1
+  NEW TOPWIN hwnd=0x2305C6 pid=10888 class='HwndWrapper[Affinity.exe;;d22ced62-590b-4323-913b-9e1162a85891]' title='' rect=(1496,91,1578,123) style=0x96000000 ex=0x080800A8 LAYERED TOPMOST NOACTIVATE cloaked=0
+    Window | Name='' | Class='Popup' | AutoId='' | Fw='WPF' | Off=False | Rect=(1496,91,82,32) | Help='' | pid=10888 | hwnd=0x2305C6
+      ToolTip | Name='Trasforma' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(1496,91,82,32) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Trasforma' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1504,97,65,20) | Help='' | pid=10888 | hwnd=0x0
+   OCR tooltip popup scale 1 (82x32) 0ms: 
+   OCR tooltip popup scale 2 (164x64) 4ms: Trasforma
+   FromPoint at tooltip centre: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+   OCR 900x300@1.5x around pointer 53ms: Trasforma / Colore Campioni Tratto
+  FromPoint (tooltip visible): ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1475,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 1
+     ToolTip | Name='Trasforma' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(1496,91,82,32) | Help='' | pid=10888 | hwnd=0x0
+##### HOVER (342,198) [panel Pagine: icona piccola]
+  FromPoint (before tooltip): Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(51,147,329,962) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Pagine' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(73,149,53,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Asset' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(126,149,44,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Stock' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(170,149,45,35) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 1
+  NEW TOPWIN hwnd=0x2405C6 pid=10888 class='HwndWrapper[Affinity.exe;;082c5d2a-12a5-49a9-ac9e-df4f08a82841]' title='' rect=(342,215,537,247) style=0x96000000 ex=0x080800A8 LAYERED TOPMOST NOACTIVATE cloaked=0
+    Window | Name='' | Class='Popup' | AutoId='' | Fw='WPF' | Off=False | Rect=(342,215,195,32) | Help='' | pid=10888 | hwnd=0x2405C6
+      ToolTip | Name='Duplica mastro selezionata' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(342,215,195,32) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Duplica mastro selezionata' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(350,221,178,20) | Help='' | pid=10888 | hwnd=0x0
+   OCR tooltip popup scale 1 (195x32) 0ms: 
+   OCR tooltip popup scale 2 (390x64) 7ms: Duplica mastro selezionata
+   FromPoint at tooltip centre: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+   OCR 900x300@1.5x around pointer 45ms: V Vettore / O Pixel / 02 / Pagine Asset Stock / > Pagine mastro / v Pagine / Layout / Canva Al / Duplica mastro selezionata
+  FromPoint (tooltip visible): Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(51,147,329,962) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 1
+     ToolTip | Name='Duplica mastro selezionata' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(342,215,195,32) | Help='' | pid=10888 | hwnd=0x0
+##### HOVER (1678,213) [panel Colore: contagocce]
+  FromPoint (before tooltip): Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,147,331,332) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Colore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,149,52,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Campioni' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1665,149,70,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Tratto' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1735,149,47,35) | Help='' | pid=10888 | hwnd=0x0
+  New top-level windows after 2.2s hover: 1
+  NEW TOPWIN hwnd=0x2505C6 pid=10888 class='HwndWrapper[Affinity.exe;;01a4c2e2-80ea-4fce-82be-8e6891df7723]' title='' rect=(1678,230,1800,262) style=0x96000000 ex=0x080800A8 LAYERED TOPMOST NOACTIVATE cloaked=0
+    Window | Name='' | Class='Popup' | AutoId='' | Fw='WPF' | Off=False | Rect=(1678,230,122,32) | Help='' | pid=10888 | hwnd=0x2505C6
+      ToolTip | Name='Selettore colore' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(1678,230,122,32) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Selettore colore' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1686,236,105,20) | Help='' | pid=10888 | hwnd=0x0
+   OCR tooltip popup scale 1 (122x32) 0ms: 
+   OCR tooltip popup scale 2 (244x64) 15ms: Selettore colore
+   FromPoint at tooltip centre: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,147,331,332) | Help='' | pid=10888 | hwnd=0x0
+   OCR 900x300@1.5x around pointer 32ms: Colore Campioni Tratto / Selettore colore
+  FromPoint (tooltip visible): Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,147,331,332) | Help='' | pid=10888 | hwnd=0x0
+  ToolTip elements found via RootElement.FindAll(Descendants): 1
+     ToolTip | Name='Selettore colore' | Class='ToolTip' | AutoId='' | Fw='WPF' | Off=False | Rect=(1678,230,122,32) | Help='' | pid=10888 | hwnd=0x0

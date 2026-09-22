@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PuntaEAscolta.App/PuntaEAscolta.App.csproj" />
+    <Project Path="src/PuntaEAscolta.Core/PuntaEAscolta.Core.csproj" />
+    <Project Path="src/PuntaEAscolta.Logic/PuntaEAscolta.Logic.csproj" />
+    <Project Path="src/PuntaEAscolta.Ocr.Onnx/PuntaEAscolta.Ocr.Onnx.csproj" />
+    <Project Path="src/PuntaEAscolta.Speech/PuntaEAscolta.Speech.csproj" />
+    <Project Path="src/PuntaEAscolta.Windows.Audio/PuntaEAscolta.Windows.Audio.csproj" />
+    <Project Path="src/PuntaEAscolta.Windows.Automation/PuntaEAscolta.Windows.Automation.csproj" />
+    <Project Path="src/PuntaEAscolta.Windows.Input/PuntaEAscolta.Windows.Input.csproj" />
+    <Project Path="src/PuntaEAscolta.Windows.Ocr/PuntaEAscolta.Windows.Ocr.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PuntaEAscolta.Logic.Tests/PuntaEAscolta.Logic.Tests.csproj" />
+    <Project Path="tests/PuntaEAscolta.Speech.Tests/PuntaEAscolta.Speech.Tests.csproj" />
+  </Folder>
+</Solution>

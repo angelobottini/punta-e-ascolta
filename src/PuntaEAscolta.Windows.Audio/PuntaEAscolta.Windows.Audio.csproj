@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>PuntaEAscolta.Windows.Audio</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PuntaEAscolta.Core\PuntaEAscolta.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NAudio" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+  </ItemGroup>
+</Project>

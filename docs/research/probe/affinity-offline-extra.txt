@@ -1,0 +1,68 @@
+﻿##### affinity-menu-visualizza-popup.png (430x683)  labels=19 disabled=10 shortcuts=3
+  @1x normal                     prep   4ms ocr(median of 3)  17ms lines=21 labels 19/19 disabled 10/10 shortcuts 1/3
+       missed shortcuts: Ctrl+Maiusc+W ; \
+  @1x levels-only+invert         prep   9ms ocr(median of 3)  17ms lines=21 labels 19/19 disabled 10/10 shortcuts 1/3
+       missed shortcuts: Ctrl+Maiusc+W ; \
+  @1,5x normal                     prep  64ms ocr(median of 3)  27ms lines=21 labels 19/19 disabled 10/10 shortcuts 1/3
+       missed shortcuts: Ctrl+Maiusc+W ; \
+  @1,5x levels-only+invert         prep  52ms ocr(median of 3)  30ms lines=21 labels 19/19 disabled 10/10 shortcuts 1/3
+       missed shortcuts: Ctrl+Maiusc+W ; \
+  @2x normal                     prep  29ms ocr(median of 3)  36ms lines=21 labels 19/19 disabled 10/10 shortcuts 2/3
+       missed shortcuts: \
+  @2x levels-only+invert         prep  39ms ocr(median of 3)  45ms lines=21 labels 19/19 disabled 10/10 shortcuts 2/3
+       missed shortcuts: \
+  @3x normal                     prep  49ms ocr(median of 3)  83ms lines=21 labels 19/19 disabled 10/10 shortcuts 2/3
+       missed shortcuts: \
+  @3x levels-only+invert         prep 104ms ocr(median of 3)  78ms lines=21 labels 19/19 disabled 10/10 shortcuts 2/3
+       missed shortcuts: \
+  @4x normal                     prep  98ms ocr(median of 3) 131ms lines=21 labels 19/19 disabled 10/10 shortcuts 2/3
+       missed shortcuts: \
+  @4x levels-only+invert         prep 144ms ocr(median of 3) 209ms lines=21 labels 19/19 disabled 10/10 shortcuts 2/3
+       missed shortcuts: \
+##### affinity-menu-file2-popup.png (486x938)  labels=26 disabled=11 shortcuts=10
+  @1,5x normal                     prep  34ms ocr(median of 3)  53ms lines=36 labels 26/26 disabled 11/11 shortcuts 8/10
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+P
+  @1,5x gamma0.5+levels            prep  48ms ocr(median of 3)  46ms lines=34 labels 23/26 disabled 11/11 shortcuts 5/10
+       missed labels: Apri… ; Accedi… ; Esci
+       non-matching OCR lines: Accedi„ ; Ctr1+Alt+H ; Ctr1+N ; CtrI+AIt+Maiusc+N ; Ctr1+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+N ; Ctrl+Alt+Maiusc+N ; Ctrl+O ; Ctrl+P
+  @1,5x gamma0.5+levels+invert     prep  37ms ocr(median of 3)  55ms lines=34 labels 23/26 disabled 11/11 shortcuts 5/10
+       missed labels: Apri… ; Accedi… ; Esci
+       non-matching OCR lines: Accedi„ ; Ctr1+Alt+H ; Ctr1+N ; CtrI+AIt+Maiusc+N ; Ctr1+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+N ; Ctrl+Alt+Maiusc+N ; Ctrl+O ; Ctrl+P
+  @1,5x gamma0.35+levels+invert    prep  52ms ocr(median of 3)  54ms lines=34 labels 23/26 disabled 11/11 shortcuts 5/10
+       missed labels: Apri… ; Accedi… ; Esci
+       non-matching OCR lines: Accedi„ ; Ctr1+Alt+H ; Ctr1+N ; CtrI+AIt+Maiusc+N ; Ctr1+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+N ; Ctrl+Alt+Maiusc+N ; Ctrl+O ; Ctrl+P
+  @1,5x levels-only+invert         prep  41ms ocr(median of 3)  50ms lines=34 labels 25/26 disabled 11/11 shortcuts 5/10
+       missed labels: Esci
+       non-matching OCR lines: CtrI+Alt+H ; CtrI+Alt+Maiusc+N ; Ctd+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+Alt+Maiusc+N ; Ctrl+O ; Ctrl+Alt+W ; Ctrl+P
+  @2x normal                     prep  43ms ocr(median of 3)  62ms lines=36 labels 26/26 disabled 11/11 shortcuts 8/10
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+P
+  @2x gamma0.5+levels            prep  78ms ocr(median of 3)  64ms lines=35 labels 25/26 disabled 11/11 shortcuts 7/10
+       missed labels: Esci
+       non-matching OCR lines: Ctd+Alt+H ; Ctd+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+O ; Ctrl+P
+  @2x gamma0.5+levels+invert     prep  61ms ocr(median of 3)  62ms lines=35 labels 25/26 disabled 11/11 shortcuts 7/10
+       missed labels: Esci
+       non-matching OCR lines: Ctd+Alt+H ; Ctd+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+O ; Ctrl+P
+  @2x gamma0.35+levels+invert    prep  62ms ocr(median of 3)  69ms lines=35 labels 24/26 disabled 11/11 shortcuts 7/10
+       missed labels: Nuovo processo immagine ; Esci
+       non-matching OCR lines: Nuovo pr ; immagine ; Ctd+O ; Ctrl+p
+       missed shortcuts: Ctrl+Alt+H ; Ctrl+O ; Ctrl+P
+  @2x levels-only+invert         prep  62ms ocr(median of 3)  61ms lines=36 labels 26/26 disabled 11/11 shortcuts 9/10
+       missed shortcuts: Ctrl+P
+##### LUMA RANGES (0-255) in 1x captures: background = min, text core = max (dark UI)
+  File popup, enabled row 'Nuovo da Appunti' (x26..150,y176..196): lumaMin=27 lumaMax=240
+  File popup, disabled row 'Salva con nome' (x26..142,y425..445):   lumaMin=27 lumaMax=147
+  File popup, disabled shortcut 'Ctrl+Maiusc+S' (x328..430,y427..447): lumaMin=27 lumaMax=147
+  Panel Colore 'S: 100' (x1603..1640,y389..404):   lumaMin=54 lumaMax=84
+  Toolbar 'Esporta' disabled (x1730..1784,y64..84): lumaMin=71 lumaMax=105
+  Panel label 'Interlinea' (x1685..1745,y628..644): lumaMin=54 lumaMax=113
+  Panel 'Somma spazio prima e dopo' (x1620..1795,y755..771): lumaMin=54 lumaMax=121
+  Panel header 'Spaziatura' (x1610..1680,y594..610): lumaMin=40 lumaMax=242
+  Hex field 'FF0000' (x1848..1892,y404..420): lumaMin=54 lumaMax=97
+  Highlighted row 'Apri Recenti' (x81..161,y316..336): lumaMin=102 lumaMax=240
+  Tooltip 'Duplica mastro selezionata' (195x32): lumaMin=87 lumaMax=242

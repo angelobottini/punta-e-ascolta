@@ -1,0 +1,194 @@
+﻿=== TOP WINDOW hwnd=0xC07C4 pid=10888 class='HwndWrapper[Affinity.exe;;002c344e-6ce9-4cb4-9b6c-fa8b3fae1325]' title='Affinity' rect=(-9,-9,1929,1149) style=0x17CF0000 ex=0x00040100 cloaked=0
+Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+  Menu | Name='' | Class='Menu' | AutoId='' | Fw='WPF' | Off=False | Rect=(55,0,737,37) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='File' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(55,0,49,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_File' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(69,9,22,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Modifica' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(104,0,85,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Modifica' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(118,9,58,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Documento' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(189,0,105,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Documento' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(203,9,78,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Testo' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(294,0,61,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Testo' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(308,9,34,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Vettore' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(355,0,75,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Vettore' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(369,9,48,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Pixel' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(430,0,57,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Pixel' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(444,9,30,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Livello' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(487,0,69,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Livello' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(501,9,42,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Visualizza' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(556,0,91,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Visualizza' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(570,9,64,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Finestra' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(647,0,79,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Finestra' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(661,9,52,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Guida' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(726,0,66,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Guida' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(740,9,39,20) | Help='' | pid=10888 | hwnd=0x0
+  Text | Name='' | Class='Text' | AutoId='' | Fw='WPF' | Off=False | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_Mini' | Fw='WPF' | Off=False | Rect=(1812,0,36,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_Maxi' | Fw='WPF' | Off=False | Rect=(1848,0,36,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_Close' | Fw='WPF' | Off=False | Rect=(1884,0,37,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_HomeButton' | Fw='WPF' | Off=False | Rect=(0,41,60,66) | Help='Home' | pid=10888 | hwnd=0x0
+  List | Name='' | Class='ListBox' | AutoId='PART_MainWorkspaces' | Fw='WPF' | Off=False | Rect=(60,41,414,66) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(65,54,104,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Vettore' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(104,64,48,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(169,54,86,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Pixel' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(208,64,30,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(255,54,100,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Layout' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(294,64,44,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(355,54,114,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Canva AI' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(394,64,58,20) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_ToggleButton' | Fw='WPF' | Off=False | Rect=(484,59,15,29) | Help='Gestione studio' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(512,53,101,43) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Modalità di visualizzazione Vettore' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Modalità di visualizzazione Pixel' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(616,57,723,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1341,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Modalità anteprima' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Modalità anteprima' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1390,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1408,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Disponi' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Disponi' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1457,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1475,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Trasforma' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Trasforma' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1524,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1542,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Allineamento' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Allineamento' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1591,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1609,57,64,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Effetto calamita' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=False | Rect=(1655,57,18,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Effetto calamita' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1676,57,20,34) | Help='' | pid=10888 | hwnd=0x0
+  Custom | Name='' | Class='QuickExportControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1696,57,129,34) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='ExportButtonReflectedItem:expo' | Fw='WPF' | Off=False | Rect=(1698,59,106,29) | Help='Esporta ' | pid=10888 | hwnd=0x0
+      Text | Name='Esporta ' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1730,64,54,20) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=False | Rect=(1804,59,18,29) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1825,57,20,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1847,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Guida' | Class='Text' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Guida' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_OverflowButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  Custom | Name='' | Class='ContextBarHost' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,108,1921,39) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_OverflowButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  Custom | Name='' | Class='ToolHost' | AutoId='PART_ToolHost' | Fw='WPF' | Off=False | Rect=(0,147,51,962) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,150,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Sposta' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,166,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,195,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Nodo' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,211,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,240,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Testo cornice' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,256,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,285,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento tabella' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,301,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,330,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Testo artistico' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,346,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,375,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Penna' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,391,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,420,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Rettangolo' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,436,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,465,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Rettangolo Cornice immagine' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,481,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,510,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Ellisse Cornice immagine' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,526,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,555,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Posiziona' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,571,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,600,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Layout unione dati' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,616,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,645,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Ritaglio Vettore' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,661,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,690,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento riempimento' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,706,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,735,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Trasparenza' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,751,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,780,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Selezione colori' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,796,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=False | Rect=(2,827,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,843,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Visualizza' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,859,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,888,45,45) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Strumento Zoom' | Class='TextBlock' | AutoId='text' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,904,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_OverflowButton' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='customise_tools_btn' | Fw='WPF' | Off=False | Rect=(0,934,50,22) | Help='Personalizza strumenti' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='Primary' | Fw='WPF' | Off=False | Rect=(9,997,32,32) | Help='Imposta riempimento' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='Secondary' | Fw='WPF' | Off=False | Rect=(9,983,32,32) | Help='Imposta tratto' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='SwitcherBtn' | Fw='WPF' | Off=False | Rect=(17,1034,16,8) | Help='Scambia colore tratto con colore di riempimento [Shift + X]' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(51,147,329,962) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Pagine' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(73,149,53,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Pagine' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(79,155,41,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Asset' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(126,149,44,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Asset' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(132,155,32,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Stock' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(170,149,45,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Stock' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(176,155,33,18) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=False | Rect=(380,147,2,962) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=False | Rect=(1588,147,2,962) | Help='' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,147,331,332) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Colore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,149,52,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Colore' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1619,155,40,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Campioni' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1665,149,70,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Campioni' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1671,155,58,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Tratto' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1735,149,47,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Tratto' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1741,155,35,18) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(1590,479,331,2) | Help='' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,481,331,425) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Livelli' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,483,46,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Livelli' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1619,489,34,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Carattere' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1659,483,68,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Carattere' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1665,489,56,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Paragrafo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1727,483,70,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Paragrafo' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1733,489,58,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Stili di testo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1797,483,83,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Stili di testo' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1803,489,71,18) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(1590,906,331,2) | Help='' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,908,331,201) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Trasforma' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,910,72,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Trasforma' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1619,916,60,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Navigatore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1685,910,79,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Navigatore' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1691,916,67,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Cronologia' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1764,910,79,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Cronologia' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1770,916,67,18) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(EMPTY) | Help='' | pid=10888 | hwnd=0x0
+  StatusBar | Name='' | Class='StatusBar' | AutoId='PART_StatusBar' | Fw='WPF' | Off=False | Rect=(0,1110,1921,31) | Help='' | pid=10888 | hwnd=0x0
+Elements=178 Named=87 WithHelpText=7 view=raw depth=7 elapsedMs=1628
+TYPE Button: 40 (named 0)
+TYPE Custom: 3 (named 0)
+TYPE List: 1 (named 0)
+TYPE ListItem: 4 (named 4)
+TYPE Menu: 1 (named 0)
+TYPE MenuItem: 10 (named 10)
+TYPE Separator: 18 (named 0)
+TYPE StatusBar: 1 (named 0)
+TYPE Tab: 4 (named 0)
+TYPE TabItem: 13 (named 13)
+TYPE Text: 61 (named 59)
+TYPE Thumb: 7 (named 0)
+TYPE ToolBar: 14 (named 0)
+TYPE Window: 1 (named 1)

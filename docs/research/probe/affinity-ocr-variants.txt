@@ -1,0 +1,609 @@
+﻿=== VARIANT 1x-normal  (img 486x938) median 32ms prep 35ms lines=36
+  [  27,  10   39x 11] 'Home'  => segs: Home
+  [  27,  43   32x 11] 'Studi'  => segs: Studi
+  [  27,  82   43x 11] 'Nuovo'  => segs: Nuovo
+  [  27, 115  130x 11] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  27, 148  249x 14] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  27, 181  120x 14] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  27, 214  176x 14] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  26, 253   38x 14] 'Apri...'  => segs: Apri...
+  [  26, 286   79x 14] 'Apri Recenti'  => segs: Apri Recenti
+  [  26, 325   42x 11] 'Chiudi'  => segs: Chiudi
+  [  26, 358   78x 11] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  26, 397   33x 11] 'Salva'  => segs: Salva
+  [  26, 430  115x 11] 'Salva con nome...'  => segs: Salva con nome...
+  [  27, 463  153x 14] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  27, 502  216x 14] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  26, 541  195x 14] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  27, 580   71x 11] 'Posiziona...'  => segs: Posiziona...
+  [  27, 613  152x 11] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  26, 646  150x 14] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  27, 685  123x 14] 'Importa contenuto'  => segs: Importa contenuto
+  [  27, 718  135x 14] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  27, 757   48x 14] 'Esporta'  => segs: Esporta
+  [  27, 796  148x 11] 'Metadati documento...'  => segs: Metadati documento...
+  [  26, 829   60x 14] 'Stampa...'  => segs: Stampa...
+  [  26, 868   54x 11] 'Accedi...'  => segs: Accedi...
+  [  27, 907   23x 11] 'Esci'  => segs: Esci
+  [ 328,  12   72x 11] 'Ctrl+Alt+H'  => segs: Ctrl+Alt+H
+  [ 328,  84   44x 11] 'Ctrl+N'  => segs: Ctrl+N
+  [ 328, 183  129x 11] 'CtrI+Alt+Maiusc+N'  => segs: CtrI+Alt+Maiusc+N
+  [ 328, 255   44x 11] 'Ctrl+O'  => segs: Ctrl+O
+  [ 328, 327   47x 11] 'CtrI+W'  => segs: CtrI+W
+  [ 328, 360   76x 11] 'CtrI+Alt+W'  => segs: CtrI+Alt+W
+  [ 328, 399   41x 11] 'CtrI+S'  => segs: CtrI+S
+  [ 328, 432   98x 11] 'CtrI+Maiusc+S'  => segs: CtrI+Maiusc+S
+  [ 328, 582  103x 11] 'CtrI+Maiusc+M'  => segs: CtrI+Maiusc+M
+  [ 328, 831   42x 11] 'Ctrl+p'  => segs: Ctrl+p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 3/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+Maiusc+N ; Ctrl+W ; Ctrl+Alt+W ; Ctrl+S ; Ctrl+Maiusc+S ; Ctrl+Maiusc+M ; Ctrl+P
+=== VARIANT 1x-invert  (img 486x938) median 32ms prep 71ms lines=36
+  [  27,  10   39x 11] 'Home'  => segs: Home
+  [  27,  43   32x 11] 'Studi'  => segs: Studi
+  [  27,  82   43x 11] 'Nuovo'  => segs: Nuovo
+  [  27, 115  130x 11] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  27, 148  249x 14] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  27, 181  120x 14] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  27, 214  176x 14] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  26, 253   38x 14] 'Apri...'  => segs: Apri...
+  [  26, 286   79x 14] 'Apri Recenti'  => segs: Apri Recenti
+  [  26, 325   42x 11] 'Chiudi'  => segs: Chiudi
+  [  26, 358   78x 11] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  26, 397   33x 11] 'Salva'  => segs: Salva
+  [  26, 430  115x 11] 'Salva con nome...'  => segs: Salva con nome...
+  [  27, 463  153x 14] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  27, 502  216x 14] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  26, 541  195x 14] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  27, 580   71x 11] 'Posiziona...'  => segs: Posiziona...
+  [  27, 613  152x 11] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  26, 646  150x 14] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  27, 685  123x 14] 'Importa contenuto'  => segs: Importa contenuto
+  [  27, 718  135x 14] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  27, 757   48x 14] 'Esporta'  => segs: Esporta
+  [  27, 796  148x 11] 'Metadati documento...'  => segs: Metadati documento...
+  [  26, 829   60x 14] 'Stampa...'  => segs: Stampa...
+  [  26, 868   54x 11] 'Accedi...'  => segs: Accedi...
+  [  27, 907   23x 11] 'Esci'  => segs: Esci
+  [ 328,  12   72x 11] 'Ctrl+Alt+H'  => segs: Ctrl+Alt+H
+  [ 328,  84   44x 11] 'Ctrl+N'  => segs: Ctrl+N
+  [ 328, 183  129x 11] 'CtrI+Alt+Maiusc+N'  => segs: CtrI+Alt+Maiusc+N
+  [ 328, 255   44x 11] 'Ctrl+O'  => segs: Ctrl+O
+  [ 328, 327   47x 11] 'CtrI+W'  => segs: CtrI+W
+  [ 328, 360   76x 11] 'CtrI+Alt+W'  => segs: CtrI+Alt+W
+  [ 328, 399   41x 11] 'CtrI+S'  => segs: CtrI+S
+  [ 328, 432   98x 11] 'CtrI+Maiusc+S'  => segs: CtrI+Maiusc+S
+  [ 328, 582  103x 11] 'CtrI+Maiusc+M'  => segs: CtrI+Maiusc+M
+  [ 328, 831   42x 11] 'Ctrl+p'  => segs: Ctrl+p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 3/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+Maiusc+N ; Ctrl+W ; Ctrl+Alt+W ; Ctrl+S ; Ctrl+Maiusc+S ; Ctrl+Maiusc+M ; Ctrl+P
+=== VARIANT 2x-normal  (img 972x1876) median 146ms prep 152ms lines=36
+  [  53,  19   80x 24] 'Home'  => segs: Home
+  [  52,  85   66x 24] 'Studi'  => segs: Studi
+  [  53, 163   88x 24] 'Nuovo'  => segs: Nuovo
+  [  53, 229  262x 24] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  53, 295  501x 30] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  53, 361  243x 30] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  53, 427  355x 30] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  51, 505   77x 30] 'Apri...'  => segs: Apri...
+  [  51, 571  160x 30] 'Apri Recenti'  => segs: Apri Recenti
+  [  52, 649   84x 24] 'Chiudi'  => segs: Chiudi
+  [  52, 715  157x 24] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  53, 793   66x 24] 'Salva'  => segs: Salva
+  [  53, 859  229x 24] 'Salva con nome...'  => segs: Salva con nome...
+  [  53, 925  308x 29] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  53,1003  433x 30] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  52,1081  390x 29] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  54,1159  143x 24] 'Posiziona...'  => segs: Posiziona...
+  [  54,1225  305x 24] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  52,1291  300x 30] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  53,1369  248x 30] 'Importa contenuto'  => segs: Importa contenuto
+  [  53,1435  273x 30] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  53,1513   97x 30] 'Esporta'  => segs: Esporta
+  [  54,1591  296x 24] 'Metadati documento...'  => segs: Metadati documento...
+  [  53,1657  119x 29] 'Stampa...'  => segs: Stampa...
+  [  51,1735  110x 24] 'Accedi...'  => segs: Accedi...
+  [  53,1813   48x 24] 'Esci'  => segs: Esci
+  [ 656,  23  145x 24] 'CtrI+Alt+H'  => segs: CtrI+Alt+H
+  [ 656, 167   88x 24] 'Ctrl+N'  => segs: Ctrl+N
+  [ 656, 365  259x 24] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 656, 509   89x 24] 'Ctrl+O'  => segs: Ctrl+O
+  [ 656, 653   95x 24] 'Ctrl+W'  => segs: Ctrl+W
+  [ 656, 719  152x 24] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 656, 797   82x 24] 'Ctrl+S'  => segs: Ctrl+S
+  [ 656, 863  196x 24] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 656,1163  206x 24] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [ 656,1661   84x 24] 'Ctrl+p'  => segs: Ctrl+p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 2x-invert  (img 972x1876) median 135ms prep 106ms lines=36
+  [  53,  19   80x 24] 'Home'  => segs: Home
+  [  52,  85   66x 24] 'Studi'  => segs: Studi
+  [  53, 163   88x 24] 'Nuovo'  => segs: Nuovo
+  [  53, 229  262x 24] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  53, 295  501x 30] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  53, 361  243x 30] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  53, 427  355x 30] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  51, 505   77x 30] 'Apri...'  => segs: Apri...
+  [  51, 571  160x 30] 'Apri Recenti'  => segs: Apri Recenti
+  [  52, 649   84x 24] 'Chiudi'  => segs: Chiudi
+  [  52, 715  157x 24] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  53, 793   66x 24] 'Salva'  => segs: Salva
+  [  53, 859  229x 24] 'Salva con nome...'  => segs: Salva con nome...
+  [  53, 925  308x 29] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  53,1003  433x 30] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  52,1081  390x 29] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  54,1159  143x 24] 'Posiziona...'  => segs: Posiziona...
+  [  54,1225  305x 24] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  52,1291  300x 30] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  53,1369  248x 30] 'Importa contenuto'  => segs: Importa contenuto
+  [  53,1435  273x 30] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  53,1513   97x 30] 'Esporta'  => segs: Esporta
+  [  54,1591  296x 24] 'Metadati documento...'  => segs: Metadati documento...
+  [  53,1657  119x 29] 'Stampa...'  => segs: Stampa...
+  [  51,1735  110x 24] 'Accedi...'  => segs: Accedi...
+  [  53,1813   48x 24] 'Esci'  => segs: Esci
+  [ 656,  23  145x 24] 'CtrI+Alt+H'  => segs: CtrI+Alt+H
+  [ 656, 167   88x 24] 'Ctrl+N'  => segs: Ctrl+N
+  [ 656, 365  259x 24] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 656, 509   89x 24] 'Ctrl+O'  => segs: Ctrl+O
+  [ 656, 653   95x 24] 'Ctrl+W'  => segs: Ctrl+W
+  [ 656, 719  152x 24] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 656, 797   82x 24] 'Ctrl+S'  => segs: Ctrl+S
+  [ 656, 863  196x 24] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 656,1163  206x 24] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [ 656,1661   84x 24] 'Ctrl+p'  => segs: Ctrl+p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 3x-normal  (img 1458x2814) median 134ms prep 92ms lines=35
+  [  80,  29  119x 35] 'Home'  => segs: Home
+  [  79, 128   99x 35] 'Studi'  => segs: Studi
+  [  80, 245  131x 35] 'Nuovo'  => segs: Nuovo
+  [  80, 344  392x 35] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  80, 443  751x 44] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  80, 542  363x 44] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  80, 641  531x 44] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  77, 758  115x 44] 'Apri...'  => segs: Apri...
+  [  77, 857  239x 44] 'Apri Recenti'  => segs: Apri Recenti
+  [  78, 974  126x 35] 'Chiudi'  => segs: Chiudi
+  [  78,1073  236x 35] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  79,1190   99x 35] 'Salva'  => segs: Salva
+  [  79,1289  344x 35] 'Salva con nome...'  => segs: Salva con nome...
+  [  79,1388  463x 44] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  79,1505  650x 44] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  78,1622  585x 44] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  80,1739  215x 35] 'Posiziona...'  => segs: Posiziona...
+  [  80,1838  458x 35] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  78,1937  451x 44] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  80,2054  371x 44] 'Importa contenuto'  => segs: Importa contenuto
+  [  80,2153  409x 44] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  80,2270  145x 44] 'Esporta'  => segs: Esporta
+  [  81,2387  444x 35] 'Metadati documento...'  => segs: Metadati documento...
+  [  79,2486  179x 43] 'Stampa...'  => segs: Stampa...
+  [  77,2603  164x 35] 'Accedi...'  => segs: Accedi...
+  [  80,2720   71x 35] 'Esci'  => segs: Esci
+  [ 984, 251  133x 35] 'Ctrl+N'  => segs: Ctrl+N
+  [ 984, 548  388x 35] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 984, 764  133x 35] 'Ctrl+O'  => segs: Ctrl+O
+  [ 984, 980  143x 35] 'Ctrl+W'  => segs: Ctrl+W
+  [ 984,1079  229x 35] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 984,1196  124x 35] 'Ctrl+S'  => segs: Ctrl+S
+  [ 984,1295  294x 35] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 984,1745  309x 35] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [ 984,2492  126x 35] 'Ctrl + p'  => segs: Ctrl + p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 3x-invert  (img 1458x2814) median 119ms prep 199ms lines=35
+  [  80,  29  119x 35] 'Home'  => segs: Home
+  [  79, 128   99x 35] 'Studi'  => segs: Studi
+  [  80, 245  131x 35] 'Nuovo'  => segs: Nuovo
+  [  80, 344  392x 35] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  80, 443  751x 44] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  80, 542  363x 44] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  80, 641  531x 44] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  77, 758  115x 44] 'Apri...'  => segs: Apri...
+  [  77, 857  239x 44] 'Apri Recenti'  => segs: Apri Recenti
+  [  78, 974  126x 35] 'Chiudi'  => segs: Chiudi
+  [  78,1073  236x 35] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  79,1190   99x 35] 'Salva'  => segs: Salva
+  [  79,1289  344x 35] 'Salva con nome...'  => segs: Salva con nome...
+  [  79,1388  463x 44] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  79,1505  650x 44] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  78,1622  585x 44] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  80,1739  215x 35] 'Posiziona...'  => segs: Posiziona...
+  [  80,1838  458x 35] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  78,1937  451x 44] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  80,2054  371x 44] 'Importa contenuto'  => segs: Importa contenuto
+  [  80,2153  409x 44] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  80,2270  145x 44] 'Esporta'  => segs: Esporta
+  [  81,2387  444x 35] 'Metadati documento...'  => segs: Metadati documento...
+  [  79,2486  179x 43] 'Stampa...'  => segs: Stampa...
+  [  77,2603  164x 35] 'Accedi...'  => segs: Accedi...
+  [  80,2720   71x 35] 'Esci'  => segs: Esci
+  [ 984, 251  133x 35] 'Ctrl+N'  => segs: Ctrl+N
+  [ 984, 548  388x 35] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 984, 764  133x 35] 'Ctrl+O'  => segs: Ctrl+O
+  [ 984, 980  143x 35] 'Ctrl+W'  => segs: Ctrl+W
+  [ 984,1079  229x 35] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 984,1196  124x 35] 'Ctrl+S'  => segs: Ctrl+S
+  [ 984,1295  294x 35] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 984,1745  309x 35] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [ 984,2492  126x 35] 'Ctrl + p'  => segs: Ctrl + p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 4x-normal  (img 1944x3752) median 217ms prep 139ms lines=35
+  [ 107,  39  158x 47] 'Home'  => segs: Home
+  [ 104, 170  133x 48] 'Studi'  => segs: Studi
+  [ 107, 327  174x 47] 'Nuovo'  => segs: Nuovo
+  [ 107, 458  522x 48] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [ 107, 590 1001x 59] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [ 107, 722  484x 60] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [ 107, 854  708x 60] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [ 103,1010  153x 59] 'Apri...'  => segs: Apri...
+  [ 103,1142  318x 59] 'Apri Recenti'  => segs: Apri Recenti
+  [ 105,1299  167x 46] 'Chiudi'  => segs: Chiudi
+  [ 105,1431  313x 46] 'Chiudi tutto'  => segs: Chiudi tutto
+  [ 106,1587  131x 46] 'Salva'  => segs: Salva
+  [ 106,1719  458x 46] 'Salva con nome...'  => segs: Salva con nome...
+  [ 106,1851  616x 58] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [ 106,2007  867x 58] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [ 103,2163  781x 58] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [ 107,2319  286x 46] 'Posiziona...'  => segs: Posiziona...
+  [ 107,2451  610x 46] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [ 104,2582  600x 59] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [ 107,2739  494x 59] 'Importa contenuto'  => segs: Importa contenuto
+  [ 107,2870  545x 59] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [ 107,3026  194x 59] 'Esporta'  => segs: Esporta
+  [ 107,3183  593x 46] 'Metadati documento...'  => segs: Metadati documento...
+  [ 106,3315  239x 58] 'Stampa...'  => segs: Stampa...
+  [ 103,3470  219x 48] 'Accedi...'  => segs: Accedi...
+  [ 107,3626   94x 48] 'Esci'  => segs: Esci
+  [1312, 335  177x 47] 'Ctrl+N'  => segs: Ctrl+N
+  [1312, 730  517x 48] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [1312,1018  177x 48] 'Ctrl+O'  => segs: Ctrl+O
+  [1313,1307  189x 46] 'Ctrl+W'  => segs: Ctrl+W
+  [1313,1439  304x 46] 'Ctrl+Alt+VV/'  => segs: Ctrl+Alt+VV/
+  [1313,1595  164x 46] 'Ctrl+S'  => segs: Ctrl+S
+  [1313,1727  391x 46] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [1313,2327  410x 46] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [1313,3323  166x 46] 'Ctrl + p'  => segs: Ctrl + p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 7/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+Alt+W ; Ctrl+P
+=== VARIANT 4x-invert  (img 1944x3752) median 195ms prep 432ms lines=35
+  [ 107,  39  158x 47] 'Home'  => segs: Home
+  [ 104, 170  133x 48] 'Studi'  => segs: Studi
+  [ 107, 327  174x 47] 'Nuovo'  => segs: Nuovo
+  [ 107, 458  522x 48] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [ 107, 590 1001x 59] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [ 107, 722  484x 60] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [ 107, 854  708x 60] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [ 103,1010  153x 59] 'Apri...'  => segs: Apri...
+  [ 103,1142  318x 59] 'Apri Recenti'  => segs: Apri Recenti
+  [ 105,1299  167x 46] 'Chiudi'  => segs: Chiudi
+  [ 105,1431  313x 46] 'Chiudi tutto'  => segs: Chiudi tutto
+  [ 106,1587  131x 46] 'Salva'  => segs: Salva
+  [ 106,1719  458x 46] 'Salva con nome...'  => segs: Salva con nome...
+  [ 106,1851  616x 58] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [ 106,2007  867x 58] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [ 103,2163  781x 58] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [ 107,2319  286x 46] 'Posiziona...'  => segs: Posiziona...
+  [ 107,2451  610x 46] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [ 104,2582  600x 59] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [ 107,2739  494x 59] 'Importa contenuto'  => segs: Importa contenuto
+  [ 107,2870  545x 59] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [ 107,3026  194x 59] 'Esporta'  => segs: Esporta
+  [ 107,3183  593x 46] 'Metadati documento...'  => segs: Metadati documento...
+  [ 106,3315  239x 58] 'Stampa...'  => segs: Stampa...
+  [ 103,3470  219x 48] 'Accedi...'  => segs: Accedi...
+  [ 107,3626   94x 48] 'Esci'  => segs: Esci
+  [1312, 335  177x 47] 'Ctrl+N'  => segs: Ctrl+N
+  [1312, 730  517x 48] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [1312,1018  177x 48] 'Ctrl+O'  => segs: Ctrl+O
+  [1313,1307  189x 46] 'Ctrl+W'  => segs: Ctrl+W
+  [1313,1439  304x 46] 'Ctrl+Alt+VV/'  => segs: Ctrl+Alt+VV/
+  [1313,1595  164x 46] 'Ctrl+S'  => segs: Ctrl+S
+  [1313,1727  391x 46] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [1313,2327  410x 46] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [1313,3323  166x 46] 'Ctrl + p'  => segs: Ctrl + p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 7/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+Alt+W ; Ctrl+P
+=== VARIANT 2x-gray  (img 972x1876) median 122ms prep 104ms lines=35
+  [  54,  20   78x 23] 'Home'  => segs: Home
+  [  53,  85   65x 24] 'Studi'  => segs: Studi
+  [  54, 163   87x 24] 'Nuovo'  => segs: Nuovo
+  [  54, 229  260x 24] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  54, 295  500x 30] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  54, 361  241x 29] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  54, 427  353x 30] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  52, 505   76x 29] 'Apri...'  => segs: Apri...
+  [  52, 571  158x 29] 'Apri Recenti'  => segs: Apri Recenti
+  [  53, 650   82x 22] 'Chiudi'  => segs: Chiudi
+  [  53, 716  156x 22] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  53, 794   65x 22] 'Salva'  => segs: Salva
+  [  53, 860  228x 22] 'Salva con nome...'  => segs: Salva con nome...
+  [  53, 926  308x 28] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  53,1004  433x 28] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  52,1082  390x 28] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  54,1160  142x 22] 'Posiziona...'  => segs: Posiziona...
+  [  54,1226  304x 22] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  52,1291  300x 30] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  54,1370  247x 28] 'Importa contenuto'  => segs: Importa contenuto
+  [  54,1435  272x 29] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  54,1513   96x 29] 'Esporta'  => segs: Esporta
+  [  54,1592  295x 22] 'Metadati documento...'  => segs: Metadati documento...
+  [  53,1658  119x 28] 'Stampa...'  => segs: Stampa...
+  [  52,1735  109x 24] 'Accedi...'  => segs: Accedi...
+  [  54,1813   46x 24] 'Esci'  => segs: Esci
+  [ 656,  23  144x 24] 'Ctrl+Alt+H'  => segs: Ctrl+Alt+H
+  [ 656, 167   88x 24] 'Ctrl+N'  => segs: Ctrl+N
+  [ 656, 365  258x 24] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 656, 509   89x 24] 'Ctrl+O'  => segs: Ctrl+O
+  [ 657, 654   94x 22] 'Ctrl+W'  => segs: Ctrl+W
+  [ 657, 720  151x 22] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 657, 798   81x 22] 'Ctrl+S'  => segs: Ctrl+S
+  [ 657, 864  195x 22] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 657,1164  204x 22] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 9/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+P
+=== VARIANT 2x-grayinvert  (img 972x1876) median 114ms prep 189ms lines=35
+  [  54,  20   78x 23] 'Home'  => segs: Home
+  [  53,  85   65x 24] 'Studi'  => segs: Studi
+  [  54, 163   87x 24] 'Nuovo'  => segs: Nuovo
+  [  54, 229  260x 24] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  54, 295  500x 30] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  54, 361  241x 29] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  54, 427  353x 30] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  52, 505   76x 29] 'Apri...'  => segs: Apri...
+  [  52, 571  158x 29] 'Apri Recenti'  => segs: Apri Recenti
+  [  53, 650   82x 22] 'Chiudi'  => segs: Chiudi
+  [  53, 716  156x 22] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  53, 794   65x 22] 'Salva'  => segs: Salva
+  [  53, 860  228x 22] 'Salva con nome...'  => segs: Salva con nome...
+  [  53, 926  308x 28] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  53,1004  433x 28] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  52,1082  390x 28] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  54,1160  142x 22] 'Posiziona...'  => segs: Posiziona...
+  [  54,1226  304x 22] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  52,1291  300x 30] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  54,1370  247x 28] 'Importa contenuto'  => segs: Importa contenuto
+  [  54,1435  272x 29] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  54,1513   96x 29] 'Esporta'  => segs: Esporta
+  [  54,1592  295x 22] 'Metadati documento...'  => segs: Metadati documento...
+  [  53,1658  119x 28] 'Stampa...'  => segs: Stampa...
+  [  52,1735  109x 24] 'Accedi...'  => segs: Accedi...
+  [  54,1813   46x 24] 'Esci'  => segs: Esci
+  [ 656,  23  144x 24] 'Ctrl+Alt+H'  => segs: Ctrl+Alt+H
+  [ 656, 167   88x 24] 'Ctrl+N'  => segs: Ctrl+N
+  [ 656, 365  258x 24] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 656, 509   89x 24] 'Ctrl+O'  => segs: Ctrl+O
+  [ 657, 654   94x 22] 'Ctrl+W'  => segs: Ctrl+W
+  [ 657, 720  151x 22] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 657, 798   81x 22] 'Ctrl+S'  => segs: Ctrl+S
+  [ 657, 864  195x 22] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 657,1164  204x 22] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 9/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+P
+=== VARIANT 3x-gray  (img 1458x2814) median 111ms prep 331ms lines=34
+  [  80,  29  119x 35] 'Home'  => segs: Home
+  [  79, 128   98x 35] 'Studi'  => segs: Studi
+  [  80, 245  131x 35] 'Nuovo'  => segs: Nuovo
+  [  80, 344  392x 35] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  80, 443  751x 44] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  80, 542  363x 44] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  80, 641  531x 44] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  77, 758  115x 44] 'Apri...'  => segs: Apri...
+  [  77, 857  239x 44] 'Apri Recenti'  => segs: Apri Recenti
+  [  79, 974  124x 35] 'Chiudi'  => segs: Chiudi
+  [  79,1073  234x 35] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  80,1191   97x 34] 'Salva'  => segs: Salva
+  [  80,1289  342x 35] 'Salva con nome...'  => segs: Salva con nome...
+  [  80,1389  461x 42] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  80,1505  649x 44] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  78,1623  584x 42] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  81,1739  213x 35] 'Posiziona...'  => segs: Posiziona...
+  [  81,1838  457x 35] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  78,1937  450x 44] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  80,2054  371x 44] 'Importa contenuto'  => segs: Importa contenuto
+  [  80,2153  409x 44] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  80,2270  145x 44] 'Esporta'  => segs: Esporta
+  [  81,2388  443x 34] 'Metadati documento...'  => segs: Metadati documento...
+  [  80,2486  178x 43] 'Stampa...'  => segs: Stampa...
+  [  77,2603  164x 35] 'Accedi...'  => segs: Accedi...
+  [  80,2720   70x 35] 'Esci'  => segs: Esci
+  [ 984, 251  132x 35] 'Ctrl+N'  => segs: Ctrl+N
+  [ 984, 548  388x 35] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 984, 764  133x 35] 'Ctrl+O'  => segs: Ctrl+O
+  [ 985, 980  141x 35] 'Ctrl+W'  => segs: Ctrl+W
+  [ 985,1079  227x 35] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 985,1196  122x 35] 'Ctrl+S'  => segs: Ctrl+S
+  [ 985,1295  293x 35] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 985,1745  307x 35] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 3x-grayinvert  (img 1458x2814) median 106ms prep 148ms lines=34
+  [  80,  29  119x 35] 'Home'  => segs: Home
+  [  79, 128   98x 35] 'Studi'  => segs: Studi
+  [  80, 245  131x 35] 'Nuovo'  => segs: Nuovo
+  [  80, 344  392x 35] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  80, 443  751x 44] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  80, 542  363x 44] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  80, 641  531x 44] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  77, 758  115x 44] 'Apri...'  => segs: Apri...
+  [  77, 857  239x 44] 'Apri Recenti'  => segs: Apri Recenti
+  [  79, 974  124x 35] 'Chiudi'  => segs: Chiudi
+  [  79,1073  234x 35] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  80,1191   97x 34] 'Salva'  => segs: Salva
+  [  80,1289  342x 35] 'Salva con nome...'  => segs: Salva con nome...
+  [  80,1389  461x 42] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  80,1505  649x 44] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  78,1623  584x 42] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  81,1739  213x 35] 'Posiziona...'  => segs: Posiziona...
+  [  81,1838  457x 35] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  78,1937  450x 44] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  80,2054  371x 44] 'Importa contenuto'  => segs: Importa contenuto
+  [  80,2153  409x 44] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  80,2270  145x 44] 'Esporta'  => segs: Esporta
+  [  81,2388  443x 34] 'Metadati documento...'  => segs: Metadati documento...
+  [  80,2486  178x 43] 'Stampa...'  => segs: Stampa...
+  [  77,2603  164x 35] 'Accedi...'  => segs: Accedi...
+  [  80,2720   70x 35] 'Esci'  => segs: Esci
+  [ 984, 251  132x 35] 'Ctrl+N'  => segs: Ctrl+N
+  [ 984, 548  388x 35] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 984, 764  133x 35] 'Ctrl+O'  => segs: Ctrl+O
+  [ 985, 980  141x 35] 'Ctrl+W'  => segs: Ctrl+W
+  [ 985,1079  227x 35] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 985,1196  122x 35] 'Ctrl+S'  => segs: Ctrl+S
+  [ 985,1295  293x 35] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 985,1745  307x 35] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 1,5x-normal  (img 729x1407) median 56ms prep 27ms lines=36
+  [  40,  14   59x 18] 'Home'  => segs: Home
+  [  39,  64   50x 18] 'Studi'  => segs: Studi
+  [  40, 122   66x 18] 'Nuovo'  => segs: Nuovo
+  [  40, 172  196x 18] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  40, 221  375x 22] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  40, 271  182x 22] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  40, 320  266x 23] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  39, 379   57x 22] 'Apri...'  => segs: Apri...
+  [  39, 428  119x 22] 'Apri Recenti'  => segs: Apri Recenti
+  [  39, 487   63x 17] 'Chiudi'  => segs: Chiudi
+  [  39, 536  118x 18] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  40, 595   49x 17] 'Salva'  => segs: Salva
+  [  40, 645  171x 17] 'Salva con nome...'  => segs: Salva con nome...
+  [  40, 694  231x 22] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  40, 752  325x 22] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  39, 811  293x 22] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  40, 870  107x 17] 'Posiziona...'  => segs: Posiziona...
+  [  40, 919  229x 17] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  39, 968  225x 23] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  40,1027  186x 22] 'Importa contenuto'  => segs: Importa contenuto
+  [  40,1076  205x 22] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  40,1135   73x 22] 'Esporta'  => segs: Esporta
+  [  40,1194  222x 17] 'Metadati documento...'  => segs: Metadati documento...
+  [  40,1243   89x 22] 'Stampa...'  => segs: Stampa...
+  [  39,1301   82x 18] 'Accedi...'  => segs: Accedi...
+  [  40,1360   35x 18] 'Esci'  => segs: Esci
+  [ 492,  17  108x 18] 'CtrI+Alt+H'  => segs: CtrI+Alt+H
+  [ 492, 125   66x 18] 'Ctrl+N'  => segs: Ctrl+N
+  [ 492, 274  194x 18] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 492, 382   67x 18] 'Ctrl+O'  => segs: Ctrl+O
+  [ 492, 490   71x 17] 'Ctrl+W'  => segs: Ctrl+W
+  [ 492, 539  114x 18] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 492, 598   62x 18] 'Ctrl+S'  => segs: Ctrl+S
+  [ 492, 647  147x 18] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 492, 873  154x 17] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [ 492,1246   63x 18] 'Ctrl+p'  => segs: Ctrl+p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 1,5x-invert  (img 729x1407) median 56ms prep 66ms lines=36
+  [  40,  14   59x 18] 'Home'  => segs: Home
+  [  39,  64   50x 18] 'Studi'  => segs: Studi
+  [  40, 122   66x 18] 'Nuovo'  => segs: Nuovo
+  [  40, 172  196x 18] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  40, 221  375x 22] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  40, 271  182x 22] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  40, 320  266x 23] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  39, 379   57x 22] 'Apri...'  => segs: Apri...
+  [  39, 428  119x 22] 'Apri Recenti'  => segs: Apri Recenti
+  [  39, 487   63x 17] 'Chiudi'  => segs: Chiudi
+  [  39, 536  118x 18] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  40, 595   49x 17] 'Salva'  => segs: Salva
+  [  40, 645  171x 17] 'Salva con nome...'  => segs: Salva con nome...
+  [  40, 694  231x 22] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  40, 752  325x 22] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  39, 811  293x 22] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  40, 870  107x 17] 'Posiziona...'  => segs: Posiziona...
+  [  40, 919  229x 17] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  39, 968  225x 23] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  40,1027  186x 22] 'Importa contenuto'  => segs: Importa contenuto
+  [  40,1076  205x 22] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  40,1135   73x 22] 'Esporta'  => segs: Esporta
+  [  40,1194  222x 17] 'Metadati documento...'  => segs: Metadati documento...
+  [  40,1243   89x 22] 'Stampa...'  => segs: Stampa...
+  [  39,1301   82x 18] 'Accedi...'  => segs: Accedi...
+  [  40,1360   35x 18] 'Esci'  => segs: Esci
+  [ 492,  17  108x 18] 'CtrI+Alt+H'  => segs: CtrI+Alt+H
+  [ 492, 125   66x 18] 'Ctrl+N'  => segs: Ctrl+N
+  [ 492, 274  194x 18] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 492, 382   67x 18] 'Ctrl+O'  => segs: Ctrl+O
+  [ 492, 490   71x 17] 'Ctrl+W'  => segs: Ctrl+W
+  [ 492, 539  114x 18] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 492, 598   62x 18] 'Ctrl+S'  => segs: Ctrl+S
+  [ 492, 647  147x 18] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 492, 873  154x 17] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  [ 492,1246   63x 18] 'Ctrl+p'  => segs: Ctrl+p
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+=== VARIANT 2,5x-invert  (img 1215x2345) median 127ms prep 136ms lines=34
+  [  67,  24   99x 30] 'Home'  => segs: Home
+  [  65, 106   83x 30] 'Studi'  => segs: Studi
+  [  67, 204  109x 29] 'Nuovo'  => segs: Nuovo
+  [  67, 286  326x 30] 'Nuovo da Preferiti...'  => segs: Nuovo da Preferiti...
+  [  67, 369  626x 37] 'Nuovo da ultimo set di impostazioni...'  => segs: Nuovo da ultimo set di impostazioni...
+  [  67, 451  302x 37] 'Nuovo da Appunti'  => segs: Nuovo da Appunti
+  [  67, 534  443x 37] 'Nuovo processo immagine'  => segs: Nuovo processo immagine
+  [  64, 631   96x 37] 'Apri...'  => segs: Apri...
+  [  64, 714  199x 37] 'Apri Recenti'  => segs: Apri Recenti
+  [  65, 812  105x 29] 'Chiudi'  => segs: Chiudi
+  [  65, 894  197x 29] 'Chiudi tutto'  => segs: Chiudi tutto
+  [  66, 992   82x 29] 'Salva'  => segs: Salva
+  [  66,1074  286x 29] 'Salva con nome...'  => segs: Salva con nome...
+  [  66,1157  386x 36] 'Salva come pacchetto...'  => segs: Salva come pacchetto...
+  [  66,1254  542x 37] 'Salva cronologia con documento'  => segs: Salva cronologia con documento
+  [  65,1352  488x 36] 'Apri cartella in Esplora risorse'  => segs: Apri cartella in Esplora risorse
+  [  67,1449  179x 29] 'Posiziona...'  => segs: Posiziona...
+  [  67,1532  381x 29] 'Posiziona modello 3D...'  => segs: Posiziona modello 3D...
+  [  65,1614  375x 37] 'Criteri posizionamento'  => segs: Criteri posizionamento
+  [  67,1712  309x 36] 'Importa contenuto'  => segs: Importa contenuto
+  [  67,1794  341x 37] 'Importa profilo ICC...'  => segs: Importa profilo ICC...
+  [  67,1891  121x 37] 'Esporta'  => segs: Esporta
+  [  67,1989  371x 29] 'Metadati documento...'  => segs: Metadati documento...
+  [  66,2072  149x 36] 'Stampa...'  => segs: Stampa...
+  [  64,2169  137x 30] 'Accedi...'  => segs: Accedi...
+  [  67,2266   59x 30] 'Esci'  => segs: Esci
+  [ 820, 209  111x 30] 'Ctrl+N'  => segs: Ctrl+N
+  [ 820, 456  323x 30] 'Ctrl+Alt+Maiusc+N'  => segs: Ctrl+Alt+Maiusc+N
+  [ 820, 636  111x 30] 'Ctrl+O'  => segs: Ctrl+O
+  [ 820, 817  119x 29] 'Ctrl+W'  => segs: Ctrl+W
+  [ 820, 899  190x 29] 'Ctrl+Alt+W'  => segs: Ctrl+Alt+W
+  [ 820, 997  103x 29] 'Ctrl+S'  => segs: Ctrl+S
+  [ 820,1079  245x 29] 'Ctrl+Maiusc+S'  => segs: Ctrl+Maiusc+S
+  [ 820,1454  257x 29] 'Ctrl+Maiusc+M'  => segs: Ctrl+Maiusc+M
+  LABELS OK: 26/26 (disabled ok: 11/11)  SHORTCUTS OK: 8/10  lines-with-label+shortcut-merged: 0
+  MISSED LABELS: 
+  MISSED SHORTCUTS: Ctrl+Alt+H ; Ctrl+P
+
+Variant       Size      Labels Disabled Shortcuts MergedLines OcrMs PrepMs
+-------       ----      ------ -------- --------- ----------- ----- ------
+1x-normal     486x938   26/26  11/11    3/10                0    32     35
+1x-invert     486x938   26/26  11/11    3/10                0    32     71
+2x-normal     972x1876  26/26  11/11    8/10                0   146    152
+2x-invert     972x1876  26/26  11/11    8/10                0   135    106
+3x-normal     1458x2814 26/26  11/11    8/10                0   134     92
+3x-invert     1458x2814 26/26  11/11    8/10                0   119    199
+4x-normal     1944x3752 26/26  11/11    7/10                0   217    139
+4x-invert     1944x3752 26/26  11/11    7/10                0   195    432
+2x-gray       972x1876  26/26  11/11    9/10                0   122    104
+2x-grayinvert 972x1876  26/26  11/11    9/10                0   114    189
+3x-gray       1458x2814 26/26  11/11    8/10                0   111    331
+3x-grayinvert 1458x2814 26/26  11/11    8/10                0   106    148
+1,5x-normal   729x1407  26/26  11/11    8/10                0    56     27
+1,5x-invert   729x1407  26/26  11/11    8/10                0    56     66
+2,5x-invert   1215x2345 26/26  11/11    8/10                0   127    136
+
+
+

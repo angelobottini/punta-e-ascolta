@@ -1,0 +1,92 @@
+﻿##### POINT (116,328) [Apri Recenti (evidenziata, sottomenu a destra)] region=(0,178,900,300)
+  scale 1: 18 lines total, 29ms; lines on pointer row: 2
+     [100,321 60x11] containsPointerX=True 'ri Recenti'
+        word gaps(px@1x): 5   lineH=11
+     [561,322 144x14] containsPointerX=False 'STRADE_vettoriale.svg'
+  scale 1,5: 19 lines total, 67ms; lines on pointer row: 2
+     [81,321 80x15] containsPointerX=True 'Apri Recenti'
+        word gaps(px@1x): 5   lineH=15
+     [560,321 145x15] containsPointerX=False 'STRADE_vettorialesvg'
+  scale 2: 19 lines total, 45ms; lines on pointer row: 2
+     [80,320 80x14] containsPointerX=True 'Apri Recenti'
+        word gaps(px@1x): 5   lineH=14
+     [560,322 146x15] containsPointerX=False 'STRADE_vettorialesvg'
+  scale 3: 21 lines total, 85ms; lines on pointer row: 2
+     [81,321 80x15] containsPointerX=True 'Apri Recenti'
+        word gaps(px@1x): 5   lineH=15
+     [560,322 145x15] containsPointerX=False 'STRADE_vettoriale.svg'
+##### POINT (150,472) [Salva con nomeâ€¦ (disabilitata)] region=(0,322,900,300)
+  scale 1: 19 lines total, 23ms; lines on pointer row: 3
+     [81,465 115x11] containsPointerX=True 'Salva con nome...'
+        word gaps(px@1x): 5,5   lineH=11
+     [383,467 98x11] containsPointerX=False 'CtrI+Maiusc+S'
+     [560,454 340x14] containsPointerX=False 'angelobottini_Create_logo_1 profile_ynf'
+        word gaps(px@1x): 84   lineH=14
+  scale 1,5: 21 lines total, 37ms; lines on pointer row: 3
+     [81,465 115x11] containsPointerX=True 'Salva con nome...'
+        word gaps(px@1x): 5,5   lineH=11
+     [383,467 98x12] containsPointerX=False 'Ctrl+Maiusc+S'
+     [560,453 340x15] containsPointerX=False 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf'
+  scale 2: 21 lines total, 49ms; lines on pointer row: 3
+     [82,464 114x12] containsPointerX=True 'Salva con nome...'
+        word gaps(px@1x): 6,5   lineH=12
+     [383,466 98x12] containsPointerX=False 'Ctrl+Maiusc+S'
+     [560,454 340x15] containsPointerX=False 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf'
+  scale 3: 21 lines total, 91ms; lines on pointer row: 3
+     [82,465 114x12] containsPointerX=True 'Salva con nome...'
+        word gaps(px@1x): 5,5   lineH=12
+     [383,467 98x12] containsPointerX=False 'Ctrl+Maiusc+S'
+     [560,454 340x15] containsPointerX=False 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf'
+##### POINT (420,224) [sopra la scorciatoia Ctrl+Alt+Maiusc+N -> atteso Nuovo da Appunti] region=(0,74,900,300)
+  scale 1: 15 lines total, 17ms; lines on pointer row: 2
+     [82,216 120x14] containsPointerX=False 'Nuovo da Appunti'
+        word gaps(px@1x): 5,5   lineH=14
+     [383,218 129x11] containsPointerX=True 'CtrI+Alt+Maiusc+N'
+  scale 1,5: 15 lines total, 25ms; lines on pointer row: 2
+     [81,215 121x15] containsPointerX=False 'Nuovo da Appunti'
+        word gaps(px@1x): 5,5   lineH=15
+     [383,217 130x12] containsPointerX=True 'Ctrl+Alt+Maiusc+N'
+  scale 2: 15 lines total, 43ms; lines on pointer row: 2
+     [82,216 122x15] containsPointerX=False 'Nuovo da Appunti'
+        word gaps(px@1x): 4,4   lineH=15
+     [383,218 130x12] containsPointerX=True 'Ctrl+Alt+Maiusc+N'
+  scale 3: 15 lines total, 82ms; lines on pointer row: 2
+     [82,216 121x15] containsPointerX=False 'Nuovo da Appunti'
+        word gaps(px@1x): 4,4   lineH=15
+     [383,218 129x12] containsPointerX=True 'Ctrl+Alt+Maiusc+N'
+##### POINT (250,124) [spazio vuoto fra Nuovo e Ctrl+N -> atteso Nuovo] region=(0,0,900,300)
+  scale 1: 20 lines total, 23ms; lines on pointer row: 2
+     [82,117 43x11] containsPointerX=False 'Nuovo'
+     [383,119 44x11] containsPointerX=False 'Ctrl+N'
+  scale 1,5: 20 lines total, 24ms; lines on pointer row: 2
+     [81,117 44x12] containsPointerX=False 'Nuovo'
+     [383,119 45x12] containsPointerX=False 'Ctrl+N'
+  scale 2: 20 lines total, 36ms; lines on pointer row: 2
+     [82,116 44x12] containsPointerX=False 'Nuovo'
+     [383,118 44x12] containsPointerX=False 'Ctrl+N'
+  scale 3: 21 lines total, 129ms; lines on pointer row: 2
+     [82,117 44x12] containsPointerX=False 'Nuovo'
+     [383,119 44x12] containsPointerX=False 'Ctrl+N'
+##### POINT (700,460) [nome file lungo nel sottomenu] region=(250,310,900,300)
+  scale 1: 15 lines total, 21ms; lines on pointer row: 2
+     [742,454 188x14] containsPointerX=False '1 profile_ynf963v'
+        word gaps(px@1x): 84   lineH=14
+     [936,454 214x11] containsPointerX=False '--v 8. 7dfcc094-6033-4297-b52('
+        word gaps(px@1x): 6,7   lineH=11
+  scale 1,5: 15 lines total, 32ms; lines on pointer row: 1
+     [560,453 370x15] containsPointerX=True 'angelobottini_Create_logo_1_casa_x_3_--profiIe_ynf963v'
+  scale 2: 15 lines total, 54ms; lines on pointer row: 1
+     [560,454 382x15] containsPointerX=True 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_-'
+  scale 3: 16 lines total, 103ms; lines on pointer row: 2
+     [560,454 381x15] containsPointerX=True 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_-'
+     [942,454 208x12] containsPointerX=False '-v 8. 7dfcc094-6033-4297-b52('
+        word gaps(px@1x): 6,6   lineH=12
+##### POINT (590,664) [Cancella nel sottomenu] region=(140,514,900,300)
+  scale 1: 13 lines total, 16ms; lines on pointer row: 1
+     [560,658 54x11] containsPointerX=True 'Cancella'
+  scale 1,5: 13 lines total, 26ms; lines on pointer row: 1
+     [560,657 55x12] containsPointerX=True 'Cancella'
+  scale 2: 13 lines total, 68ms; lines on pointer row: 1
+     [560,658 54x12] containsPointerX=True 'Cancella'
+  scale 3: 13 lines total, 71ms; lines on pointer row: 1
+     [560,658 54x12] containsPointerX=True 'Cancella'

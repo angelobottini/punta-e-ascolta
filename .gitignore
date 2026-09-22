@@ -1,0 +1,9 @@
+bin/
+obj/
+artifacts/
+publish/
+*.user
+.vs/
+settings.json
+cache/
+logs/

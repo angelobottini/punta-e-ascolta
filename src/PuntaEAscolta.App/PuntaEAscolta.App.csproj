@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>PuntaEAscolta.App</RootNamespace>
+    <AssemblyName>PuntaEAscolta</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <!-- Windows Forms solo per NotifyIcon (icona nell'area di notifica) -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <SatelliteResourceLanguages>it;en</SatelliteResourceLanguages>
+    <!-- La consapevolezza DPI è dichiarata nel manifest (serve a WPF); l'analizzatore Windows Forms lo segnala e va zittito. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <StartupObject>PuntaEAscolta.App.Program</StartupObject>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PuntaEAscolta.Core\PuntaEAscolta.Core.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Logic\PuntaEAscolta.Logic.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Speech\PuntaEAscolta.Speech.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Ocr.Onnx\PuntaEAscolta.Ocr.Onnx.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Windows.Input\PuntaEAscolta.Windows.Input.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Windows.Automation\PuntaEAscolta.Windows.Automation.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Windows.Ocr\PuntaEAscolta.Windows.Ocr.csproj" />
+    <ProjectReference Include="..\PuntaEAscolta.Windows.Audio\PuntaEAscolta.Windows.Audio.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,94 @@
+﻿Foreground is Affinity main: True
+Menu item: MenuItem | Name='Visualizza' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(556,0,91,37) | Help='' | pid=10888 | hwnd=0x0
+Patterns: ExpandCollapsePatternIdentifiers.Pattern, SynchronizedInputPatternIdentifiers.Pattern
+Opened with method=click in 1134ms
+ExpandCollapseState after open: Expanded
+NEW TOPWIN hwnd=0xA07BC pid=10888 class='HwndWrapper[Affinity.exe;;df933103-fcaa-4e21-bbe1-a220b41e304d]' title='' rect=(556,35,986,718) style=0x96000000 ex=0x08080088 LAYERED TOPMOST NOACTIVATE cloaked=0
+  UIA root of popup: Window | Name='' | Class='Popup' | AutoId='' | Fw='WPF' | Off=False | Rect=(556,35,430,683) | Help='' | pid=10888 | hwnd=0xA07BC
+  UIA parent of popup: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+Foreground after open: hwnd=0xC07C4 pid=10888 class='HwndWrapper[Affinity.exe;;002c344e-6ce9-4cb4-9b6c-fa8b3fae1325]' title='Affinity' rect=(-9,-9,1929,1149) style=0x17CF0000 ex=0x00040100 cloaked=0
+--- UIA subtree of menu item 'Visualizza' while open ---
+  MenuItem | Name='Zoom' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,36,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Zoom' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,40,39,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,69,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Ruota' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,75,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Ruota' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,79,39,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Modalità' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,108,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Modalità' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,112,59,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,141,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Mostra' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,147,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Mostra' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,151,47,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Modalità anteprima' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,180,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Modalità anteprima' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,184,130,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+Maiusc+W' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,186,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,213,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Ritaglia nella tela' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,219,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ritaglia nella tela' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,223,113,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='\' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,225,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Blocca guide' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,252,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Blocca guide' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,256,84,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,258,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,285,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Effetto calamita…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,291,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Effetto calamita…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,295,114,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,297,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Margini e guide…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,324,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Margini e guide…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,328,116,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,330,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Griglia e asse…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,357,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Griglia e asse…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,361,98,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,363,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Griglia di base…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,390,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Griglia di base…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,394,105,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,396,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,423,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Nuova visualizzazione' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,429,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Nuova visualizzazione' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,433,145,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,435,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Visualizzazioni' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,462,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Visualizzazioni' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,466,95,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,495,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Passa a punto di vista precedente' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,501,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Passa a punto di vista precedente' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,505,221,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,507,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Passa a punto di vista successivo' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,534,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Passa a punto di vista successivo' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,538,215,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,540,104,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,567,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Barra degli strumenti superiore' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,573,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Barra degli strumenti superiore' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,577,205,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Barra degli strumenti contestuale' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,606,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Barra degli strumenti contestuale' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,610,219,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Strumenti' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,639,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Strumenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,643,64,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,672,422,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Attiva/Disattiva UI' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,678,422,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Attiva/Disattiva UI' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,682,119,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Tab' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(854,684,104,20) | Help='' | pid=10888 | hwnd=0x0
+UIA child MenuItems under 'Visualizza': 27
+ExpandCollapseState after CopyFromScreen: Expanded
+Popup rect: 556,35,986,718
+Visible items: 19
+FROMPOINT(no hover) (768,52) expected='Zoom' 12ms -> MenuItem | Name='Zoom' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,36,422,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=617: Text | Name='_Zoom' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,40,39,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Zoom' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,36,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (768,164) expected='Mostra' 1ms -> MenuItem | Name='Mostra' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,147,422,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=617: Text | Name='Mostra' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,151,47,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Mostra' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,147,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (768,268) expected='Blocca guide' 2ms -> MenuItem | Name='Blocca guide' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,252,422,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=617: Text | Name='Blocca guide' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,256,84,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Blocca guide' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,252,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (768,374) expected='Griglia e asse…' 1ms -> MenuItem | Name='Griglia e asse…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,357,422,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=617: Text | Name='Griglia e asse…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,361,98,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Griglia e asse…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,357,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (768,478) expected='Visualizzazioni' 2ms -> MenuItem | Name='Visualizzazioni' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,462,422,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=617: Text | Name='_Visualizzazioni' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,466,95,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Visualizzazioni' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,462,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (768,590) expected='Barra degli strumenti superiore' 2ms -> Text | Name='Barra degli strumenti superiore' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,577,205,20) | Help='' | pid=10888 | hwnd=0x0
+   at label x=617: Text | Name='Barra degli strumenti superiore' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,577,205,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Barra degli strumenti superiore' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,573,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(hover) (617,52) expected='Zoom' -> MenuItem | Name='Zoom' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,36,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(hover) (617,164) expected='Mostra' -> MenuItem | Name='Mostra' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(557,147,422,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(hover) (617,268) expected='Blocca guide' -> Text | Name='Blocca guide' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(582,256,84,20) | Help='' | pid=10888 | hwnd=0x0
+ExpandCollapseState at end: Expanded
+ExpandCollapseState after close: Collapsed

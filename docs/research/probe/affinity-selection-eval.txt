@@ -1,0 +1,134 @@
+﻿===== SCALA 1x (passo 1: 900x300 senza trattamento colore; passo 2 solo se il passo 1 non trova nulla: 400x120 a 2x, grigi + auto-levels)
+  [OK ] (1714,636) atteso='Interlinea' -> passo 1 'Interlinea' [contiene-X] 
+  [ERR] (1706,763) atteso='Somma spazio prima e dopo' -> passo 1 'Somma spazio prima e dapo' [contiene-X] 
+  [OK ] (123,197) atteso='Pagine mastro' -> passo 1 'Pagine mastro' [contiene-X] 
+  [OK ] (1645,603) atteso='Spaziatura' -> passo 1 'Spaziatura' [contiene-X] 
+  [OK ] (1724,926) atteso='Navigatore' -> passo 1 'Navigatore' [contiene-X] 
+  [ERR] (1620,397) atteso='S: 100' -> passo 2 's: 100' [contiene-X] 
+  [ERR] (1754,75) atteso='Esporta' -> passo 1 'Esparü' [contiene-X] 
+  [OK ] (316,75) atteso='Layout' -> passo 1 'Layout' [contiene-X] 
+  [OK ] (1789,793) atteso='Solo tra paragrafi' -> passo 1 'Solo tra paragrafi' [contiene-X] 
+  [OK ] (241,19) atteso='Documento' -> passo 1 'Documento' [contiene-X] 
+  [ERR] (1868,412) atteso='FF0000' -> passo 2 'n: FFOOOO' [contiene-X] 
+  [OK ] (148,165) atteso='Asset' -> passo 1 'Asset' [contiene-X] 
+  [ERR] (1850,461) atteso='100 %' -> passo 2 '100%' [contiene-X] 
+  [OK ] (1690,733) atteso='Spazio tra stessi stili:' -> passo 1 'Spazio tra stessi stili:' [contiene-X] 
+  [OK ] (1650,571) atteso='[Nessuno stile]' -> passo 1 '[Nessuno stile]' [contiene-X] 
+  [ERR] (116,328) atteso='Apri Recenti' -> passo 1 'ri Recenti' [contiene-X] 
+  [OK ] (150,472) atteso='Salva con nome' -> passo 1 'Salva con nome' [contiene-X] 
+  [OK ] (420,224) atteso='Nuovo da Appunti' -> passo 1 'Nuovo da Appunti' [shortcut->label-a-sinistra] 
+  [ERR] (250,124) atteso='Nuovo' -> passo 2 '<nulla>' [-] 
+  [ERR] (700,460) atteso='angelobottini_Create_logo_1_casa_x_3_--p~' -> passo 1 'profile_ynf963v' [piu-vicina-sulla-riga d=130px] 
+  [OK ] (590,664) atteso='Cancella' -> passo 1 'Cancella' [contiene-X] 
+  [OK ] (650,235) atteso='Ritaglia nella tela' -> passo 1 'Ritaglia nella tela' [contiene-X] 
+  [ERR] (900,235) atteso='Ritaglia nella tela' -> passo 2 '<nulla>' [-] 
+  [OK ] (700,550) atteso='Passa a punto di vista successivo' -> passo 1 'Passa a punto di vista successivo' [contiene-X] 
+  [OK ] (880,694) atteso='Attiva/Disattiva UI' -> passo 1 'Attiva/Disattiva UI' [shortcut->label-a-sinistra] 
+  TOTALE scala 1x: corretti 16/25 (passo 1: 16, recuperati dal passo 2: 0); tempo passo 1 (prep+ocr) medio 22ms max 65ms; passo 2 eseguito 5 volte, medio 24ms max 58ms
+===== SCALA 1,5x (passo 1: 900x300 senza trattamento colore; passo 2 solo se il passo 1 non trova nulla: 400x120 a 2x, grigi + auto-levels)
+  [OK ] (1714,636) atteso='Interlinea' -> passo 1 'Interlinea' [contiene-X] 
+  [OK ] (1706,763) atteso='Somma spazio prima e dopo' -> passo 1 'Somma spazio prima e dopo' [contiene-X] 
+  [OK ] (123,197) atteso='Pagine mastro' -> passo 1 'Pagine mastro' [contiene-X] 
+  [OK ] (1645,603) atteso='Spaziatura' -> passo 1 'Spaziatura' [contiene-X] 
+  [OK ] (1724,926) atteso='Navigatore' -> passo 1 'Navigatore' [contiene-X] 
+  [ERR] (1620,397) atteso='S: 100' -> passo 2 's: 100' [contiene-X] 
+  [OK ] (1754,75) atteso='Esporta' -> passo 2 'Esporta' [contiene-X] 
+  [OK ] (316,75) atteso='Layout' -> passo 1 'Layout' [contiene-X] 
+  [OK ] (1789,793) atteso='Solo tra paragrafi' -> passo 1 'Solo tra paragrafi' [contiene-X] 
+  [OK ] (241,19) atteso='Documento' -> passo 1 'Documento' [contiene-X] 
+  [OK ] (1868,412) atteso='FF0000' -> passo 1 'FF0000' [contiene-X] 
+  [OK ] (148,165) atteso='Asset' -> passo 1 'Asset' [contiene-X] 
+  [ERR] (1850,461) atteso='100 %' -> passo 1 '100%' [contiene-X] 
+  [OK ] (1690,733) atteso='Spazio tra stessi stili:' -> passo 1 'Spazio tra stessi stili:' [contiene-X] 
+  [OK ] (1650,571) atteso='[Nessuno stile]' -> passo 1 '[Nessuno stile]' [contiene-X] 
+  [OK ] (116,328) atteso='Apri Recenti' -> passo 1 'Apri Recenti' [contiene-X] 
+  [OK ] (150,472) atteso='Salva con nome' -> passo 1 'Salva con nome' [contiene-X] 
+  [OK ] (420,224) atteso='Nuovo da Appunti' -> passo 1 'Nuovo da Appunti' [shortcut->label-a-sinistra] 
+  [ERR] (250,124) atteso='Nuovo' -> passo 2 '<nulla>' [-] 
+  [ERR] (700,460) atteso='angelobottini_Create_logo_1_casa_x_3_--p~' -> passo 1 'angelobottini_Create_logo_1_casa_x_3_--profiIe_ynf963v' [contiene-X] 
+  [OK ] (590,664) atteso='Cancella' -> passo 1 'Cancella' [contiene-X] 
+  [OK ] (650,235) atteso='Ritaglia nella tela' -> passo 1 'Ritaglia nella tela' [contiene-X] 
+  [ERR] (900,235) atteso='Ritaglia nella tela' -> passo 2 '<nulla>' [-] 
+  [OK ] (700,550) atteso='Passa a punto di vista successivo' -> passo 1 'Passa a punto di vista successivo' [contiene-X] 
+  [OK ] (880,694) atteso='Attiva/Disattiva UI' -> passo 1 'Attiva/Disattiva UI' [shortcut->label-a-sinistra] 
+  TOTALE scala 1,5x: corretti 20/25 (passo 1: 19, recuperati dal passo 2: 1); tempo passo 1 (prep+ocr) medio 38ms max 55ms; passo 2 eseguito 4 volte, medio 14ms max 15ms
+===== SCALA 2x (passo 1: 900x300 senza trattamento colore; passo 2 solo se il passo 1 non trova nulla: 400x120 a 2x, grigi + auto-levels)
+  [OK ] (1714,636) atteso='Interlinea' -> passo 1 'Interlinea' [contiene-X] 
+  [OK ] (1706,763) atteso='Somma spazio prima e dopo' -> passo 1 'Somma spazio prima e dopo' [contiene-X] 
+  [OK ] (123,197) atteso='Pagine mastro' -> passo 1 'Pagine mastro' [contiene-X] 
+  [OK ] (1645,603) atteso='Spaziatura' -> passo 1 'Spaziatura' [contiene-X] 
+  [OK ] (1724,926) atteso='Navigatore' -> passo 1 'Navigatore' [contiene-X] 
+  [ERR] (1620,397) atteso='S: 100' -> passo 2 's: 100' [contiene-X] 
+  [OK ] (1754,75) atteso='Esporta' -> passo 2 'Esporta' [contiene-X] 
+  [OK ] (316,75) atteso='Layout' -> passo 1 'Layout' [contiene-X] 
+  [OK ] (1789,793) atteso='Solo tra paragrafi' -> passo 1 'Solo tra paragrafi' [contiene-X] 
+  [OK ] (241,19) atteso='Documento' -> passo 1 'Documento' [contiene-X] 
+  [ERR] (1868,412) atteso='FF0000' -> passo 1 'FFOOOO' [contiene-X] 
+  [OK ] (148,165) atteso='Asset' -> passo 1 'Asset' [contiene-X] 
+  [ERR] (1850,461) atteso='100 %' -> passo 1 '10096' [contiene-X] 
+  [OK ] (1690,733) atteso='Spazio tra stessi stili:' -> passo 1 'Spazio tra stessi stili:' [contiene-X] 
+  [ERR] (1650,571) atteso='[Nessuno stile]' -> passo 1 '[Nessuno stile)' [contiene-X] 
+  [OK ] (116,328) atteso='Apri Recenti' -> passo 1 'Apri Recenti' [contiene-X] 
+  [OK ] (150,472) atteso='Salva con nome' -> passo 1 'Salva con nome' [contiene-X] 
+  [OK ] (420,224) atteso='Nuovo da Appunti' -> passo 1 'Nuovo da Appunti' [shortcut->label-a-sinistra] 
+  [ERR] (250,124) atteso='Nuovo' -> passo 2 '<nulla>' [-] 
+  [OK ] (700,460) atteso='angelobottini_Create_logo_1_casa_x_3_--p~' -> passo 1 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_-' [contiene-X] 
+  [OK ] (590,664) atteso='Cancella' -> passo 1 'Cancella' [contiene-X] 
+  [OK ] (650,235) atteso='Ritaglia nella tela' -> passo 1 'Ritaglia nella tela' [contiene-X] 
+  [ERR] (900,235) atteso='Ritaglia nella tela' -> passo 2 '<nulla>' [-] 
+  [OK ] (700,550) atteso='Passa a punto di vista successivo' -> passo 1 'Passa a punto di vista successivo' [contiene-X] 
+  [OK ] (880,694) atteso='Attiva/Disattiva UI' -> passo 1 'Attiva/Disattiva UI' [shortcut->label-a-sinistra] 
+  TOTALE scala 2x: corretti 19/25 (passo 1: 18, recuperati dal passo 2: 1); tempo passo 1 (prep+ocr) medio 55ms max 71ms; passo 2 eseguito 4 volte, medio 14ms max 16ms
+===== SCALA 3x (passo 1: 900x300 senza trattamento colore; passo 2 solo se il passo 1 non trova nulla: 400x120 a 2x, grigi + auto-levels)
+  [OK ] (1714,636) atteso='Interlinea' -> passo 1 'Interlinea' [contiene-X] 
+  [OK ] (1706,763) atteso='Somma spazio prima e dopo' -> passo 1 'Somma spazio prima e dopo' [contiene-X] 
+  [OK ] (123,197) atteso='Pagine mastro' -> passo 1 'Pagine mastro' [contiene-X] 
+  [OK ] (1645,603) atteso='Spaziatura' -> passo 1 'Spaziatura' [contiene-X] 
+  [OK ] (1724,926) atteso='Navigatore' -> passo 1 'Navigatore' [contiene-X] 
+  [ERR] (1620,397) atteso='S: 100' -> passo 2 's: 100' [contiene-X] 
+  [OK ] (1754,75) atteso='Esporta' -> passo 2 'Esporta' [contiene-X] 
+  [ERR] (316,75) atteso='Layout' -> passo 1 'Canva Al' [piu-vicina-sulla-riga d=78px] 
+  [OK ] (1789,793) atteso='Solo tra paragrafi' -> passo 1 'Solo tra paragrafi' [contiene-X] 
+  [OK ] (241,19) atteso='Documento' -> passo 1 'Documento' [contiene-X] 
+  [ERR] (1868,412) atteso='FF0000' -> passo 2 'n: FFOOOO' [contiene-X] 
+  [OK ] (148,165) atteso='Asset' -> passo 1 'Asset' [contiene-X] 
+  [ERR] (1850,461) atteso='100 %' -> passo 2 '100%' [contiene-X] 
+  [OK ] (1690,733) atteso='Spazio tra stessi stili:' -> passo 1 'Spazio tra stessi stili:' [contiene-X] 
+  [ERR] (1650,571) atteso='[Nessuno stile]' -> passo 1 '[Nessuno stile)' [contiene-X] 
+  [OK ] (116,328) atteso='Apri Recenti' -> passo 1 'Apri Recenti' [contiene-X] 
+  [OK ] (150,472) atteso='Salva con nome' -> passo 1 'Salva con nome' [contiene-X] 
+  [OK ] (420,224) atteso='Nuovo da Appunti' -> passo 1 'Nuovo da Appunti' [shortcut->label-a-sinistra] 
+  [ERR] (250,124) atteso='Nuovo' -> passo 2 '<nulla>' [-] 
+  [OK ] (700,460) atteso='angelobottini_Create_logo_1_casa_x_3_--p~' -> passo 1 'angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_-' [contiene-X] 
+  [OK ] (590,664) atteso='Cancella' -> passo 1 'Cancella' [contiene-X] 
+  [OK ] (650,235) atteso='Ritaglia nella tela' -> passo 1 'Ritaglia nella tela' [contiene-X] 
+  [ERR] (900,235) atteso='Ritaglia nella tela' -> passo 2 '<nulla>' [-] 
+  [OK ] (700,550) atteso='Passa a punto di vista successivo' -> passo 1 'Passa a punto di vista successivo' [contiene-X] 
+  [OK ] (880,694) atteso='Attiva/Disattiva UI' -> passo 1 'Attiva/Disattiva UI' [shortcut->label-a-sinistra] 
+  TOTALE scala 3x: corretti 18/25 (passo 1: 17, recuperati dal passo 2: 1); tempo passo 1 (prep+ocr) medio 108ms max 131ms; passo 2 eseguito 6 volte, medio 16ms max 17ms
+===== GAP fra glifo iniziale e testo (1.5x)
+  [v Spaziatura] lineH=15px@1x : v <gap 0,68H> Spaziatura
+  [> Pagine mastro] lineH=9px@1x : >
+  [> Pagine mastro] lineH=15px@1x : Pagine <gap 0,30H> mastro
+  [V Vettore O Pixel] lineH=15px@1x : Layout
+  [V Vettore O Pixel] lineH=29px@1x : a
+  [V Vettore O Pixel] lineH=17px@1x : V <gap 0,58H> Vettore <gap 1,65H> O <gap 0,62H> Pixel
+  [V Vettore O Pixel] lineH=17px@1x : 02
+  [V Vettore O Pixel] lineH=11px@1x : Canva <gap 0,35H> Al
+===== TOOLTIP via OCR (nessun testo sulla riga del puntatore): regola T = segmento con Y in (py, py+60] e X iniziale in [px-20, px+40]
+  affinity-tooltip-4-full.png (1362,74) @1,5x atteso='Modalità anteprima' -> riga puntatore: '<nulla>' ; regola T: 'Modalità anteprima'  (42ms)
+  affinity-tooltip-4-full.png (1362,74) @2x atteso='Modalità anteprima' -> riga puntatore: '<nulla>' ; regola T: 'Modalità anteprima'  (58ms)
+  affinity-tooltip-5-full.png (1496,74) @1,5x atteso='Trasforma' -> riga puntatore: '<nulla>' ; regola T: 'Trasforma'  (48ms)
+  affinity-tooltip-5-full.png (1496,74) @2x atteso='Trasforma' -> riga puntatore: '<nulla>' ; regola T: 'Trasforma'  (52ms)
+  affinity-tooltip-6-full.png (342,198) @1,5x atteso='Duplica mastro selezionata' -> riga puntatore: '<nulla>' ; regola T: 'Duplica mastro selezionata'  (40ms)
+  affinity-tooltip-6-full.png (342,198) @2x atteso='Duplica mastro selezionata' -> riga puntatore: '<nulla>' ; regola T: 'Duplica mastro selezionata'  (56ms)
+  affinity-tooltip-7-full.png (1678,213) @1,5x atteso='Selettore colore' -> riga puntatore: '<nulla>' ; regola T: 'Selettore colore'  (26ms)
+  affinity-tooltip-7-full.png (1678,213) @2x atteso='Selettore colore' -> riga puntatore: '<nulla>' ; regola T: 'Selettore colore'  (44ms)
+  affinity-tooltip-1-full.png (24,172) @1,5x atteso='' -> riga puntatore: 'Pagine' ; regola T: '>'  (38ms)
+  affinity-tooltip-1-full.png (24,172) @2x atteso='' -> riga puntatore: 'Pagine' ; regola T: '>'  (53ms)
+  affinity-tooltip-2-full.png (24,397) @1,5x atteso='' -> riga puntatore: '<nulla>' ; regola T: '<nulla>'  (27ms)
+  affinity-tooltip-2-full.png (24,397) @2x atteso='' -> riga puntatore: '<nulla>' ; regola T: '<nulla>'  (39ms)
+  affinity-tooltip-3-full.png (24,667) @1,5x atteso='' -> riga puntatore: '<nulla>' ; regola T: '<nulla>'  (25ms)
+  affinity-tooltip-3-full.png (24,667) @2x atteso='' -> riga puntatore: '<nulla>' ; regola T: '<nulla>'  (39ms)
+  affinity-samples-full.png (960,600) @1,5x atteso='' -> riga puntatore: '<nulla>' ; regola T: '<nulla>'  (24ms)
+  affinity-samples-full.png (960,600) @2x atteso='' -> riga puntatore: '<nulla>' ; regola T: '<nulla>'  (38ms)

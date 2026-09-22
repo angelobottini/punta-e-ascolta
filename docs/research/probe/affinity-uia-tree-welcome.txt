@@ -1,0 +1,524 @@
+﻿=== TOP WINDOW hwnd=0x60578 pid=10888 class='HwndWrapper[Affinity.exe;;d05887b0-b1b1-444d-88bd-bb5fe9307345]' title='' rect=(-9,-9,1929,1149) style=0x16CF0000 ex=0x00000100 cloaked=0
+Window | Name='' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0x60578
+  <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  Button | Name='' | Class='Button' | AutoId='PART_Close' | Fw='WPF' | Off=False | Rect=(1893,-9,37,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='' | Fw='WPF' | Off=False | Rect=(82,56,196,47) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ti diamo il benvenuto' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(86,56,192,27) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='angelobottini' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(86,83,89,20) | Help='' | pid=10888 | hwnd=0x0
+  RadioButton | Name='home' | Class='RadioButton' | AutoId='' | Fw='WPF' | Off=False | Rect=(1688,53,62,52) | Help='Home' | pid=10888 | hwnd=0x0
+  RadioButton | Name='newdocopen' | Class='RadioButton' | AutoId='' | Fw='WPF' | Off=False | Rect=(1765,53,62,52) | Help='Apri' | pid=10888 | hwnd=0x0
+  RadioButton | Name='newdocnew' | Class='RadioButton' | AutoId='' | Fw='WPF' | Off=False | Rect=(1841,53,62,52) | Help='Nuova' | pid=10888 | hwnd=0x0
+  List | Name='' | Class='ListBox' | AutoId='' | Fw='WPF' | Off=False | Rect=(627,135,668,40) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(639,137,100,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Home' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(669,145,40,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(739,137,182,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Documenti recenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(769,145,122,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(921,137,99,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Guida' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(951,145,39,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1020,137,150,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='I miei modelli' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1050,145,90,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1170,137,112,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Preferiti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1200,145,52,20) | Help='' | pid=10888 | hwnd=0x0
+  Pane | Name='' | Class='ScrollViewer' | AutoId='' | Fw='WPF' | Off=False | Rect=(-1,186,1924,935) | Help='' | pid=10888 | hwnd=0x0
+    List | Name='' | Class='ListBox' | AutoId='list' | Fw='WPF' | Off=False | Rect=(0,187,1922,219) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='STRADE_vettoriale.svg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(15,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(175,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='STRADE_vettoriale.svg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(37,373,146,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Consorzio_Oscar_Romero.eps' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(219,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(234,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(394,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='Consorzio_Oscar_Romero.eps' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(234,373,190,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='STRADE.eps' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(438,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(453,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(613,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='STRADE.eps' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(508,373,79,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='STRADE_alta_risoluzione.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(657,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(672,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(832,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='STRADE_alta_risoluzione.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(674,373,185,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_--v_8._7dfcc094-6033-4297-b520-faf2f1682c35_3.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(876,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(891,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1051,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_--v_8._7dfcc094-6033-4297-b520-faf2f1682c35_3.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(890,373,191,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='1casax3.af' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1095,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1110,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1270,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='1casax3.af' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1171,373,67,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='ChatGPT Image 4 giu 2026, 20_57_08.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1314,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1329,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1489,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='ChatGPT Image 4 giu 2026, 20_57_08.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1329,373,190,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='ovile-logo-def.pdf' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1533,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1548,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1708,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='ovile-logo-def.pdf' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1583,373,120,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='COVER_Ovile 2025.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1752,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1767,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1927,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='COVER_Ovile 2025.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1788,373,147,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='i1.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(1971,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1986,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2146,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='i1.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2060,373,41,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='24_IM01_01.dwg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2190,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2205,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2365,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='24_IM01_01.dwg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2245,373,110,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='vista utile.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2409,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2424,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2584,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='vista utile.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2475,373,87,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Servoscala.af' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2628,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2643,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2803,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='Servoscala.af' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2695,373,85,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Gemini_Generated_Image_vtuz1fvtuz1fvtuz.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2847,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2862,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3022,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='Gemini_Generated_Image_vtuz1fvtuz1fvtuz.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2863,373,187,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='55192123432_66aed38dd0_o.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3066,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3081,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3241,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='55192123432_66aed38dd0_o.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3081,373,189,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='55187293546_32fd3f50eb_3k.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3285,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3300,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3460,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='55187293546_32fd3f50eb_3k.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3301,373,188,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='55185633398_92ce8444be_5k.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3504,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3519,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3679,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='55185633398_92ce8444be_5k.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3518,373,192,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='WhatsApp Image 2026-01-16 at 13.19.20.jpeg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3723,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3738,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3898,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='WhatsApp Image 2026-01-16 at 13.19.20.jpeg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3738,373,190,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Gemini_Generated_Image_2pybrh2pybrh2pyb.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3942,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3957,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+        Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(4117,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+        Text | Name='Gemini_Generated_Image_2pybrh2pybrh2pyb.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3958,373,187,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Documenti recenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(10,197,125,20) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='Vedi di più…' | Class='Button' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,199,81,20) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Vedi di più…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,199,81,20) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    List | Name='' | Class='ListBox' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,406,1922,18) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    List | Name='' | Class='ListBox' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,424,1922,259) | Help='' | pid=10888 | hwnd=0x0
+      Group | Name='Ti diamo il benvenuto in Affinity.' | Class='GroupItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,424,1922,259) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Introduzione ad Affinity' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(14,578,96,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Una rapida panoramica di Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(14,615,86,55) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='52,4 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(159,631,45,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(219,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Importazione' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(233,615,81,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Come importare in Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(233,633,114,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='6,2 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(382,650,38,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(438,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Esportazione' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(452,615,78,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Come esportare da Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(452,633,116,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='10,5 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(597,650,45,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(657,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Livelli' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(671,615,34,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Scopri come lavorare con i livelli.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(671,633,128,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='839 KB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(820,650,38,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(876,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Studi personalizzati' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(890,597,117,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Scopri di più su come personalizzare gli Studi.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(890,615,124,55) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='12,3 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1035,641,45,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1095,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Regolazioni e filtri live' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1109,596,109,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Utilizzare regolazioni e filtri in Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1109,633,126,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='29,9 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1254,641,45,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1314,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Testo' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1328,615,32,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Lavorare con il testo in Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1328,633,122,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='52,7 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1473,650,45,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1533,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Traccia immagine' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1547,615,105,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Tracciamento bitmap ai vettori.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1547,633,127,37) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='430 KB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1696,650,38,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+        ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1752,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Mockup flessibili' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1766,597,101,18) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='Un flusso di lavoro non distruttivo e riutilizzabile.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1766,615,113,55) | Help='' | pid=10888 | hwnd=0x0
+          Text | Name='5 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1920,641,29,17) | Help='' | pid=10888 | hwnd=0x0
+          <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Button | Name='Vedi di più…' | Class='Button' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,436,81,20) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Vedi di più…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,436,81,20) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+=== TOP WINDOW hwnd=0xC07C4 pid=10888 class='HwndWrapper[Affinity.exe;;002c344e-6ce9-4cb4-9b6c-fa8b3fae1325]' title='Affinity' rect=(-9,-9,1929,1149) style=0x17CF0000 ex=0x00040100 cloaked=0
+Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+  Window | Name='' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0x60578
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Button | Name='' | Class='Button' | AutoId='PART_Close' | Fw='WPF' | Off=False | Rect=(1893,-9,37,36) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='' | Fw='WPF' | Off=False | Rect=(82,56,196,47) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Ti diamo il benvenuto' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(86,56,192,27) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='angelobottini' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(86,83,89,20) | Help='' | pid=10888 | hwnd=0x0
+    RadioButton | Name='home' | Class='RadioButton' | AutoId='' | Fw='WPF' | Off=False | Rect=(1688,53,62,52) | Help='Home' | pid=10888 | hwnd=0x0
+    RadioButton | Name='newdocopen' | Class='RadioButton' | AutoId='' | Fw='WPF' | Off=False | Rect=(1765,53,62,52) | Help='Apri' | pid=10888 | hwnd=0x0
+    RadioButton | Name='newdocnew' | Class='RadioButton' | AutoId='' | Fw='WPF' | Off=False | Rect=(1841,53,62,52) | Help='Nuova' | pid=10888 | hwnd=0x0
+    List | Name='' | Class='ListBox' | AutoId='' | Fw='WPF' | Off=False | Rect=(627,135,668,40) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(639,137,100,35) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Home' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(669,145,40,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(739,137,182,35) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Documenti recenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(769,145,122,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(921,137,99,35) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Guida' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(951,145,39,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1020,137,150,35) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='I miei modelli' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1050,145,90,20) | Help='' | pid=10888 | hwnd=0x0
+      ListItem | Name='Serif.Windows.UI.Controls.EnumObject' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1170,137,112,35) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Preferiti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1200,145,52,20) | Help='' | pid=10888 | hwnd=0x0
+    Pane | Name='' | Class='ScrollViewer' | AutoId='' | Fw='WPF' | Off=False | Rect=(-1,186,1924,935) | Help='' | pid=10888 | hwnd=0x0
+      List | Name='' | Class='ListBox' | AutoId='list' | Fw='WPF' | Off=False | Rect=(0,187,1922,219) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='STRADE_vettoriale.svg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(15,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(175,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='STRADE_vettoriale.svg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(37,373,146,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='Consorzio_Oscar_Romero.eps' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(219,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(234,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(394,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='Consorzio_Oscar_Romero.eps' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(234,373,190,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='STRADE.eps' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(438,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(453,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(613,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='STRADE.eps' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(508,373,79,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='STRADE_alta_risoluzione.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(657,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(672,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(832,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='STRADE_alta_risoluzione.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(674,373,185,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_--v_8._7dfcc094-6033-4297-b520-faf2f1682c35_3.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(876,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(891,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1051,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='angelobottini_Create_logo_1_casa_x_3_--profile_ynf963v_--v_8._7dfcc094-6033-4297-b520-faf2f1682c35_3.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(890,373,191,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='1casax3.af' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1095,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1110,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1270,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='1casax3.af' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1171,373,67,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='ChatGPT Image 4 giu 2026, 20_57_08.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1314,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1329,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1489,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='ChatGPT Image 4 giu 2026, 20_57_08.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1329,373,190,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='ovile-logo-def.pdf' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1533,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1548,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1708,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='ovile-logo-def.pdf' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1583,373,120,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='COVER_Ovile 2025.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1752,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1767,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(1927,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='COVER_Ovile 2025.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1788,373,147,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='i1.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(1971,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(1986,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2146,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='i1.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2060,373,41,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='24_IM01_01.dwg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2190,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2205,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2365,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='24_IM01_01.dwg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2245,373,110,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='vista utile.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2409,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2424,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2584,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='vista utile.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2475,373,87,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='Servoscala.af' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2628,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2643,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(2803,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='Servoscala.af' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2695,373,85,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='Gemini_Generated_Image_vtuz1fvtuz1fvtuz.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(2847,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(2862,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3022,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='Gemini_Generated_Image_vtuz1fvtuz1fvtuz.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(2863,373,187,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='55192123432_66aed38dd0_o.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3066,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3081,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3241,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='55192123432_66aed38dd0_o.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3081,373,189,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='55187293546_32fd3f50eb_3k.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3285,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3300,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3460,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='55187293546_32fd3f50eb_3k.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3301,373,188,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='55185633398_92ce8444be_5k.jpg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3504,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3519,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3679,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='55185633398_92ce8444be_5k.jpg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3518,373,192,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='WhatsApp Image 2026-01-16 at 13.19.20.jpeg' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3723,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3738,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(3898,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='WhatsApp Image 2026-01-16 at 13.19.20.jpeg' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3738,373,190,20) | Help='' | pid=10888 | hwnd=0x0
+        ListItem | Name='Gemini_Generated_Image_2pybrh2pybrh2pyb.png' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=True | Rect=(3942,187,219,219) | Help='' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Close' | Fw='WPF' | Off=True | Rect=(3957,202,30,30) | Help='Rimuovi' | pid=10888 | hwnd=0x0
+          Button | Name='' | Class='Button' | AutoId='Star' | Fw='WPF' | Off=True | Rect=(4117,202,30,30) | Help='Attiva/Disattiva preferito' | pid=10888 | hwnd=0x0
+          Text | Name='Gemini_Generated_Image_2pybrh2pybrh2pyb.png' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(3958,373,187,20) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Documenti recenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(10,197,125,20) | Help='' | pid=10888 | hwnd=0x0
+      Button | Name='Vedi di più…' | Class='Button' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,199,81,20) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Vedi di più…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,199,81,20) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      List | Name='' | Class='ListBox' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,406,1922,18) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      List | Name='' | Class='ListBox' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,424,1922,259) | Help='' | pid=10888 | hwnd=0x0
+        Group | Name='Ti diamo il benvenuto in Affinity.' | Class='GroupItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,424,1922,259) | Help='' | pid=10888 | hwnd=0x0
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Introduzione ad Affinity' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(14,578,96,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Una rapida panoramica di Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(14,615,86,55) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='52,4 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(159,631,45,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(219,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Importazione' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(233,615,81,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Come importare in Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(233,633,114,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='6,2 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(382,650,38,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(438,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Esportazione' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(452,615,78,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Come esportare da Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(452,633,116,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='10,5 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(597,650,45,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(657,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Livelli' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(671,615,34,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Scopri come lavorare con i livelli.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(671,633,128,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='839 KB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(820,650,38,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(876,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Studi personalizzati' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(890,597,117,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Scopri di più su come personalizzare gli Studi.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(890,615,124,55) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='12,3 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1035,641,45,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1095,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Regolazioni e filtri live' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1109,596,109,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Utilizzare regolazioni e filtri in Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1109,633,126,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='29,9 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1254,641,45,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1314,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Testo' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1328,615,32,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Lavorare con il testo in Affinity.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1328,633,122,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='52,7 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1473,650,45,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1533,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Traccia immagine' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1547,615,105,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Tracciamento bitmap ai vettori.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1547,633,127,37) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='430 KB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1696,650,38,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+          ListItem | Name='' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1752,464,219,219) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Mockup flessibili' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1766,597,101,18) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='Un flusso di lavoro non distruttivo e riutilizzabile.' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1766,615,113,55) | Help='' | pid=10888 | hwnd=0x0
+            Text | Name='5 MB' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1920,641,29,17) | Help='' | pid=10888 | hwnd=0x0
+            <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      Button | Name='Vedi di più…' | Class='Button' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,436,81,20) | Help='' | pid=10888 | hwnd=0x0
+        Text | Name='Vedi di più…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1816,436,81,20) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  Menu | Name='' | Class='Menu' | AutoId='' | Fw='WPF' | Off=False | Rect=(55,0,737,37) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='File' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(55,0,49,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_File' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(69,9,22,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Modifica' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(104,0,85,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Modifica' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(118,9,58,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Documento' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(189,0,105,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Documento' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(203,9,78,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Testo' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(294,0,61,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Testo' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(308,9,34,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Vettore' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(355,0,75,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Vettore' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(369,9,48,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Pixel' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(430,0,57,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Pixel' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(444,9,30,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Livello' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(487,0,69,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Livello' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(501,9,42,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Visualizza' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(556,0,91,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Visualizza' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(570,9,64,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Finestra' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(647,0,79,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Finestra' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(661,9,52,20) | Help='' | pid=10888 | hwnd=0x0
+    MenuItem | Name='Guida' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(726,0,66,37) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='_Guida' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(740,9,39,20) | Help='' | pid=10888 | hwnd=0x0
+  <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  Button | Name='' | Class='Button' | AutoId='PART_Mini' | Fw='WPF' | Off=False | Rect=(1812,0,36,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_Maxi' | Fw='WPF' | Off=False | Rect=(1848,0,36,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_Close' | Fw='WPF' | Off=False | Rect=(1884,0,37,36) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_HomeButton' | Fw='WPF' | Off=False | Rect=(0,41,60,66) | Help='Home' | pid=10888 | hwnd=0x0
+  List | Name='' | Class='ListBox' | AutoId='PART_MainWorkspaces' | Fw='WPF' | Off=False | Rect=(60,41,414,66) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(65,54,104,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Vettore' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(104,64,48,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(169,54,86,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Pixel' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(208,64,30,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(255,54,100,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Layout' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(294,64,44,20) | Help='' | pid=10888 | hwnd=0x0
+    ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(355,54,114,39) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Canva AI' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(394,64,58,20) | Help='' | pid=10888 | hwnd=0x0
+  Button | Name='' | Class='Button' | AutoId='PART_ToggleButton' | Fw='WPF' | Off=False | Rect=(484,59,15,29) | Help='Gestione studio' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(512,53,101,43) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(616,57,723,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1341,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1390,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1408,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1457,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1475,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1524,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1542,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1591,57,16,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1609,57,64,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=False | Rect=(1655,57,18,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1676,57,20,34) | Help='' | pid=10888 | hwnd=0x0
+  Custom | Name='' | Class='QuickExportControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1696,57,129,34) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='ExportButtonReflectedItem:expo' | Fw='WPF' | Off=False | Rect=(1698,59,106,29) | Help='Esporta ' | pid=10888 | hwnd=0x0
+      Text | Name='Esporta ' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1730,64,54,20) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='PART_DropDownButton' | Fw='WPF' | Off=False | Rect=(1804,59,18,29) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1825,57,20,34) | Help='' | pid=10888 | hwnd=0x0
+  ToolBar | Name='' | Class='ToolBar' | AutoId='' | Fw='WPF' | Off=False | Rect=(1847,57,46,34) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  Custom | Name='' | Class='ContextBarHost' | AutoId='' | Fw='WPF' | Off=False | Rect=(0,108,1921,39) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  Custom | Name='' | Class='ToolHost' | AutoId='PART_ToolHost' | Fw='WPF' | Off=False | Rect=(0,147,51,962) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,150,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,166,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,195,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,211,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,240,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,256,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,285,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,301,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,330,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,346,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,375,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,391,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,420,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,436,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,465,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,481,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,510,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,526,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,555,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,571,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,600,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,616,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,645,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,661,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,690,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,706,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,735,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,751,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,780,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,796,45,13) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=False | Rect=(2,827,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,843,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,859,45,13) | Help='' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='btn' | Fw='WPF' | Off=False | Rect=(2,888,45,45) | Help='' | pid=10888 | hwnd=0x0
+      <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Separator | Name='' | Class='Separator' | AutoId='' | Fw='WPF' | Off=True | Rect=(2,904,45,13) | Help='' | pid=10888 | hwnd=0x0
+    <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+    Button | Name='' | Class='Button' | AutoId='customise_tools_btn' | Fw='WPF' | Off=False | Rect=(0,934,50,22) | Help='Personalizza strumenti' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='Primary' | Fw='WPF' | Off=False | Rect=(9,997,32,32) | Help='Imposta riempimento' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='Secondary' | Fw='WPF' | Off=False | Rect=(9,983,32,32) | Help='Imposta tratto' | pid=10888 | hwnd=0x0
+    Button | Name='' | Class='Button' | AutoId='SwitcherBtn' | Fw='WPF' | Off=False | Rect=(17,1034,16,8) | Help='Scambia colore tratto con colore di riempimento [Shift + X]' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(51,147,329,962) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Pagine' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(73,149,53,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Pagine' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(79,155,41,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Asset' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(126,149,44,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Asset' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(132,155,32,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Stock' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(170,149,45,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Stock' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(176,155,33,18) | Help='' | pid=10888 | hwnd=0x0
+  <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=False | Rect=(380,147,2,962) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=False | Rect=(1588,147,2,962) | Help='' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,147,331,332) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Colore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,149,52,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Colore' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1619,155,40,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Campioni' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1665,149,70,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Campioni' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1671,155,58,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Tratto' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1735,149,47,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Tratto' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1741,155,35,18) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(1590,479,331,2) | Help='' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,481,331,425) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Livelli' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,483,46,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Livelli' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1619,489,34,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Carattere' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1659,483,68,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Carattere' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1665,489,56,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Paragrafo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1727,483,70,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Paragrafo' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1733,489,58,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Stili di testo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1797,483,83,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Stili di testo' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1803,489,71,18) | Help='' | pid=10888 | hwnd=0x0
+  Thumb | Name='' | Class='Thumb' | AutoId='Splitter' | Fw='WPF' | Off=True | Rect=(1590,906,331,2) | Help='' | pid=10888 | hwnd=0x0
+  Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,908,331,201) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Trasforma' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,910,72,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Trasforma' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1619,916,60,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Navigatore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1685,910,79,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Navigatore' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1691,916,67,18) | Help='' | pid=10888 | hwnd=0x0
+    TabItem | Name='StudioPage, Title = Cronologia' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1764,910,79,35) | Help='' | pid=10888 | hwnd=0x0
+      Text | Name='Cronologia' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1770,916,67,18) | Help='' | pid=10888 | hwnd=0x0
+  <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  <error: Impossibile convertire il valore "∞" nel tipo "System.Int32". Errore: "Valore troppo grande o troppo piccolo per un Int32.">
+  StatusBar | Name='' | Class='StatusBar' | AutoId='PART_StatusBar' | Fw='WPF' | Off=False | Rect=(0,1110,1921,31) | Help='' | pid=10888 | hwnd=0x0
+Elements=502 Named=271 WithHelpText=89 view=raw depth=7 elapsedMs=4197
+TYPE Button: 132 (named 12)
+TYPE Custom: 3 (named 0)
+TYPE Group: 2 (named 2)
+TYPE List: 15 (named 0)
+TYPE ListItem: 70 (named 52)
+TYPE Menu: 1 (named 0)
+TYPE MenuItem: 10 (named 10)
+TYPE Pane: 2 (named 0)
+TYPE ProgressBar: 18 (named 0)
+TYPE RadioButton: 6 (named 6)
+TYPE ScrollBar: 4 (named 0)
+TYPE Separator: 18 (named 0)
+TYPE StatusBar: 1 (named 0)
+TYPE Tab: 4 (named 0)
+TYPE TabItem: 13 (named 13)
+TYPE Text: 179 (named 175)
+TYPE Thumb: 7 (named 0)
+TYPE ToolBar: 14 (named 0)
+TYPE Window: 3 (named 1)

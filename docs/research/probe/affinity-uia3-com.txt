@@ -1,0 +1,33 @@
+﻿main hwnd=0xC07C4
+ROOT type=finestra(50032) Name='Affinity' Class='Window' AutoId='' Fw='WPF' Rect=(-9,-9,1938,1158) Help='' FullDesc='' enabled=1
+COM UIA3 FindAll(Descendants, control view default): count=101 named=43 withHelp=7 in 120ms
+  by control type id: 50000:32, 50007:4, 50008:1, 50009:1, 50010:1, 50011:11, 50017:1, 50018:4, 50019:13, 50020:12, 50021:14, 50025:3, 50027:2, 50037:1, 50038:1
+COM UIA3 raw view cached FindAll: count=183 named=91 in 198ms
+PT (24,397) [tool palette Penna] 6ms -> type=pulsante(50000) Name='' Class='Button' AutoId='btn' Fw='WPF' Rect=(2,375,45,45) Help='' FullDesc='' enabled=0
+      child: type=testo(50020) Name='Strumento Penna' Class='TextBlock' AutoId='text' Fw='WPF' Rect=(0,0,0,0) Help='' FullDesc='' enabled=0
+PT (1362,74) [toolbar Modalita anteprima] 4ms -> type=barra degli strumenti(50021) Name='' Class='ToolBar' AutoId='' Fw='WPF' Rect=(1341,57,46,34) Help='' FullDesc='' enabled=1
+      child: type=testo(50020) Name='Modalità anteprima' Class='Text' AutoId='text' Fw='WPF' Rect=(0,0,0,0) Help='' FullDesc='' enabled=0
+      child: type=pulsante(50000) Name='' Class='Button' AutoId='PART_DropDownButton' Fw='WPF' Rect=(0,0,0,0) Help='' FullDesc='' enabled=0
+      child: type=testo(50020) Name='Modalità anteprima' Class='TextBlock' AutoId='' Fw='WPF' Rect=(0,0,0,0) Help='' FullDesc='' enabled=1
+PT (316,75) [studio Layout] 5ms -> type=voce di elenco(50007) Name='Serif.Affinity.Workspaces.Workspace' Class='ListBoxItem' AutoId='' Fw='WPF' Rect=(255,54,100,39) Help='' FullDesc='' enabled=1
+      child: type=testo(50020) Name='Layout' Class='TextBlock' AutoId='PART_TextBlock' Fw='WPF' Rect=(294,64,44,20) Help='' FullDesc='' enabled=1
+PT (1714,636) [panel label Interlinea] 3ms -> type=scheda(50018) Name='' Class='TabControl' AutoId='' Fw='WPF' Rect=(1590,481,331,425) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Livelli' Class='TabItem' AutoId='' Fw='WPF' Rect=(1613,483,46,35) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Carattere' Class='TabItem' AutoId='' Fw='WPF' Rect=(1659,483,68,35) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Paragrafo' Class='TabItem' AutoId='' Fw='WPF' Rect=(1727,483,70,35) Help='' FullDesc='' enabled=1
+PT (123,197) [panel row Pagine mastro] 4ms -> type=scheda(50018) Name='' Class='TabControl' AutoId='' Fw='WPF' Rect=(51,147,329,962) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Pagine' Class='TabItem' AutoId='' Fw='WPF' Rect=(73,149,53,35) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Asset' Class='TabItem' AutoId='' Fw='WPF' Rect=(126,149,44,35) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Stock' Class='TabItem' AutoId='' Fw='WPF' Rect=(170,149,45,35) Help='' FullDesc='' enabled=1
+PT (1678,213) [panel icon contagocce] 3ms -> type=scheda(50018) Name='' Class='TabControl' AutoId='' Fw='WPF' Rect=(1590,147,331,332) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Colore' Class='TabItem' AutoId='' Fw='WPF' Rect=(1613,149,52,35) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Campioni' Class='TabItem' AutoId='' Fw='WPF' Rect=(1665,149,70,35) Help='' FullDesc='' enabled=1
+      child: type=voce di scheda(50019) Name='StudioPage, Title = Tratto' Class='TabItem' AutoId='' Fw='WPF' Rect=(1735,149,47,35) Help='' FullDesc='' enabled=1
+PT (1724,926) [tab Navigatore] 5ms -> type=voce di scheda(50019) Name='StudioPage, Title = Navigatore' Class='TabItem' AutoId='' Fw='WPF' Rect=(1685,910,79,35) Help='' FullDesc='' enabled=1
+      child: type=testo(50020) Name='Navigatore' Class='TextBlock' AutoId='TabTitle' Fw='WPF' Rect=(1691,916,67,18) Help='' FullDesc='' enabled=1
+PT (241,19) [menu bar Documento] 4ms -> type=testo(50020) Name='_Documento' Class='TextBlock' AutoId='' Fw='WPF' Rect=(203,9,78,20) Help='' FullDesc='' enabled=1
+PT (1754,75) [button Esporta] 4ms -> type=testo(50020) Name='Esporta ' Class='TextBlock' AutoId='' Fw='WPF' Rect=(1730,64,54,20) Help='' FullDesc='' enabled=0
+PT (960,600) [canvas area vuota] 3ms -> type=finestra(50032) Name='Affinity' Class='Window' AutoId='' Fw='WPF' Rect=(-9,-9,1938,1158) Help='' FullDesc='' enabled=1
+      child: type=barra del titolo(50037) Name='' Class='' AutoId='TitleBar' Fw='' Rect=(28,0,1892,29) Help='' FullDesc='' enabled=1
+      child: type=menu(50009) Name='' Class='Menu' AutoId='' Fw='WPF' Rect=(55,0,737,37) Help='' FullDesc='' enabled=1
+      child: type=testo(50020) Name='' Class='Text' AutoId='' Fw='WPF' Rect=(0,0,0,0) Help='' FullDesc='' enabled=1

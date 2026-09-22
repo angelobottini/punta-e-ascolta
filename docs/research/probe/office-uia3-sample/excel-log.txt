@@ -1,0 +1,355 @@
+OfficeProbe mode=excel 2026-09-21 19:33:51
+Process arch=Arm64 OS arch=Arm64 .NET=10.0.12 apartment=MTA
+Interop assembly: Interop.UIAutomationClient, Version=10.0.19041.0, Culture=neutral, PublicKeyToken=null @ C:\Users\Angelo\AppData\Local\Temp\claude\C--Users-Angelo-Desktop-Matteo\d74c920e-45bd-48a5-abcd-2768715aa453\scratchpad\spikes\office\bin\Release\net10.0-windows\win-arm64\Interop.UIAutomationClient.dll
+new CUIAutomation8 + IUIAutomation2 timeouts: 19,5 ms
+EXCEL PIDs before: []; WINWORD: [18000]
+CreateInstance: 910 ms
+created EXCEL PIDs: [21644]
+My Excel PID=21644 machine=x64 app.Hwnd=0x220500 class=XLMAIN pid=21644 Version=16.0 Build=20326
+DPI=120 zoom=100% foreground pid=16412 (mine=21644)
+PointsToScreenPixelsX(0)=103 PointsToScreenPixelsY(0)=315
+
+########## 5. EXCEL CELLS ##########
+C3 points: Left=96 Top=28,8 Width=51,6 Height=14,4
+C3 via PointsToScreenPixelsX/Y(Left/Top) directly = (199,344); via x0 + Left*dpi/72*zoom = (263,363) size 86x24
+
+--- cell C3: calc rect=(263,363,86x24) centre=(306,375); COM RangeFromPoint(centre)=$C$3; COM Text='1234,5000' Formula='1234.5' FormulaLocal='1234,5' Value2='1234,5'
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (104,2 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='C3' pid=21644 rect=(263,363,86x24)
+        Name='C3'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='1234,5000' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='C3' Description='' Help='' Value='1234,5000' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='1234,5000'
+    ancestors (raw view):
+      [0] ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='C3' Name='C3' textPattern=True
+      [1] ct=50028 (griglia dati) class='XLSpreadsheetGrid' fw= aid='Grid' Name='Grigia' textPattern=False
+      [2] ct=50033 (pannello) class='' fw= aid='Foglio1' Name='Foglio Foglio1' textPattern=False
+      [3] ct=50033 (pannello) class='ExcelGrid' fw= aid='Cartel1' Name='Cartel1' textPattern=False
+      [4] ct=50025 (Personalizzato) class='' fw=Win32 aid='' Name='Cartel1' textPattern=False
+      [5] ct=50033 (pannello) class='XLDESK' fw=Win32 aid='' Name='' textPattern=False
+      [6] ct=50032 (finestra) class='XLMAIN' fw=Win32 aid='' Name='Cartel1 - Excel' textPattern=False
+      [7] ct=50033 (pannello) class='#32769' fw=Win32 aid='' Name='Desktop 1' textPattern=False
+
+--- cell B2: calc rect=(183,339,80x24) centre=(223,351); COM RangeFromPoint(centre)=$B$2; COM Text='Prodotto' Formula='Prodotto' FormulaLocal='Prodotto' Value2='Prodotto'
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (7,3 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='B2' pid=21644 rect=(183,339,80x24)
+        Name='B2'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='Prodotto' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='B2' Description='' Help='' Value='Prodotto' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='Prodotto'
+
+--- cell B3: calc rect=(183,363,80x24) centre=(223,375); COM RangeFromPoint(centre)=$B$3; COM Text='Mele rosse' Formula='Mele rosse' FormulaLocal='Mele rosse' Value2='Mele rosse'
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (6,9 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='B3' pid=21644 rect=(183,363,80x24)
+        Name='B3'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='Mele rosse' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='B3' Description='' Help='' Value='Mele rosse' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='Mele rosse'
+
+--- cell D3: calc rect=(349,363,107x24) centre=(402,375); COM RangeFromPoint(centre)=$D$3; COM Text='1,5000 €' Formula='1.5' FormulaLocal='1,5' Value2='1,5'
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (19,1 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='D3' pid=21644 rect=(349,363,107x24)
+        Name='D3'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='1,5000 €' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='D3' Description='' Help='' Value='1,5000 €' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='1,5000 €'
+
+--- cell C4: calc rect=(263,387,86x24) centre=(306,399); COM RangeFromPoint(centre)=$C$4; COM Text='7' Formula='7' FormulaLocal='7' Value2='7'
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (6,7 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='C4' pid=21644 rect=(263,387,86x24)
+        Name='C4'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='7' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='C4' Description='' Help='' Value='7' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='7'
+
+--- cell D4: calc rect=(349,387,107x24) centre=(402,399); COM RangeFromPoint(centre)=$D$4; COM Text='1851,75000 €' Formula='=C3*D3' FormulaLocal='=C3*D3' Value2='1851,75'
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (7,5 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='D4' pid=21644 rect=(349,387,107x24)
+        Name='D4'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='1851,75000 €' ItemStatus='Contiene Formula.' AcceleratorKey='' AccessKey=''
+        Legacy: Name='D4' Description='' Help='' Value='1851,75000 €' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='1851,75000 €'
+
+--- cell E6: calc rect=(456,435,80x24) centre=(496,447); COM RangeFromPoint(centre)=$E$6; COM Text='' Formula='' FormulaLocal='' Value2=''
+    WindowFromPoint class=EXCEL7 pid=21644
+    DescribeElementAtPoint (6,3 ms): ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='E6' pid=21644 rect=(456,435,80x24)
+        Name='E6'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='E6' Description='' Help='' Value='' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText=''
+
+########## 5b. HEADERS, FORMULA BAR, NAME BOX ##########
+
+--- column header above C: (306,303)
+    column header: ct=50029 (Intestazione colonna) class='XLGridColumnHeader' fw= aid='' pid=21644 rect=(263,291,86x24)
+        Name='C'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='C' Description='' Help='' Value='' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='C'
+
+--- row header left of row 3: (88,375)
+    row header: ct=50029 (Intestazione di riga) class='XLGridRowHeader' fw= aid='' pid=21644 rect=(69,363,34x24)
+        Name='3'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='3' Description='' Help='' Value='' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='3'
+
+--- pointing at the ACTIVE cell D4 (formula) after Select
+    active cell D4: ct=50029 (Elemento) class='XLSpreadsheetCell' fw= aid='D4' pid=21644 rect=(349,387,107x24)
+        Name='D4'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='1851,75000 €' ItemStatus='Contiene Formula.' AcceleratorKey='' AccessKey=''
+        Legacy: Name='D4' Description='' Help='' Value='1851,75000 €' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='1851,75000 €'
+
+--- scanning upwards from the column header to find the formula bar
+  y=293:
+    scan: ct=50029 (Intestazione colonna) class='XLGridColumnHeader' fw= aid='' pid=21644 rect=(536,291,80x24)
+        Name='F'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='F' Description='' Help='' Value='' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='F'
+  y=283:
+    scan: ct=50004 (Modifica) class='XLFormulaBarEditor' fw= aid='FormulaBar' pid=21644 rect=(343,243,1508x48)
+        Name='Barra della formula'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Barra della formula' Description='' Help='' Value='' DefaultAction='' Shortcut='' Role=0x2A
+        => SpokenText='Barra della formula'
+  y=233:
+    scan: ct=50026 (Gruppo) class='NetUIChunk' fw=Win32 aid='' pid=21644 rect=(510,121,253x120)
+        Name='Allineamento'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, Z A'
+        Legacy: Name='Allineamento' Description='' Help='' Value='' DefaultAction='' Shortcut='ALT, H, Z A' Role=0x14
+        => SpokenText='Allineamento'
+  y=193:
+    scan: ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='AlignRight' pid=21644 rect=(584,173,30x30)
+        Name='Allinea a destra'
+        HelpText=''
+        FullDescription='Allinea il contenuto a destra.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, L L'
+        Legacy: Name='Allinea a destra' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='ALT, H, L L' Role=0x2B
+        => SpokenText='Allinea a destra'
+formula bar element: ct=50004 aid='FormulaBar' Name='Barra della formula' textPattern=True valuePattern=False
+formula bar TextPattern.DocumentRange.GetText = '=C3*D3' (3,2 ms) [active cell D4, COM Formula='=C3*D3']
+GetSentenceAtPoint on the formula bar: status=NotOnText sentence='<null>' dist=56,4
+
+--- name box area (left of formula bar)
+  y=293:
+    scan: ct=50029 (Intestazione colonna) class='XLGridColumnHeader' fw= aid='' pid=21644 rect=(103,291,80x24)
+        Name='A'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='A' Description='' Help='' Value='' DefaultAction='Doppio clic' Shortcut='' Role=0x22
+        => SpokenText='A'
+  y=283:
+    scan: ct=50033 (pannello) class='EXCEL;' fw=Win32 aid='' pid=21644 rect=(69,243,274x48)
+        Name=''
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='' Description='' Help='' Value='' DefaultAction='' Shortcut='' Role=0xA
+        => SpokenText=''
+  y=273:
+    scan: ct=50004 (Modifica) class='Edit' fw=Win32 aid='1001' pid=21644 rect=(83,257,98x23)
+        Name='Casella Nome'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=True)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Casella Nome' Description='' Help='' Value='' DefaultAction='' Shortcut='' Role=0x2A
+        => SpokenText='Casella Nome'
+  y=253:
+    scan: ct=50033 (pannello) class='EXCEL;' fw=Win32 aid='' pid=21644 rect=(69,243,274x48)
+        Name=''
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='' Description='' Help='' Value='' DefaultAction='' Shortcut='' Role=0xA
+        => SpokenText=''
+  y=233:
+    scan: ct=50026 (Gruppo) class='NetUIChunk' fw=Win32 aid='' pid=21644 rect=(84,121,134x120)
+        Name='Appunti'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, Z L'
+        Legacy: Name='Appunti' Description='' Help='' Value='' DefaultAction='' Shortcut='ALT, H, Z L' Role=0x14
+        => SpokenText='Appunti'
+  y=213:
+    scan: ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='FormatPainter' pid=21644 rect=(148,187,30x30)
+        Name='Copia formato'
+        HelpText=''
+        FullDescription='Se l'aspetto di una determinata sezione è particolarmente gradevole, è possibile applicarlo ad altro contenuto nel documento.\n\nPer iniziare: \n1. Selezionare il contenuto con la formattazione da usare\n2. Fare clic su Copia formato\n3. Selezionare un altro elemento per applicare automaticamente la [...]'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, O O'
+        Legacy: Name='Copia formato' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='ALT, H, O O' Role=0x2B
+        => SpokenText='Copia formato'
+
+########## 5c. EXCEL SELECTION / FOCUS ##########
+    focused element: ct=50026 (Gruppo) class='h-full overflow-y-auto scroll-py-2.5 [scrollbar-gutter:stable_both-edges] outline-none' fw=Chrome aid='' pid=16412 rect=(1397,91,512x1038)
+        Name='In esecuzione punta-ascolta-spikes Interrompi questo workflow Workflow 21min 31s 5 agenti 1.2M token Rapporto Affinity dai dati raccolti, prova Office con istanz[...]'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='In esecuzione punta-ascolta-spikes Interrompi questo workflow Workflow 21min 31s 5 agenti 1.2M token Rapporto Affinity dai dati raccolti, prova Office con istanz[...]' Description='' Help='' Value='' DefaultAction='' Shortcut='' Role=0x14
+        => SpokenText='In esecuzione punta-ascolta-spikes Interrompi questo workflow Workflow 21min 31s 5 agenti 1.2M token Rapporto Affinity dai dati raccolti, prova Office con istanz[...]'
+SelectionPattern on ct=50033 'Foglio Foglio1': 9 item(s) (2,7 ms)
+    sel[0] ct=50029 Name='B2' Value='Prodotto'
+    sel[1] ct=50029 Name='B3' Value='Mele rosse'
+    sel[2] ct=50029 Name='B4' Value='Totale'
+    sel[3] ct=50029 Name='C2' Value='Quantità'
+    sel[4] ct=50029 Name='C3' Value='1234,5000'
+    sel[5] ct=50029 Name='C4' Value='7'
+    sel[6] ct=50029 Name='D2' Value='Prezzo'
+    sel[7] ct=50029 Name='D3' Value='1,5000 €'
+    sel[8] ct=50029 Name='D4' Value='1851,75000 €'
+TextPattern host above a cell: ct=50029 class=XLSpreadsheetCell levels=0
+GetSentenceAtPoint on a cell: status=Ok sentence='1234,5000' err=
+
+########## 5d. EXCEL RIBBON / STATUS BAR ##########
+top-level window children: 8
+   [0] ct=50033 class='DropShadow' Name='DropShadowTop'
+       descendants: 1 in 2 ms
+   [1] ct=50033 class='EXCEL2' Name=''
+       descendants: 23 in 21 ms
+   [2] ct=50033 class='EXCEL2' Name=''
+       descendants: 126 in 84 ms
+   [3] ct=50033 class='EXCEL;' Name=''
+       descendants: 4 in 8 ms
+   [4] ct=50004 class='XLFormulaBarEditor' Name='Barra della formula'
+       descendants: 1 in 0 ms
+   [5] ct=50033 class='XLDESK' Name=''
+   [6] ct=50037 class='' Name=''
+       descendants: 6 in 5 ms
+   [7] ct=50010 class='' Name='Barra dei menu foglio di lavoro'
+       descendants: 2 in 24 ms
+visible NetUI elements of type Button/CheckBox/SplitButton/MenuItem/ComboBox/TabItem: 121; with EMPTY Name: 0; with HelpText: 0
+
+--- B1 ribbon 'Grassetto': tree element ct=50000 Name='Grassetto' rect=(228,173,30x30) -> ElementFromPoint(243,188)
+    DescribeElementAtPoint (13,3 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='Bold' pid=21644 rect=(228,173,30x30)
+        Name='Grassetto'
+        HelpText=''
+        FullDescription='Applica il grassetto al testo.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='CTRL+G; ALT, H, 1'
+        Legacy: Name='Grassetto' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='CTRL+G; ALT, H, 1' Role=0x2B
+        => SpokenText='Grassetto'
+        parent: ct=50026 class='NetUIChunk' Name='Carattere'
+
+--- B2 ribbon 'Somma automatica': tree element ct=50031 Name='Somma automatica' rect=(1378,123,60x30) -> ElementFromPoint(1408,138)
+    DescribeElementAtPoint (11,0 ms): ct=50011 (Voce di menu) class='NetUIRibbonButton' fw=Win32 aid='AutoSumMenu_Dropdown' pid=21644 rect=(1408,123,30x30)
+        Name='Altre opzioni'
+        HelpText=''
+        FullDescription='Consente di aggiungere automaticamente un calcolo rapido al foglio di lavoro, ad esempio una somma o una media.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, 7'
+        Legacy: Name='Altre opzioni' Description='' Help='' Value='' DefaultAction='Apri' Shortcut='ALT, H, 7' Role=0xC
+        => SpokenText='Altre opzioni'
+        parent: ct=50031 class='NetUISplitButtonAnchor' Name='Somma automatica'
+
+--- B3 ribbon 'Unisci': tree element ct=50031 Name='Unisci e allinea al centro' rect=(693,173,60x30) -> ElementFromPoint(723,188)
+    DescribeElementAtPoint (11,2 ms): ct=50011 (Voce di menu) class='NetUIRibbonButton' fw=Win32 aid='MergeCenterMenu_Dropdown' pid=21644 rect=(723,173,30x30)
+        Name='Altre opzioni'
+        HelpText=''
+        FullDescription='Consente di scegliere come unire le celle.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, U U'
+        Legacy: Name='Altre opzioni' Description='' Help='' Value='' DefaultAction='Apri' Shortcut='ALT, H, U U' Role=0xC
+        => SpokenText='Altre opzioni'
+        parent: ct=50031 class='NetUISplitButtonAnchor' Name='Unisci e allinea al centro'
+
+--- TAB 'Formule': tree element ct=50019 Name='Formule' rect=(535,81,86x38) -> ElementFromPoint(578,100)
+    DescribeElementAtPoint (12,3 ms): ct=50019 (Elemento di scheda) class='NetUIRibbonTab' fw=Win32 aid='TabFormulas' pid=21644 rect=(535,81,86x38)
+        Name='Formule'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, U 1'
+        Legacy: Name='Formule' Description='' Help='' Value='' DefaultAction='Passaggio' Shortcut='ALT, U 1' Role=0x25
+        => SpokenText='Formule'
+        parent: ct=50018 class='NetUIPanViewer' Name='Schede della barra multifunzione'
+StatusBar: Name='Barra di stato' rect=(69,1084,1782x27)
+status bar named items: 50020:'Modalità Cella Pronto' | 50000:'Registrazione macro Registrazione non att[...]' | 50000:'Verifica accessibilità Accessibilità: con[...]' | 50000:'Media 773,6875' | 50000:'Conteggio 9' | 50000:'Somma 3094,75' | 50000:'Normale' | 50000:'Pagina e layout' | 50000:'Anteprima interruzioni di pagina' | 50000:'Zoom indietro' | 50015:'Zoom' | 50000:'Zoom indietro' | 50027:'Posizione' | 50000:'Zoom avanti' | 50000:'Zoom avanti' | 50000:'Zoom 100%' | 50027:'Casella di ridimensionamento'
+
+--- SB 'Modalità Cella Pronto': tree element ct=50020 Name='Modalità Cella Pronto' rect=(74,1085,60x26) -> ElementFromPoint(104,1098)
+    DescribeElementAtPoint (8,9 ms): ct=50020 (Testo) class='NetUISimpleButton' fw=Win32 aid='' pid=21644 rect=(74,1085,60x26)
+        Name='Modalità Cella Pronto'
+        HelpText=''
+        FullDescription='Modalità Pronto'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Modalità Cella Pronto' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x29
+        => SpokenText='Modalità Cella Pronto'
+        parent: ct=50017 class='NetUInetpane' Name='Barra di stato'
+
+--- SB 'Registrazione macro Regist[...]': tree element ct=50000 Name='Registrazione macro Registrazione non attivata' rect=(138,1085,40x26) -> ElementFromPoint(158,1098)
+    DescribeElementAtPoint (6,3 ms): ct=50000 (Pulsante) class='NetUISimpleButton' fw=Win32 aid='' pid=21644 rect=(138,1085,40x26)
+        Name='Registrazione macro Registrazione non attivata'
+        HelpText=''
+        FullDescription='Nessuna registrazione di macro in corso. Fare clic per iniziare a registrare una nuova macro.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Registrazione macro Registrazione non attivata' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x2B
+        => SpokenText='Registrazione macro Registrazione non attivata'
+        parent: ct=50017 class='NetUInetpane' Name='Barra di stato'
+
+--- SB 'Verifica accessibilità Acc[...]': tree element ct=50000 Name='Verifica accessibilità Accessibilità: conforme' rect=(178,1085,176x26) -> ElementFromPoint(266,1098)
+    DescribeElementAtPoint (6,0 ms): ct=50000 (Pulsante) class='NetUISimpleButton' fw=Win32 aid='' pid=21644 rect=(178,1085,176x26)
+        Name='Verifica accessibilità Accessibilità: conforme'
+        HelpText=''
+        FullDescription='Controllo dell'accessibilità completato. Per ulteriori informazioni, fai clic qui.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Verifica accessibilità Accessibilità: conforme' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x2B
+        => SpokenText='Verifica accessibilità Accessibilità: conforme'
+        parent: ct=50017 class='NetUInetpane' Name='Barra di stato'
+screenshot saved: excel-window.png (window rect 60,20,1800x1100)
+released workbook/sheet/window/range RCWs before Quit
+cleanup: my EXCEL PID 21644 gone=False; user's WINWORD 18000 alive=True
+
+=== TIMINGS (ms) grouped by call ===
+COM CreateInstance(Excel.Application)        n=  1 min=   909,5 med=   909,5 max=   909,5
+COM Window.RangeFromPoint                    n=  7 min=     0,2 med=     0,3 max=     4,5
+DescribeElementAtPoint TOTAL                 n= 14 min=     6,0 med=     8,9 max=   104,2
+FindAllBuildCache(descendants of )           n=  2 min=     4,6 med=    24,4 max=    24,4
+FindAllBuildCache(descendants of DropShadow) n=  1 min=     2,5 med=     2,5 max=     2,5
+FindAllBuildCache(descendants of EXCEL;)     n=  1 min=     8,5 med=     8,5 max=     8,5
+FindAllBuildCache(descendants of EXCEL2)     n=  2 min=    20,6 med=    83,8 max=    83,8
+FindAllBuildCache(descendants of XLFormulaBarEditor) n=  1 min=     0,4 med=     0,4 max=     0,4
+FormulaBar.DocumentRange.GetText             n=  1 min=     3,2 med=     3,2 max=     3,2
+GetFocusedElement                            n=  1 min=     5,8 med=     5,8 max=     5,8
+reader.Describe                              n= 39 min=     2,7 med=     4,4 max=    14,4
+reader.ElementFromPoint                      n= 41 min=     1,9 med=     2,6 max=    89,0
+reader.Expand(Line)                          n=  2 min=     0,2 med=     1,7 max=     1,7
+reader.Expand(Paragraph)                     n=  1 min=     0,4 med=     0,4 max=     0,4
+reader.FindTextHost                          n=  2 min=     0,3 med=     0,4 max=     0,4
+reader.Line.GetBoundingRectangles            n=  2 min=     1,5 med=     2,5 max=     2,5
+reader.MoveEndpointByRange                   n=  1 min=     1,4 med=     1,4 max=     1,4
+reader.paragraph.GetText                     n=  1 min=     0,2 med=     0,2 max=     0,2
+reader.prefix.GetText                        n=  1 min=     0,3 med=     0,3 max=     0,3
+reader.RangeFromPoint                        n=  2 min=     0,5 med=     1,2 max=     1,2
+SelectionPattern.GetCurrentSelection         n=  1 min=     2,7 med=     2,7 max=     2,7
+
+=== CALLS > 300 ms ===
+excel/COM CreateInstance(Excel.Application): 910 ms
+
+=== CALLS > 100 ms ===
+excel-cell/DescribeElementAtPoint TOTAL: 104 ms
+
+=== EXCEPTIONS ===

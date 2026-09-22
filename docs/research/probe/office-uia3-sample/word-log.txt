@@ -1,0 +1,774 @@
+OfficeProbe mode=word 2026-09-21 19:32:40
+Process arch=Arm64 OS arch=Arm64 .NET=10.0.12 apartment=MTA
+Interop assembly: Interop.UIAutomationClient, Version=10.0.19041.0, Culture=neutral, PublicKeyToken=null @ C:\Users\Angelo\AppData\Local\Temp\claude\C--Users-Angelo-Desktop-Matteo\d74c920e-45bd-48a5-abcd-2768715aa453\scratchpad\spikes\office\bin\Release\net10.0-windows\win-arm64\Interop.UIAutomationClient.dll
+new CUIAutomation8 + IUIAutomation2 timeouts: 15,3 ms
+WINWORD PIDs before: [18000]
+CreateInstance: 1305 ms
+WINWORD PIDs after: [16488,18000] created: [16488]
+My Word PID = 16488 machine=x64 (user's PID 18000 machine=x64)
+Word Version=16.0 Build=16.0.20326
+ActiveWindow.Hwnd=0x8F0068 class=OpusApp pid=16488
+Window DPI=120 (scale 125%); view=print zoom=100%
+Foreground window PID after app.Activate = 16412 (mine=16488)
+doc.Content.Text length=893 (.NET string length of inserted text=892)
+COM text escaped: Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\rQuesto è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa succede quando una frase va a capo in modo automatico. La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i colori e poi salva il lavoro nella cartella dei documenti. Alla fine della giornata spegne tutto e va a cena con la famiglia.\rOggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo!». Costa 12.50 euro, ecc. ma non importa.\rPrima riga con interruzione manuale\vSeconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salva... Poi chiudi tutto. Hai capito?\r
+
+########## 1. SENTENCE UNDER THE POINTER ##########
+
+--- T1 P1S1 'Rossi' centre: COM range [8,13) text='Rossi' GetPoint l=592 t=382 w=43 h=38 (17,3 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (78,1 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (2,0 ms)
+    RangeFromPoint: ok (1,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,9 getText=   0,3 rects=   0,2 ms | len=   1 nRects=1 dist=0,0px | 's'
+    TextUnit_Word        expand=   0,5 getText=   0,2 rects=   0,2 ms | len=   6 nRects=1 dist=0,0px | 'Rossi '
+        rect x=592 y=383 w=46 h=22
+    TextUnit_Line        expand=   0,7 getText=   0,3 rects=   0,4 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,5 rects=   0,4 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=10 dist=0,0px total=12,0 ms
+    SENTENCE: Il sig. Rossi arriva alle 15.30.
+    ancestors (raw view):
+      [0] ct=50004 (Modifica) class='' fw= aid='Body' Name='Contenuto pagina 1' textPattern=True
+      [1] ct=50025 (pagina) class='' fw= aid='UIA_AutomationId_Word_Page_1' Name='Pagina 1' textPattern=True
+      [2] ct=50030 (documento) class='_WwG' fw=Win32 aid='' Name='Documento1' textPattern=True
+      [3] ct=50033 (pannello) class='_WwB' fw=Win32 aid='' Name='Documento1' textPattern=False
+      [4] ct=50033 (pannello) class='_WwF' fw=Win32 aid='' Name='' textPattern=False
+      [5] ct=50032 (finestra) class='OpusApp' fw=Win32 aid='' Name='Documento1 - Word' textPattern=False
+      [6] ct=50033 (pannello) class='#32769' fw=Win32 aid='' Name='Desktop 1' textPattern=False
+    EXPECTED: Il sig. Rossi arriva alle 15.30.
+    RESULT  : CORRECT
+
+--- T2 P1S2 'mele' centre: COM range [56,60) text='mele' GetPoint l=942 t=382 w=39 h=38 (0,4 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (3,0 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,5 ms) text='' rects=1
+    TextUnit_Character   expand=   0,5 getText=   0,3 rects=   0,3 ms | len=   1 nRects=1 dist=0,0px | 'e'
+    TextUnit_Word        expand=   0,5 getText=   0,2 rects=   0,2 ms | len=   4 nRects=1 dist=0,0px | 'mele'
+        rect x=942 y=383 w=39 h=22
+    TextUnit_Line        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=57 dist=0,0px total=5,3 ms
+    SENTENCE: Porta con sé 3,5 kg di mele!
+    EXPECTED: Porta con sé 3,5 kg di mele!
+    RESULT  : CORRECT
+
+--- T3 P1S3 'bene' centre: COM range [65,69) text='bene' GetPoint l=1014 t=382 w=39 h=38 (0,2 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (3,9 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,3 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=1,0px | 'n'
+    TextUnit_Word        expand=   0,5 getText=   0,2 rects=   0,2 ms | len=   4 nRects=1 dist=0,0px | 'bene'
+        rect x=1014 y=383 w=39 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,1 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,1 rects=   0,1 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=67 dist=0,0px total=5,0 ms
+    SENTENCE: Va bene?
+    EXPECTED: Va bene?
+    RESULT  : CORRECT
+
+--- T4 P2S2 'giardino' centre: COM range [315,323) text='giardino' GetPoint l=921 t=468 w=63 h=24 (1,0 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,4 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,1 ms | len=   1 nRects=1 dist=0,0px | 'd'
+    TextUnit_Word        expand=   0,4 getText=   0,1 rects=   0,1 ms | len=   8 nRects=1 dist=0,0px | 'giardino'
+        rect x=921 y=468 w=63 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,1 rects=   0,2 ms | len= 101 nRects=1 dist=0,0px | 'contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla '
+        rect x=547 y=468 w=786 h=22
+    TextUnit_Paragraph   expand=   0,2 getText=   0,2 rects=   1,2 ms | len= 524 nRects=6 dist=0,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=Ok offset=248 dist=0,0px total=5,1 ms
+    SENTENCE: La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi.
+    EXPECTED: La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi.
+    RESULT  : CORRECT
+
+--- T5 P2S2 'fermarsi' centre: COM range [391,399) text='fermarsi' GetPoint l=721 t=492 w=66 h=25 (0,2 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,8 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,4 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=4,0px | 'a'
+    TextUnit_Word        expand=   0,3 getText=   0,2 rects=   0,1 ms | len=   8 nRects=1 dist=0,0px | 'fermarsi'
+        rect x=721 y=493 w=66 h=22
+    TextUnit_Line        expand=   0,2 getText=   0,2 rects=   0,1 ms | len= 100 nRects=1 dist=0,0px | 'riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i '
+        rect x=547 y=493 w=773 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   1,1 ms | len= 524 nRects=6 dist=0,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=Ok offset=324 dist=0,0px total=4,8 ms
+    SENTENCE: La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi.
+    EXPECTED: La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi.
+    RESULT  : CORRECT
+
+--- T6 P2S3 'cartella' centre: COM range [504,512) text='cartella' GetPoint l=791 t=517 w=60 h=24 (0,3 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,5 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=1,0px | 'e'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   9 nRects=1 dist=0,0px | 'cartella '
+        rect x=791 y=517 w=64 h=22
+    TextUnit_Line        expand=   0,4 getText=   0,2 rects=   0,2 ms | len= 109 nRects=1 dist=0,0px | 'colori e poi salva il lavoro nella cartella dei documenti. Alla fine della giornata spegne tutto e va a cena '
+        rect x=547 y=517 w=803 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,2 rects=   1,2 ms | len= 524 nRects=6 dist=0,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=Ok offset=437 dist=0,0px total=5,2 ms
+    SENTENCE: Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i colori e poi salva il lavoro nella cartella dei documenti.
+    EXPECTED: Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i colori e poi salva il lavoro nella cartella dei documenti.
+    RESULT  : CORRECT
+
+--- T7 P3S1 'disegno' centre: COM range [641,648) text='disegno' GetPoint l=903 t=578 w=61 h=27 (0,9 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (3,2 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,3 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=3,0px | 'g'
+    TextUnit_Word        expand=   0,5 getText=   0,2 rects=   0,2 ms | len=   7 nRects=1 dist=0,0px | 'disegno'
+        rect x=903 y=581 w=61 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,1 ms | len= 104 nRects=1 dist=0,0px | 'Oggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: '
+        rect x=547 y=581 w=779 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,1 rects=   0,5 ms | len= 153 nRects=2 dist=0,0px | 'Oggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo![...]'
+    GetSentenceAtPoint: status=Ok offset=50 dist=0,0px total=6,3 ms
+    SENTENCE: Oggi Matteo è contento 😀 perché ha finito il disegno.
+    EXPECTED: Oggi Matteo è contento 😀 perché ha finito il disegno.
+    RESULT  : CORRECT
+
+--- T8 P3S2 'Bianchi' centre: COM range [662,669) text='Bianchi' GetPoint l=1064 t=578 w=59 h=27 (0,2 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,5 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,3 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,1 rects=   0,2 ms | len=   1 nRects=1 dist=0,0px | 'n'
+    TextUnit_Word        expand=   0,3 getText=   0,1 rects=   0,1 ms | len=   8 nRects=1 dist=0,0px | 'Bianchi '
+        rect x=1064 y=581 w=63 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,1 rects=   0,1 ms | len= 104 nRects=1 dist=0,0px | 'Oggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: '
+        rect x=547 y=581 w=779 h=22
+    TextUnit_Paragraph   expand=   0,2 getText=   0,1 rects=   0,2 ms | len= 153 nRects=2 dist=0,0px | 'Oggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo![...]'
+    GetSentenceAtPoint: status=Ok offset=70 dist=0,0px total=6,1 ms
+    SENTENCE: La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo!».
+    EXPECTED: La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo!».
+    RESULT  : CORRECT
+
+--- T9 P3S3 'importa' centre: COM range [739,746) text='importa' GetPoint l=864 t=605 w=62 h=37 (0,3 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,8 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,3 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=0,0px | 'o'
+    TextUnit_Word        expand=   0,5 getText=   0,2 rects=   0,2 ms | len=   7 nRects=1 dist=0,0px | 'importa'
+        rect x=864 y=605 w=62 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,1 rects=   0,1 ms | len=  49 nRects=1 dist=0,0px | '«Bravo!». Costa 12.50 euro, ecc. ma non importa.\r'
+        rect x=547 y=605 w=395 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   0,2 ms | len= 153 nRects=2 dist=0,0px | 'Oggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo![...]'
+    GetSentenceAtPoint: status=Ok offset=147 dist=0,0px total=6,1 ms
+    SENTENCE: Costa 12.50 euro, ecc. ma non importa.
+    EXPECTED: Costa 12.50 euro, ecc. ma non importa.
+    RESULT  : CORRECT
+
+--- T10 P4S2 'Seconda' centre: COM range [784,791) text='Seconda' GetPoint l=547 t=666 w=70 h=38 (0,7 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,4 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=5,0px | 'n'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   8 nRects=1 dist=0,0px | 'Seconda '
+        rect x=547 y=667 w=74 h=22
+    TextUnit_Line        expand=   0,4 getText=   0,2 rects=   0,2 ms | len= 108 nRects=1 dist=0,0px | 'Seconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salva... Poi chiudi tutto. Hai capito?'
+        rect x=547 y=667 w=810 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   0,6 ms | len= 144 nRects=2 dist=0,0px | 'Prima riga con interruzione manuale\vSeconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salv[...]'
+    GetSentenceAtPoint: status=Ok offset=40 dist=0,0px total=6,5 ms
+    SENTENCE: Seconda riga dopo l'interruzione.
+    EXPECTED: Seconda riga dopo l'interruzione.
+    RESULT  : CORRECT
+
+--- T11 P4S4 'chiudi' centre: COM range [867,873) text='chiudi' GetPoint l=1158 t=666 w=49 h=38 (0,3 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,7 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,3 ms | len=   1 nRects=1 dist=0,0px | 'u'
+    TextUnit_Word        expand=   0,6 getText=   0,2 rects=   0,2 ms | len=   7 nRects=1 dist=0,0px | 'chiudi '
+        rect x=1158 y=667 w=53 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,1 rects=   0,2 ms | len= 108 nRects=1 dist=0,0px | 'Seconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salva... Poi chiudi tutto. Hai capito?'
+        rect x=547 y=667 w=810 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,1 rects=   0,2 ms | len= 144 nRects=2 dist=0,0px | 'Prima riga con interruzione manuale\vSeconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salv[...]'
+    GetSentenceAtPoint: status=Ok offset=122 dist=0,0px total=6,6 ms
+    SENTENCE: Poi chiudi tutto.
+    EXPECTED: Poi chiudi tutto.
+    RESULT  : CORRECT
+
+--- T12 P1S1 '15.30.' RIGHT EDGE: COM range [26,32) text='15.30.' GetPoint l=719 t=382 w=50 h=38 (0,8 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,5 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,3 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,2 rects=   0,3 ms | len=   1 nRects=1 dist=2,0px | ' '
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   2 nRects=1 dist=0,0px | '. '
+        rect x=763 y=383 w=9 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,2 rects=   0,3 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=32 dist=0,0px total=6,2 ms
+    SENTENCE: Il sig. Rossi arriva alle 15.30.
+    EXPECTED: Il sig. Rossi arriva alle 15.30.
+    RESULT  : CORRECT
+
+--- T13 P1S2 'Porta' LEFT EDGE: COM range [33,38) text='Porta' GetPoint l=772 t=382 w=42 h=38 (0,4 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,6 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=0,0px | 'P'
+    TextUnit_Word        expand=   0,3 getText=   0,1 rects=   0,2 ms | len=   6 nRects=1 dist=0,0px | 'Porta '
+        rect x=772 y=383 w=46 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,3 rects=   0,3 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=33 dist=0,0px total=5,5 ms
+    SENTENCE: Porta con sé 3,5 kg di mele!
+    EXPECTED: Porta con sé 3,5 kg di mele!
+    RESULT  : CORRECT
+
+--- T14 P1S3 'bene?' RIGHT EDGE: COM range [65,70) text='bene?' GetPoint l=1014 t=382 w=48 h=38 (0,3 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,4 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=2,0px | '\r'
+    TextUnit_Word        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=2,0px | '\r'
+        rect x=1062 y=383 w=10 h=22
+    TextUnit_Line        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=0,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=70 dist=0,0px total=5,3 ms
+    SENTENCE: Va bene?
+    EXPECTED: Va bene?
+    RESULT  : CORRECT
+
+--- T15 P2S1 'automatico.' RIGHT EDGE: COM range [225,236) text='automatico.' GetPoint l=981 t=444 w=96 h=24 (0,8 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,2 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=2,0px | ' '
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,1 ms | len=   2 nRects=1 dist=0,0px | '. '
+        rect x=1072 y=444 w=9 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,1 ms | len=  95 nRects=1 dist=0,0px | 'che cosa succede quando una frase va a capo in modo automatico. La seconda frase del paragrafo '
+        rect x=547 y=444 w=779 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   2,0 ms | len= 524 nRects=6 dist=0,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=Ok offset=165 dist=0,0px total=5,8 ms
+    SENTENCE: Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa succede quando una frase va a capo in modo automatico.
+    EXPECTED: Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa succede quando una frase va a capo in modo automatico.
+    RESULT  : CORRECT
+
+--- T16 P2S2 'La' LEFT EDGE: COM range [237,239) text='La' GetPoint l=1081 t=444 w=19 h=24 (0,3 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,2 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,1 rects=   0,2 ms | len=   1 nRects=1 dist=0,0px | 'L'
+    TextUnit_Word        expand=   0,3 getText=   0,1 rects=   0,1 ms | len=   3 nRects=1 dist=0,0px | 'La '
+        rect x=1081 y=444 w=23 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,1 rects=   0,2 ms | len=  95 nRects=1 dist=0,0px | 'che cosa succede quando una frase va a capo in modo automatico. La seconda frase del paragrafo '
+        rect x=547 y=444 w=779 h=22
+    TextUnit_Paragraph   expand=   0,4 getText=   0,5 rects=   1,7 ms | len= 524 nRects=6 dist=0,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=Ok offset=166 dist=0,0px total=5,1 ms
+    SENTENCE: La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi.
+    EXPECTED: La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi.
+    RESULT  : CORRECT
+
+--- T17 P4S5 'capito?' RIGHT EDGE: COM range [885,892) text='capito?' GetPoint l=1288 t=666 w=58 h=38 (0,7 ms)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,3 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,3 getText=   0,1 rects=   0,1 ms | len=   0 nRects=1 dist=2,0px | ''
+    TextUnit_Word        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   0 nRects=1 dist=2,0px | ''
+        rect x=1346 y=667 w=11 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,3 ms | len= 108 nRects=1 dist=0,0px | 'Seconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salva... Poi chiudi tutto. Hai capito?'
+        rect x=547 y=667 w=810 h=22
+    TextUnit_Paragraph   expand=   0,7 getText=   0,3 rects=   0,6 ms | len= 144 nRects=2 dist=0,0px | 'Prima riga con interruzione manuale\vSeconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salv[...]'
+    GetSentenceAtPoint: status=Ok offset=144 dist=0,0px total=5,0 ms
+    SENTENCE: Hai capito?
+    EXPECTED: Hai capito?
+    RESULT  : CORRECT
+
+SENTENCE TARGETS CORRECT: 17/17
+
+########## document element ##########
+doc element: ct=50004 class= fw= aid=Body Name.len=18 Name='Contenuto pagina 1' Value.len=0 hasValue=False LegacyName.len=18 LegacyValue.len=0 LegacyDesc.len=0 rect=(453,382,992,702)
+SupportedTextSelection=SupportedTextSelection_Multiple; TextPattern2=yes
+DocumentRange.GetText(-1): len=892 in 0,4 ms; escaped: Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\rQuesto è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa succede quando una frase va a capo in modo automatico. La seconda frase del paragrafo contiene parole comuni come tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i colori e poi salva il lavoro nella cartella dei documenti. Alla fine della giornata spegne tutto e va a cena con la famiglia.\rOggi Matteo è contento 😀 perché ha finito il disegno. La dott.ssa Bianchi lo ha visto ieri e ha detto: «Bravo!». Costa 12.50 euro, ecc. ma non importa.\rPrima riga con interruzione manuale\vSeconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salva... Poi chiudi tutto. Hai capito?
+GetVisibleRanges: 4 range(s) in 1,2 ms
+document children: 0 (1,6 ms)
+
+########## 2. SELECTION ##########
+SetForegroundWindow(my Word) returned True; foreground PID now=16488 (mine=16488)
+COM selected [296,475) len=179: 'tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i colori'
+inside: 'finestra' (first selected line) @(874,480): hasSel=True inside=True expected=True -> CORRECT (10,5 ms) textLen=179 rects=3
+inside: 'fermarsi' (middle) @(754,504): hasSel=True inside=True expected=True -> CORRECT (4,5 ms) textLen=179 rects=3
+inside: 'mouse' (last part) @(1216,504): hasSel=True inside=True expected=True -> CORRECT (3,5 ms) textLen=179 rects=3
+outside: 'comuni' (same line, before selection) @(704,480): hasSel=True inside=False expected=False -> CORRECT (4,8 ms) textLen=179 rects=3
+outside: 'salva' (just after selection) @(658,529): hasSel=True inside=False expected=False -> CORRECT (3,5 ms) textLen=179 rects=3
+outside: 'Rossi' (other paragraph) @(613,401): hasSel=True inside=False expected=False -> CORRECT (3,2 ms) textLen=179 rects=3
+outside: 'famiglia' (end of paragraph) @(630,559): hasSel=True inside=False expected=False -> CORRECT (3,1 ms) textLen=179 rects=3
+SELECTION CLASSIFICATION CORRECT: 7/7
+UIA selection text == COM text: True; UIA='tavolo, finestra e giardino, e continua ancora un poco per arrivare alla riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i colori'
+   rect[0] x=787 y=468 w=546 h=22
+   rect[1] x=547 y=493 w=773 h=22
+   rect[2] x=547 y=517 w=45 h=22
+TryGetFocusedSelection: has=True hostFound=True textLen=179 (6,0 ms)
+GetFocusedElement: pid=16488 ct=50030 class=_WwG aid= Name.len=10 textPattern=True
+after collapsing to a caret: hasSel=False host=True textLen=0 rects=1
+
+########## 4. EMPTY AREAS ##########
+document element rect: l=453 t=382 r=1445 b=1084; text columns approx x=[547,1346]
+
+--- E1 blank page area 200 px below last paragraph @(847,904) pixel=#FFFFFF
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (4,4 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (1,2 ms) text='' rects=1
+    TextUnit_Character   expand=   0,7 getText=   0,4 rects=   0,3 ms | len=   1 nRects=1 dist=215,0px | 'i'
+    TextUnit_Word        expand=   0,6 getText=   0,5 rects=   0,5 ms | len=   3 nRects=1 dist=215,0px | 'il '
+        rect x=845 y=667 w=13 h=22
+    TextUnit_Line        expand=   0,4 getText=   0,3 rects=   0,3 ms | len= 108 nRects=1 dist=215,0px | 'Seconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salva... Poi chiudi tutto. Hai capito?'
+        rect x=547 y=667 w=810 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   0,7 ms | len= 144 nRects=2 dist=215,0px | 'Prima riga con interruzione manuale\vSeconda riga dopo l'interruzione. Apri il file relazione.docx e premi Salv[...]'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=215,0px total=4,5 ms
+    SENTENCE: <none>
+
+--- E2 blank to the RIGHT of the short line of P1 (inside text column) @(1306,401) pixel=#FFFFFF
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (3,1 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,4 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=234,0px | '\r'
+    TextUnit_Word        expand=   0,3 getText=   0,1 rects=   0,2 ms | len=   1 nRects=1 dist=234,0px | '\r'
+        rect x=1062 y=383 w=10 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=234,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=234,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=234,0px total=4,0 ms
+    SENTENCE: <none>
+
+--- E3 left page MARGIN beside P2 (60 px left of text) @(487,492) pixel=#FFFFFF
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (2,5 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,8 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=60,0px | 'r'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   5 nRects=1 dist=60,0px | 'riga '
+        rect x=547 y=493 w=33 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len= 100 nRects=1 dist=60,0px | 'riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i '
+        rect x=547 y=493 w=773 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   1,1 ms | len= 524 nRects=6 dist=60,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=60,0px total=4,2 ms
+    SENTENCE: <none>
+
+--- E4 top page margin above P1 @(847,312) pixel=#FFFFFF
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50025 (pagina) class='' fw= Name.len=8 Name='Pagina 1' (2,9 ms)
+    TextPattern host: ct=50025 class='' levels up=0 (0,3 ms)
+    RangeFromPoint: ok (0,9 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=71,0px | ' '
+    TextUnit_Word        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   4 nRects=1 dist=71,0px | 'con '
+        rect x=818 y=383 w=33 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,1 rects=   0,2 ms | len=  71 nRects=1 dist=71,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  71 nRects=1 dist=71,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=71,0px total=3,9 ms
+    SENTENCE: <none>
+    ancestors (raw view):
+      [0] ct=50025 (pagina) class='' fw= aid='UIA_AutomationId_Word_Page_1' Name='Pagina 1' textPattern=True
+      [1] ct=50030 (documento) class='_WwG' fw=Win32 aid='' Name='Documento1' textPattern=True
+      [2] ct=50033 (pannello) class='_WwB' fw=Win32 aid='' Name='Documento1' textPattern=False
+      [3] ct=50033 (pannello) class='_WwF' fw=Win32 aid='' Name='' textPattern=False
+      [4] ct=50032 (finestra) class='OpusApp' fw=Win32 aid='' Name='Documento1 - Word' textPattern=False
+      [5] ct=50033 (pannello) class='#32769' fw=Win32 aid='' Name='Desktop 1' textPattern=False
+
+--- E5 area OUTSIDE the page (left of it) @(303,492) pixel=#0F0E0F
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50030 (documento) class='_WwG' fw=Win32 Name.len=10 Name='Documento1' (3,0 ms)
+    TextPattern host: ct=50030 class='_WwG' levels up=0 (0,1 ms)
+    RangeFromPoint: ok (0,6 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=244,0px | 'r'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   5 nRects=1 dist=244,0px | 'riga '
+        rect x=547 y=493 w=33 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len= 100 nRects=1 dist=244,0px | 'riga successiva senza fermarsi. Matteo disegna ogni giorno con il computer: usa il mouse, sceglie i '
+        rect x=547 y=493 w=773 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   1,2 ms | len= 524 nRects=6 dist=244,0px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=244,0px total=5,3 ms
+    SENTENCE: <none>
+    ancestors (raw view):
+      [0] ct=50030 (documento) class='_WwG' fw=Win32 aid='' Name='Documento1' textPattern=True
+      [1] ct=50033 (pannello) class='_WwB' fw=Win32 aid='' Name='Documento1' textPattern=False
+      [2] ct=50033 (pannello) class='_WwF' fw=Win32 aid='' Name='' textPattern=False
+      [3] ct=50032 (finestra) class='OpusApp' fw=Win32 aid='' Name='Documento1 - Word' textPattern=False
+      [4] ct=50033 (pannello) class='#32769' fw=Win32 aid='' Name='Desktop 1' textPattern=False
+
+--- E6 area OUTSIDE the page (right of it) @(1595,492) pixel=#0A0B0C
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50030 (documento) class='_WwG' fw=Win32 Name.len=10 Name='Documento1' (3,3 ms)
+    TextPattern host: ct=50030 class='_WwG' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,7 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=1038,3px | 'c'
+    TextUnit_Word        expand=   0,3 getText=   0,1 rects=   0,1 ms | len=   7 nRects=1 dist=999,3px | 'colori '
+        rect x=547 y=517 w=49 h=22
+    TextUnit_Line        expand=   0,4 getText=   0,1 rects=   0,2 ms | len= 109 nRects=1 dist=246,3px | 'colori e poi salva il lavoro nella cartella dei documenti. Alla fine della giornata spegne tutto e va a cena '
+        rect x=547 y=517 w=803 h=22
+    TextUnit_Paragraph   expand=   0,2 getText=   0,2 rects=   1,0 ms | len= 524 nRects=6 dist=246,3px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=246,3px total=5,6 ms
+    SENTENCE: <none>
+
+--- E7 gap between P1 and P2 (7 px below the P1 line) @(647,412) pixel=#FFFFFF
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (3,4 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,9 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=7,1px | 'r'
+    TextUnit_Word        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   7 nRects=1 dist=7,0px | 'arriva '
+        rect x=638 y=383 w=48 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,3 rects=   0,2 ms | len=  71 nRects=1 dist=7,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+        rect x=547 y=383 w=525 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,3 rects=   0,2 ms | len=  71 nRects=1 dist=7,0px | 'Il sig. Rossi arriva alle 15.30. Porta con sé 3,5 kg di mele! Va bene?\r'
+    GetSentenceAtPoint: status=Ok offset=15 dist=7,0px total=6,5 ms
+    SENTENCE: Il sig. Rossi arriva alle 15.30.
+
+--- E8 page right margin beside P2 @(1405,492) pixel=#FFFFFF
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50004 (Modifica) class='' fw= Name.len=18 Name='Contenuto pagina 1' (3,2 ms)
+    TextPattern host: ct=50004 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,4 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=848,4px | 'c'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   7 nRects=1 dist=809,4px | 'colori '
+        rect x=547 y=517 w=49 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len= 109 nRects=1 dist=60,4px | 'colori e poi salva il lavoro nella cartella dei documenti. Alla fine della giornata spegne tutto e va a cena '
+        rect x=547 y=517 w=803 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   1,1 ms | len= 524 nRects=6 dist=60,4px | 'Questo è un paragrafo volutamente lungo, scritto per occupare diverse righe della pagina e verificare che cosa [...]'
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=60,4px total=4,5 ms
+    SENTENCE: <none>
+
+########## 3. RIBBON, TAB HEADER, STATUS BAR ##########
+top-level window children: 6
+   [0] ct=50033 class='DropShadow' Name='DropShadowTop'
+       descendants: 1 in 3 ms
+   [1] ct=50033 class='MsoCommandBarDock' Name='MsoDockTop'
+       descendants: 136 in 92 ms
+   [2] ct=50033 class='MsoCommandBarDock' Name='MsoDockBottom'
+       descendants: 25 in 21 ms
+   [3] ct=50033 class='_WwF' Name=''
+   [4] ct=50037 class='' Name=''
+       descendants: 6 in 4 ms
+   [5] ct=50010 class='' Name='Barra dei menu'
+       descendants: 2 in 25 ms
+visible NetUI elements of type Button/CheckBox/SplitButton/MenuItem/ComboBox/TabItem: 112; with EMPTY Name: 1; with HelpText: 0
+   unnamed: ct=50011 class='NetUIAnchor' rect=(893,133,443x75)
+
+--- B1 ribbon 'Grassetto': tree element ct=50000 Name='Grassetto' rect=(198,173,30x30) -> ElementFromPoint(213,188)
+    DescribeElementAtPoint (17,4 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='Bold' pid=16488 rect=(198,173,30x30)
+        Name='Grassetto'
+        HelpText=''
+        FullDescription='Applica il grassetto al testo.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='CTRL+G; ALT, H, 1'
+        Legacy: Name='Grassetto' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='CTRL+G; ALT, H, 1' Role=0x2B
+        => SpokenText='Grassetto'
+        parent: ct=50026 class='NetUIChunk' Name='Carattere'
+
+--- B2 ribbon 'Corsivo': tree element ct=50000 Name='Corsivo' rect=(230,173,30x30) -> ElementFromPoint(245,188)
+    DescribeElementAtPoint (12,3 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='Italic' pid=16488 rect=(230,173,30x30)
+        Name='Corsivo'
+        HelpText=''
+        FullDescription='Applica il corsivo al testo.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='CTRL+I; ALT, H, 2'
+        Legacy: Name='Corsivo' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='CTRL+I; ALT, H, 2' Role=0x2B
+        => SpokenText='Corsivo'
+        parent: ct=50026 class='NetUIChunk' Name='Carattere'
+(no visible ribbon element whose Name starts with 'Centra')
+
+--- B3 ribbon 'Allinea al centro': tree element ct=50000 Name='Allinea al centro' rect=(616,173,30x30) -> ElementFromPoint(631,188)
+    DescribeElementAtPoint (12,6 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='AlignCenter' pid=16488 rect=(616,173,30x30)
+        Name='Allinea al centro'
+        HelpText=''
+        FullDescription='Allinea il contenuto al centro.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='CTRL+E; ALT, H, I L'
+        Legacy: Name='Allinea al centro' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='CTRL+E; ALT, H, I L' Role=0x2B
+        => SpokenText='Allinea al centro'
+        parent: ct=50026 class='NetUIChunk' Name='Paragrafo'
+
+--- B4 ribbon 'Elenchi puntati': tree element ct=50031 Name='Elenchi puntati' rect=(584,133,49x30) -> ElementFromPoint(608,148)
+    DescribeElementAtPoint (12,1 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='' pid=16488 rect=(584,133,30x30)
+        Name='Elenchi puntati'
+        HelpText=''
+        FullDescription='Consente di creare un elenco puntato.\n\nFare clic sulla freccia per modificare l'aspetto dei punti elenco.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Elenchi puntati' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x2B
+        => SpokenText='Elenchi puntati'
+        parent: ct=50031 class='NetUISplitButtonAnchor' Name='Elenchi puntati'
+
+--- B5 ribbon 'Copia formato': tree element ct=50000 Name='Copia formato' rect=(148,187,30x30) -> ElementFromPoint(163,202)
+    DescribeElementAtPoint (12,1 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='FormatPainter' pid=16488 rect=(148,187,30x30)
+        Name='Copia formato'
+        HelpText=''
+        FullDescription='Se l'aspetto di una determinata sezione è particolarmente gradevole, è possibile applicarlo ad altro contenuto nel documento.\n\nPer iniziare: \n1. Selezionare il contenuto con la formattazione da usare\n2. Fare clic su Copia formato\n3. Selezionare un altro elemento per applicare automaticamente la [...]'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT+CTRL+C, ALT+CTRL+V; ALT, H, O O'
+        Legacy: Name='Copia formato' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='ALT+CTRL+C, ALT+CTRL+V; ALT, H, O O' Role=0x2B
+        => SpokenText='Copia formato'
+        parent: ct=50026 class='NetUIChunk' Name='Appunti'
+
+--- B6 ribbon 'Incolla': tree element ct=50031 Name='Incolla' rect=(94,123,52x96) -> ElementFromPoint(120,171)
+    DescribeElementAtPoint (11,7 ms): ct=50011 (Voce di menu) class='NetUIRibbonButton' fw=Win32 aid='PasteMenu_Dropdown' pid=16488 rect=(94,171,52x48)
+        Name='Altre opzioni'
+        HelpText=''
+        FullDescription='Visualizza le varie opzioni per incollare, ad esempio per mantenere la formattazione o incollare solo il contenuto.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, H, V'
+        Legacy: Name='Altre opzioni' Description='' Help='' Value='' DefaultAction='Apri' Shortcut='ALT, H, V' Role=0xC
+        => SpokenText='Altre opzioni'
+        parent: ct=50031 class='NetUISplitButtonAnchor' Name='Incolla'
+
+--- B7 ribbon 'Colore carattere': tree element ct=50031 Name='Colore carattere' rect=(515,173,49x30) -> ElementFromPoint(539,188)
+    DescribeElementAtPoint (12,9 ms): ct=50000 (Pulsante) class='NetUIRibbonButton' fw=Win32 aid='' pid=16488 rect=(515,173,30x30)
+        Name='Colore carattere Rosso'
+        HelpText=''
+        FullDescription='Consente di cambiare il colore del testo.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Colore carattere Rosso' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x2B
+        => SpokenText='Colore carattere Rosso'
+        parent: ct=50031 class='NetUISplitButtonAnchor' Name='Colore carattere'
+
+--- TAB 'Inserisci': tree element ct=50019 Name='Inserisci' rect=(213,81,83x38) -> ElementFromPoint(254,100)
+    DescribeElementAtPoint (12,9 ms): ct=50019 (Elemento di scheda) class='NetUIRibbonTab' fw=Win32 aid='TabInsert' pid=16488 rect=(213,81,83x38)
+        Name='Inserisci'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, Y'
+        Legacy: Name='Inserisci' Description='' Help='' Value='' DefaultAction='Passaggio' Shortcut='ALT, Y' Role=0x25
+        => SpokenText='Inserisci'
+        parent: ct=50018 class='NetUIPanViewer' Name='Schede della barra multifunzione'
+
+--- TAB 'Layout': tree element ct=50019 Name='Layout' rect=(428,81,75x38) -> ElementFromPoint(465,100)
+    DescribeElementAtPoint (13,5 ms): ct=50019 (Elemento di scheda) class='NetUIRibbonTab' fw=Win32 aid='TabPageLayoutWord' pid=16488 rect=(428,81,75x38)
+        Name='Layout'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey='ALT, L'
+        Legacy: Name='Layout' Description='' Help='' Value='' DefaultAction='Passaggio' Shortcut='ALT, L' Role=0x25
+        => SpokenText='Layout'
+        parent: ct=50018 class='NetUIPanViewer' Name='Schede della barra multifunzione'
+StatusBar: Name='Barra di stato' rect=(69,1084,1782x27)
+status bar named items: 50000:'Numero pagina Pagina 1 di 1' | 50020:'Conteggio parole 151 parole' | 50000:'Modalità di creazione condivisa ' | 50000:'Lingua Italiano (Italia)' | 50000:'Completamento del testo Completamento del[...]' | 50000:'Registrazione macro Registrazione non att[...]' | 50000:'Verifica accessibilità Accessibilità: con[...]' | 50000:'Focus ' | 50000:'Modalità di lettura' | 50000:'Layout di stampa' | 50000:'Layout Web' | 50000:'Zoom indietro (CTRL -)' | 50015:'Zoom' | 50000:'Zoom indietro' | 50027:'Posizione' | 50000:'Zoom avanti' | 50000:'Zoom avanti (CTRL +)' | 50000:'Zoom 100%' | 50027:'Casella di ridimensionamento'
+
+--- SB 'Numero pagina Pagina 1 di [...]': tree element ct=50000 Name='Numero pagina Pagina 1 di 1' rect=(74,1085,97x26) -> ElementFromPoint(122,1098)
+    DescribeElementAtPoint (7,1 ms): ct=50000 (Pulsante) class='NetUISimpleButton' fw=Win32 aid='' pid=16488 rect=(74,1085,97x26)
+        Name='Numero pagina Pagina 1 di 1'
+        HelpText=''
+        FullDescription='Il numero di pagina corrente del documento. Fare clic o toccare per aprire il riquadro di spostamento.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Numero pagina Pagina 1 di 1' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x2B
+        => SpokenText='Numero pagina Pagina 1 di 1'
+        parent: ct=50017 class='NetUInetpane' Name='Barra di stato'
+
+--- SB 'Conteggio parole 151 parol[...]': tree element ct=50020 Name='Conteggio parole 151 parole' rect=(175,1085,84x26) -> ElementFromPoint(217,1098)
+    DescribeElementAtPoint (6,6 ms): ct=50020 (Testo) class='NetUISimpleButton' fw=Win32 aid='' pid=16488 rect=(175,1085,84x26)
+        Name='Conteggio parole 151 parole'
+        HelpText=''
+        FullDescription='Il numero di parole nel documento. Fare clic o toccare per aprire la finestra di dialogo Conteggio parole.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Conteggio parole 151 parole' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x29
+        => SpokenText='Conteggio parole 151 parole'
+        parent: ct=50017 class='NetUInetpane' Name='Barra di stato'
+
+--- SB 'Modalità di creazione cond[...]': tree element ct=50000 Name='Modalità di creazione condivisa ' rect=(263,1085,40x26) -> ElementFromPoint(283,1098)
+    DescribeElementAtPoint (6,5 ms): ct=50000 (Pulsante) class='NetUISimpleButton' fw=Win32 aid='' pid=16488 rect=(263,1085,40x26)
+        Name='Modalità di creazione condivisa '
+        HelpText=''
+        FullDescription='Creazione condivisa in modalità compatibilità.'
+        Value(hasPattern=False)='' ItemStatus='' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Modalità di creazione condivisa ' Description='' Help='' Value='' DefaultAction='Premere' Shortcut='' Role=0x2B
+        => SpokenText='Modalità di creazione condivisa '
+        parent: ct=50017 class='NetUInetpane' Name='Barra di stato'
+screenshot saved: word-window.png (window rect 60,20,1800x1100)
+
+########## 1b. SAME TEXT AT ZOOM 150 % ##########
+zoom150 'mele' @(969,395): status=Ok dist=0,0 -> CORRECT
+zoom150 'giardino' @(955,523): status=Ok dist=0,0 -> CORRECT
+zoom150 'disegno' @(926,689): status=Ok dist=0,0 -> CORRECT
+
+########## 1c. TABLE CELLS AND INLINE PICTURE ##########
+COM text of cell(1,1): 'Nome del prodotto. Mele rosse del Trentino.\r\a'
+
+--- table cell(1,1) 'Trentino' @(859,718)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50029 (Elemento) class='' fw= Name.len=0 Name='' (7,8 ms)
+    TextPattern host: ct=50029 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,7 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=2,0px | 't'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   8 nRects=1 dist=0,0px | 'Trentino'
+        rect x=828 y=705 w=63 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  44 nRects=1 dist=0,0px | 'Nome del prodotto. Mele rosse del Trentino.\a'
+        rect x=553 y=705 w=353 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  44 nRects=1 dist=0,0px | 'Nome del prodotto. Mele rosse del Trentino.\a'
+    GetSentenceAtPoint: status=Ok offset=38 dist=0,0px total=7,7 ms
+    SENTENCE: Mele rosse del Trentino.
+    EXPECTED: Mele rosse del Trentino. -> CORRECT
+    ancestors (raw view):
+      [0] ct=50029 (Elemento) class='' fw= aid='' Name='' textPattern=True
+      [1] ct=50036 (tabella) class='' fw= aid='' Name='' textPattern=True
+      [2] ct=50004 (Modifica) class='' fw= aid='Body' Name='Contenuto pagina 1' textPattern=True
+      [3] ct=50025 (pagina) class='' fw= aid='UIA_AutomationId_Word_Page_1' Name='Pagina 1' textPattern=True
+      [4] ct=50030 (documento) class='_WwG' fw=Win32 aid='' Name='Documento1' textPattern=True
+      [5] ct=50033 (pannello) class='_WwB' fw=Win32 aid='' Name='Documento1' textPattern=False
+      [6] ct=50033 (pannello) class='_WwF' fw=Win32 aid='' Name='' textPattern=False
+      [7] ct=50032 (finestra) class='OpusApp' fw=Win32 aid='' Name='Documento1 - Word' textPattern=False
+      [8] ct=50033 (pannello) class='#32769' fw=Win32 aid='' Name='Desktop 1' textPattern=False
+
+--- table cell(1,2) 'Prezzo' @(981,718)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50029 (Elemento) class='' fw= Name.len=0 Name='' (3,6 ms)
+    TextPattern host: ct=50029 class='' levels up=0 (0,3 ms)
+    RangeFromPoint: ok (0,4 ms) text='' rects=1
+    TextUnit_Character   expand=   0,5 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=0,0px | 'z'
+    TextUnit_Word        expand=   0,5 getText=   0,2 rects=   0,3 ms | len=   6 nRects=1 dist=0,0px | 'Prezzo'
+        rect x=955 y=705 w=52 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   7 nRects=1 dist=0,0px | 'Prezzo\a'
+        rect x=955 y=705 w=61 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,1 rects=   0,2 ms | len=   7 nRects=1 dist=0,0px | 'Prezzo\a'
+    GetSentenceAtPoint: status=Ok offset=3 dist=0,0px total=5,5 ms
+    SENTENCE: Prezzo
+    EXPECTED: Prezzo -> CORRECT
+
+--- table cell(2,1) 'Pere' @(570,756)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50029 (Elemento) class='' fw= Name.len=0 Name='' (3,8 ms)
+    TextPattern host: ct=50029 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,4 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=3,0px | 'r'
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   4 nRects=1 dist=0,0px | 'Pere'
+        rect x=553 y=743 w=35 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  22 nRects=1 dist=0,0px | 'Pere. Dolci e mature!\a'
+        rect x=553 y=743 w=174 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,1 rects=   0,2 ms | len=  22 nRects=1 dist=0,0px | 'Pere. Dolci e mature!\a'
+    GetSentenceAtPoint: status=Ok offset=2 dist=0,0px total=6,1 ms
+    SENTENCE: Pere.
+    EXPECTED: Pere. -> CORRECT
+
+--- table cell(2,2) 'euro' @(1011,756)
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50029 (Elemento) class='' fw= Name.len=0 Name='' (3,4 ms)
+    TextPattern host: ct=50029 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,3 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   1 nRects=1 dist=2,0px | 'r'
+    TextUnit_Word        expand=   0,6 getText=   0,2 rects=   0,2 ms | len=   4 nRects=1 dist=0,0px | 'euro'
+        rect x=993 y=743 w=36 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=  10 nRects=1 dist=0,0px | '3,50 euro\a'
+        rect x=955 y=743 w=84 h=22
+    TextUnit_Paragraph   expand=   0,3 getText=   0,3 rects=   0,2 ms | len=  10 nRects=1 dist=0,0px | '3,50 euro\a'
+    GetSentenceAtPoint: status=Ok offset=7 dist=0,0px total=5,9 ms
+    SENTENCE: 3,50 euro
+    EXPECTED: 3,50 euro -> CORRECT
+
+--- inline picture: GetPoint l=547 t=819 w=420 h=145 -> (757,891) pixel=#FFE89C
+    WindowFromPoint: hwnd=0x1606D8 class=_WwG pid=16488 rootIsMine=True
+    ElementFromPoint: ct=50006 (immagine) class='' fw= Name.len=10 Name='Immagine 1' (3,4 ms)
+    TextPattern host: ct=50006 class='' levels up=0 (0,2 ms)
+    RangeFromPoint: ok (0,4 ms) text='' rects=1
+    TextUnit_Character   expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   0 nRects=1 dist=214,0px | ''
+    TextUnit_Word        expand=   0,4 getText=   0,2 rects=   0,2 ms | len=   0 nRects=1 dist=214,0px | ''
+        rect x=967 y=932 w=10 h=22
+    TextUnit_Line        expand=   0,3 getText=   0,2 rects=   0,2 ms | len=   0 nRects=1 dist=0,0px | ''
+        rect x=547 y=819 w=430 h=135
+    TextUnit_Paragraph   expand=   0,3 getText=   0,1 rects=   0,2 ms | len=   0 nRects=1 dist=0,0px | ''
+    GetSentenceAtPoint: status=NotOnText offset=0 dist=0,0px total=6,4 ms
+    SENTENCE: <none>
+    ancestors (raw view):
+      [0] ct=50006 (immagine) class='' fw= aid='' Name='Immagine 1' textPattern=True
+      [1] ct=50004 (Modifica) class='' fw= aid='Body' Name='Contenuto pagina 1' textPattern=True
+      [2] ct=50025 (pagina) class='' fw= aid='UIA_AutomationId_Word_Page_1' Name='Pagina 1' textPattern=True
+      [3] ct=50030 (documento) class='_WwG' fw=Win32 aid='' Name='Documento1' textPattern=True
+      [4] ct=50033 (pannello) class='_WwB' fw=Win32 aid='' Name='Documento1' textPattern=False
+      [5] ct=50033 (pannello) class='_WwF' fw=Win32 aid='' Name='' textPattern=False
+      [6] ct=50032 (finestra) class='OpusApp' fw=Win32 aid='' Name='Documento1 - Word' textPattern=False
+      [7] ct=50033 (pannello) class='#32769' fw=Win32 aid='' Name='Desktop 1' textPattern=False
+    DescribeElementAtPoint(picture): ct=50006 (immagine) class='' fw= aid='' pid=16488 rect=(547,819,420x130)
+        Name='Immagine 1'
+        HelpText=''
+        FullDescription=''
+        Value(hasPattern=False)='' ItemStatus='In linea con il testo' AcceleratorKey='' AccessKey=''
+        Legacy: Name='Immagine 1' Description='' Help='' Value='' DefaultAction='' Shortcut='' Role=0x28
+        => SpokenText='Immagine 1'
+screenshot saved: word-window-table.png (window rect 60,20,1800x1100)
+
+########## 6b. BIG DOCUMENT ##########
+big document: 231083 chars inserted in 3523 ms (incl. 3 s sleep); pages=58
+normal paragraph, MaxChars=8000: COM text='giardino' @(952,443) status=Ok offset=248 paraLen=524 total=10,5 ms -> CORRECT
+GIANT paragraph 3rd repetition, MaxChars=8000: COM text='giardino' @(1296,843) status=Ok offset=1296 paraLen=8000 total=8,1 ms -> CORRECT
+GIANT paragraph 3rd repetition, MaxChars=1000 (window fallback): COM text='giardino' @(1296,843) status=Ok offset=595 paraLen=1104 total=10,6 ms -> CORRECT
+GIANT paragraph, MaxChars=40000: COM text='giardino' @(1296,843) status=Ok offset=1296 paraLen=20960 total=18,1 ms -> CORRECT
+host under pointer in big doc: ct=50004 Name='Contenuto pagina 1'
+DocumentRange.GetText(-1): 4757 chars in 1,0 ms
+giant paragraph GetText(-1): 20960 chars in 1,1 ms
+giant paragraph GetBoundingRectangles: 3,2 ms
+Document element (_WwG) DocumentRange.GetText(-1): 65000 chars in 3,2 ms; Name.len=10
+Document element (_WwG) DocumentRange.GetText(2000): 2000 chars in 0,6 ms
+Expand(Page): 0,5 ms, text len=4757
+screenshot saved: word-window-big.png (window rect 60,20,1800x1100)
+cleanup: my WINWORD PID 16488 gone=True; user's WINWORD 18000 alive=True
+
+=== TIMINGS (ms) grouped by call ===
+COM CreateInstance(Word.Application)         n=  1 min=  1304,6 med=  1304,6 max=  1304,6
+COM Window.GetPoint                          n= 17 min=     0,2 med=     0,4 max=    17,3
+Describe(document)                           n=  1 min=     9,1 med=     9,1 max=     9,1
+DescribeElementAtPoint TOTAL                 n= 12 min=     6,5 med=    12,3 max=    17,4
+Document(_WwG).DocumentRange.GetText(-1) big n=  1 min=     3,2 med=     3,2 max=     3,2
+Document(_WwG).DocumentRange.GetText(2000) big n=  1 min=     0,6 med=     0,6 max=     0,6
+DocumentRange.GetText(-1)                    n=  1 min=     0,4 med=     0,4 max=     0,4
+DocumentRange.GetText(-1) big                n=  1 min=     1,0 med=     1,0 max=     1,0
+ElementFromPoint                             n= 30 min=     2,2 med=     3,0 max=    78,1
+Expand(Page)                                 n=  1 min=     0,5 med=     0,5 max=     0,5
+Expand(TextUnit_Character)                   n= 30 min=     0,3 med=     0,4 max=     0,9
+Expand(TextUnit_Line)                        n= 30 min=     0,2 med=     0,3 max=     0,7
+Expand(TextUnit_Paragraph)                   n= 30 min=     0,2 med=     0,3 max=     0,7
+Expand(TextUnit_Word)                        n= 30 min=     0,3 med=     0,4 max=     0,6
+FindAll(children of document)                n=  1 min=     1,6 med=     1,6 max=     1,6
+FindAllBuildCache(descendants of )           n=  2 min=     4,1 med=    24,8 max=    24,8
+FindAllBuildCache(descendants of DropShadow) n=  1 min=     2,8 med=     2,8 max=     2,8
+FindAllBuildCache(descendants of MsoCommandBarDock) n=  2 min=    20,7 med=    91,8 max=    91,8
+FindTextHost                                 n= 30 min=     0,1 med=     0,2 max=     2,0
+GetBoundingRectangles(TextUnit_Character)    n= 30 min=     0,1 med=     0,2 max=     0,3
+GetBoundingRectangles(TextUnit_Line)         n= 30 min=     0,1 med=     0,2 max=     0,4
+GetBoundingRectangles(TextUnit_Paragraph)    n= 30 min=     0,1 med=     0,3 max=     2,0
+GetBoundingRectangles(TextUnit_Word)         n= 30 min=     0,1 med=     0,2 max=     0,5
+GetSentenceAtPoint TOTAL                     n= 34 min=     3,9 med=     5,8 max=    18,1
+GetText(TextUnit_Character)                  n= 30 min=     0,1 med=     0,2 max=     0,4
+GetText(TextUnit_Line)                       n= 30 min=     0,1 med=     0,2 max=     0,3
+GetText(TextUnit_Paragraph)                  n= 30 min=     0,1 med=     0,2 max=     0,5
+GetText(TextUnit_Word)                       n= 30 min=     0,1 med=     0,2 max=     0,5
+GetVisibleRanges                             n=  1 min=     1,2 med=     1,2 max=     1,2
+giant paragraph GetBoundingRectangles        n=  1 min=     3,2 med=     3,2 max=     3,2
+giant paragraph GetText(-1)                  n=  1 min=     1,1 med=     1,1 max=     1,1
+RangeFromPoint                               n= 30 min=     0,2 med=     0,4 max=     1,2
+reader.Describe                              n= 13 min=     3,7 med=     9,2 max=    13,2
+reader.ElementFromPoint                      n= 59 min=     2,0 med=     2,9 max=     5,3
+reader.Expand(Line)                          n= 37 min=     0,3 med=     0,3 max=     0,7
+reader.Expand(Paragraph)                     n= 30 min=     0,2 med=     0,3 max=     0,7
+reader.fallback.MoveByLine                   n=  1 min=     2,9 med=     2,9 max=     2,9
+reader.FindTextHost                          n= 47 min=     0,1 med=     0,2 max=     0,5
+reader.GetFocusedElement                     n=  1 min=     4,0 med=     4,0 max=     4,0
+reader.GetSelection                          n= 10 min=     0,1 med=     0,2 max=     0,6
+reader.Line.GetBoundingRectangles            n= 37 min=     0,1 med=     0,2 max=     1,9
+reader.MoveEndpointByRange                   n= 30 min=     0,1 med=     0,2 max=     1,3
+reader.paragraph.GetText                     n= 30 min=     0,1 med=     0,2 max=     0,9
+reader.prefix.GetText                        n= 30 min=     0,1 med=     0,2 max=     0,9
+reader.RangeFromPoint                        n= 37 min=     0,2 med=     0,3 max=     0,7
+reader.selection.GetBoundingRectangles       n= 10 min=     0,2 med=     0,3 max=     0,5
+reader.selection.GetText                     n= 10 min=     0,2 med=     0,3 max=     0,4
+TryGetSelectionAtPoint TOTAL                 n=  7 min=     3,1 med=     3,5 max=    10,5
+
+=== CALLS > 300 ms ===
+word/COM CreateInstance(Word.Application): 1305 ms
+
+=== CALLS > 100 ms ===
+
+=== EXCEPTIONS ===

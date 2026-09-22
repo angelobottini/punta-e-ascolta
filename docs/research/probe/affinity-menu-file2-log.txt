@@ -1,0 +1,121 @@
+﻿Foreground is Affinity main: True
+Menu item: MenuItem | Name='File' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(55,0,49,37) | Help='' | pid=10888 | hwnd=0x0
+Patterns: ExpandCollapsePatternIdentifiers.Pattern, SynchronizedInputPatternIdentifiers.Pattern
+Opened with method=click in 1107ms
+ExpandCollapseState after open: Expanded
+NEW TOPWIN hwnd=0x370604 pid=10888 class='HwndWrapper[Affinity.exe;;2fbc1e28-eaa0-4214-888c-711138ced38e]' title='' rect=(55,35,541,973) style=0x96000000 ex=0x08080088 LAYERED TOPMOST NOACTIVATE cloaked=0
+  UIA root of popup: Window | Name='' | Class='Popup' | AutoId='' | Fw='WPF' | Off=False | Rect=(55,35,486,938) | Help='' | pid=10888 | hwnd=0x370604
+  UIA parent of popup: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+Foreground after open: hwnd=0xC07C4 pid=10888 class='HwndWrapper[Affinity.exe;;002c344e-6ce9-4cb4-9b6c-fa8b3fae1325]' title='Affinity' rect=(-9,-9,1929,1149) style=0x17CF0000 ex=0x00040100 cloaked=0
+--- UIA subtree of menu item 'File' while open ---
+  MenuItem | Name='Home' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,36,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Home' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,40,40,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+Alt+H' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,42,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Studi' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,69,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Studi' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,73,34,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,102,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Nuovo' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,108,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Nuovo' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,112,44,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+N' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,114,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Nuovo da Preferiti…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,141,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Nuovo da Preferiti…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,145,132,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,147,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Nuovo da ultimo set di impostazioni…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,174,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Nuovo da ultimo set di impostazioni…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,178,251,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,180,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Nuovo da Appunti' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,207,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Nuovo da Appunti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,211,122,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+Alt+Maiusc+N' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,213,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Nuovo processo immagine' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,240,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Nuovo processo immagine' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,244,178,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,273,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Apri…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,279,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Apri…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,283,38,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+O' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,285,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Apri Recenti' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,312,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Apri _Recenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,316,80,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,345,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Chiudi' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,351,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Chiudi' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,355,42,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+W' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,357,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Chiudi tutto' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,384,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Chiudi tutto' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,388,79,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+Alt+W' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,390,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,417,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Salva' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,423,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Salva' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,427,34,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+S' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,429,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Salva con nome…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,456,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Salva con _nome…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,460,116,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+Maiusc+S' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,462,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Salva come pacchetto…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,489,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Salva come pa_cchetto…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,493,155,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,495,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,522,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Salva cronologia con documento' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,528,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Salva cronologia con documento' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,532,217,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,534,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,561,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Apri cartella in Esplora risorse' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,567,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Apri cartella in Esplora risorse' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,571,195,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,573,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,600,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Posiziona…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,606,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='P_osiziona…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,610,73,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+Maiusc+M' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,612,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Posiziona modello 3D…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,639,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Posiziona modello 3D…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,643,154,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,645,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Criteri posizionamento' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,672,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Criteri posizionamento' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,676,150,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,705,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Importa contenuto' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,711,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Importa contenuto' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,715,125,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Importa profilo ICC…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,744,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Importa profilo ICC…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,748,137,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,750,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,777,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Esporta' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,783,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Esporta' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,787,49,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,816,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Metadati documento...' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,822,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Metadati documento...' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,826,149,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,828,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Stampa…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,855,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='_Stampa…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,859,61,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Ctrl+P' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,861,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,888,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Accedi…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,894,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='Accedi…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,898,55,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,900,130,20) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Serif.Affinity.Workspaces.WorkspaceMenuSeparator' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,927,478,6) | Help='' | pid=10888 | hwnd=0x0
+  MenuItem | Name='Esci' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,933,478,33) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='E_sci' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,937,25,20) | Help='' | pid=10888 | hwnd=0x0
+    Text | Name='' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(383,939,130,20) | Help='' | pid=10888 | hwnd=0x0
+UIA child MenuItems under 'File': 38
+ExpandCollapseState after CopyFromScreen: Expanded
+Popup rect: 55,35,541,973
+Visible items: 26
+FROMPOINT(no hover) (295,52) expected='Home' 32ms -> MenuItem | Name='Home' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,36,478,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=116: Text | Name='Home' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,40,40,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Home' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,36,478,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (295,190) expected='Nuovo da ultimo set di impostazioni…' 6ms -> Text | Name='Nuovo da ultimo set di impostazioni…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,178,251,20) | Help='' | pid=10888 | hwnd=0x0
+   at label x=116: Text | Name='Nuovo da ultimo set di impostazioni…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,178,251,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Nuovo da ultimo set di impostazioni…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,174,478,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (295,328) expected='Apri Recenti' 6ms -> MenuItem | Name='Apri Recenti' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,312,478,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=116: Text | Name='Apri _Recenti' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,316,80,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Apri Recenti' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,312,478,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (295,472) expected='Salva con nome…' 6ms -> MenuItem | Name='Salva con nome…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,456,478,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=116: Text | Name='Salva con _nome…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,460,116,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Salva con nome…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,456,478,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (295,622) expected='Posiziona…' 5ms -> MenuItem | Name='Posiziona…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,606,478,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=116: Text | Name='P_osiziona…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,610,73,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Posiziona…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,606,478,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(no hover) (295,760) expected='Importa profilo ICC…' 5ms -> MenuItem | Name='Importa profilo ICC…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,744,478,33) | Help='' | pid=10888 | hwnd=0x0
+   at label x=116: Text | Name='Importa profilo ICC…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,748,137,20) | Help='' | pid=10888 | hwnd=0x0
+   parent: MenuItem | Name='Importa profilo ICC…' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,744,478,33) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(hover) (116,52) expected='Home' -> Text | Name='Home' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,40,40,20) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(hover) (116,190) expected='Nuovo da ultimo set di impostazioni…' -> Text | Name='Nuovo da ultimo set di impostazioni…' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(81,178,251,20) | Help='' | pid=10888 | hwnd=0x0
+FROMPOINT(hover) (116,328) expected='Apri Recenti' -> MenuItem | Name='Apri Recenti' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(56,312,478,33) | Help='' | pid=10888 | hwnd=0x0
+ExpandCollapseState at end: Expanded
+ExpandCollapseState after close: Collapsed

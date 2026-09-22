@@ -1,0 +1,105 @@
+﻿##### POINT (1714,636) atteso='Interlinea' [etichetta pannello Paragrafo (grigia)]
+  UIA FromPoint 150ms: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,481,331,425) | Help='' | pid=10888 | hwnd=0x0
+     parent: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+     child: TabItem | Name='StudioPage, Title = Livelli' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,483,46,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Carattere' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1659,483,68,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Paragrafo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1727,483,70,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Stili di testo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1797,483,83,35) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 35ms, righe=9, riga sotto il puntatore='Interlinea'  (tutte sulla stessa Y: Interlinea)
+  OCR 1,5x normal: 42ms, righe=8, riga sotto il puntatore='Interlinea'  (tutte sulla stessa Y: Interlinea)
+  OCR 2x normal: 66ms, righe=13, riga sotto il puntatore='Interlinea'  (tutte sulla stessa Y: Interlinea)
+  OCR 2x invert: 73ms, righe=13, riga sotto il puntatore='Interlinea'  (tutte sulla stessa Y: Interlinea)
+  OCR 3x normal: 140ms, righe=15, riga sotto il puntatore='Interlinea'  (tutte sulla stessa Y: Interlinea)
+##### POINT (1706,763) atteso='Somma spazio prima e dopo' [etichetta checkbox disabilitata]
+  UIA FromPoint 11ms: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,481,331,425) | Help='' | pid=10888 | hwnd=0x0
+     parent: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+     child: TabItem | Name='StudioPage, Title = Livelli' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,483,46,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Carattere' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1659,483,68,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Paragrafo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1727,483,70,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Stili di testo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1797,483,83,35) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 38ms, righe=7, riga sotto il puntatore='Somma spazio prima e dapo'  (tutte sulla stessa Y: Somma spazio prima e dapo)
+  OCR 1,5x normal: 53ms, righe=9, riga sotto il puntatore='Somma spazio prima e dopo'  (tutte sulla stessa Y: Somma spazio prima e dopo)
+  OCR 2x normal: 72ms, righe=11, riga sotto il puntatore='Somma spazio prima e dopo'  (tutte sulla stessa Y: Somma spazio prima e dopo)
+  OCR 2x invert: 76ms, righe=11, riga sotto il puntatore='Somma spazio prima e dopo'  (tutte sulla stessa Y: Somma spazio prima e dopo)
+  OCR 3x normal: 171ms, righe=14, riga sotto il puntatore='Somma spazio prima e dopo'  (tutte sulla stessa Y: Somma spazio prima e dopo)
+##### POINT (123,197) atteso='Pagine mastro' [riga pannello Pagine]
+  UIA FromPoint 6ms: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(51,147,329,962) | Help='' | pid=10888 | hwnd=0x0
+     parent: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+     child: TabItem | Name='StudioPage, Title = Pagine' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(73,149,53,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Asset' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(126,149,44,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Stock' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(170,149,45,35) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 24ms, righe=9, riga sotto il puntatore='Pagine mastro'  (tutte sulla stessa Y: > | Pagine mastro)
+  OCR 1,5x normal: 53ms, righe=10, riga sotto il puntatore='Pagine mastro'  (tutte sulla stessa Y: > | Pagine mastro)
+  OCR 2x normal: 75ms, righe=9, riga sotto il puntatore='Pagine mastro'  (tutte sulla stessa Y: > | Pagine mastro)
+  OCR 2x invert: 77ms, righe=9, riga sotto il puntatore='Pagine mastro'  (tutte sulla stessa Y: > | Pagine mastro)
+  OCR 3x normal: 125ms, righe=7, riga sotto il puntatore='> Pagine mastro'  (tutte sulla stessa Y: > Pagine mastro)
+##### POINT (1645,603) atteso='Spaziatura' [intestazione sezione]
+  UIA FromPoint 10ms: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,481,331,425) | Help='' | pid=10888 | hwnd=0x0
+     parent: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+     child: TabItem | Name='StudioPage, Title = Livelli' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,483,46,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Carattere' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1659,483,68,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Paragrafo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1727,483,70,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Stili di testo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1797,483,83,35) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 35ms, righe=8, riga sotto il puntatore='v Spaziatura'  (tutte sulla stessa Y: v Spaziatura)
+  OCR 1,5x normal: 38ms, righe=8, riga sotto il puntatore='v Spaziatura'  (tutte sulla stessa Y: v Spaziatura)
+  OCR 2x normal: 70ms, righe=10, riga sotto il puntatore='v Spaziatura'  (tutte sulla stessa Y: v Spaziatura)
+  OCR 2x invert: 76ms, righe=10, riga sotto il puntatore='v Spaziatura'  (tutte sulla stessa Y: v Spaziatura)
+  OCR 3x normal: 143ms, righe=13, riga sotto il puntatore='v Spaziatura'  (tutte sulla stessa Y: v Spaziatura)
+##### POINT (1724,926) atteso='Navigatore' [titolo scheda pannello]
+  UIA FromPoint 13ms: TabItem | Name='StudioPage, Title = Navigatore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1685,910,79,35) | Help='' | pid=10888 | hwnd=0x0
+     parent: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,908,331,201) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Navigatore' | Class='TextBlock' | AutoId='TabTitle' | Fw='WPF' | Off=False | Rect=(1691,916,67,18) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 31ms, righe=15, riga sotto il puntatore='Trasforma Navigatore Cronologia'  (tutte sulla stessa Y: Trasforma Navigatore Cronologia)
+  OCR 1,5x normal: 49ms, righe=17, riga sotto il puntatore='Trasforma Navigatore Cronologia'  (tutte sulla stessa Y: Trasforma Navigatore Cronologia)
+  OCR 2x normal: 70ms, righe=12, riga sotto il puntatore='Trasforma Navigatore Cronologia'  (tutte sulla stessa Y: Trasforma Navigatore Cronologia)
+  OCR 2x invert: 70ms, righe=12, riga sotto il puntatore='Trasforma Navigatore Cronologia'  (tutte sulla stessa Y: Trasforma Navigatore Cronologia)
+  OCR 3x normal: 133ms, righe=14, riga sotto il puntatore='Navigatore Cronologia'  (tutte sulla stessa Y: Trasforma | Navigatore Cronologia)
+##### POINT (1620,397) atteso='S: 100' [testo minuscolo a basso contrasto pannello Colore]
+  UIA FromPoint 7ms: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,147,331,332) | Help='' | pid=10888 | hwnd=0x0
+     parent: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+     child: TabItem | Name='StudioPage, Title = Colore' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,149,52,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Campioni' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1665,149,70,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Tratto' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1735,149,47,35) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 21ms, righe=4, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 1,5x normal: 41ms, righe=4, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 2x normal: 50ms, righe=4, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 2x invert: 54ms, righe=6, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 3x normal: 115ms, righe=2, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+##### POINT (1754,75) atteso='Esporta' [pulsante Esporta disabilitato]
+  UIA FromPoint 11ms: Text | Name='Esporta ' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(1730,64,54,20) | Help='' | pid=10888 | hwnd=0x0
+     parent: Button | Name='' | Class='Button' | AutoId='ExportButtonReflectedItem:expo' | Fw='WPF' | Off=False | Rect=(1698,59,106,29) | Help='Esporta ' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 18ms, righe=3, riga sotto il puntatore='Esparü'  (tutte sulla stessa Y: Esparü)
+  OCR 1,5x normal: 35ms, righe=1, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 2x normal: 48ms, righe=1, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 2x invert: 49ms, righe=1, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+  OCR 3x normal: 102ms, righe=2, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: )
+##### POINT (316,75) atteso='Layout' [selettore studio evidenziato arancione]
+  UIA FromPoint 15ms: ListItem | Name='Serif.Affinity.Workspaces.Workspace' | Class='ListBoxItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(255,54,100,39) | Help='' | pid=10888 | hwnd=0x0
+     parent: List | Name='' | Class='ListBox' | AutoId='PART_MainWorkspaces' | Fw='WPF' | Off=False | Rect=(60,41,414,66) | Help='' | pid=10888 | hwnd=0x0
+     child: Text | Name='Layout' | Class='TextBlock' | AutoId='PART_TextBlock' | Fw='WPF' | Off=False | Rect=(294,64,44,20) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 36ms, righe=19, riga sotto il puntatore='Layout'  (tutte sulla stessa Y: a | Layout | V Vettore O Pixel | Canva Al)
+  OCR 1,5x normal: 58ms, righe=16, riga sotto il puntatore='Layout'  (tutte sulla stessa Y: Layout | a | V Vettore O Pixel | 02 | Canva Al)
+  OCR 2x normal: 79ms, righe=17, riga sotto il puntatore='Layout'  (tutte sulla stessa Y: a | Layout | Canva Al | V Vettore | O Pixel)
+  OCR 2x invert: 82ms, righe=15, riga sotto il puntatore='Layout'  (tutte sulla stessa Y: a | V Vettore O Pixel | Layout)
+  OCR 3x normal: 171ms, righe=19, riga sotto il puntatore='<nessuna>'  (tutte sulla stessa Y: a | V Vettore O Pixel | Canva Al)
+##### POINT (1789,793) atteso='Solo tra paragrafi' [casella combinata]
+  UIA FromPoint 17ms: Tab | Name='' | Class='TabControl' | AutoId='' | Fw='WPF' | Off=False | Rect=(1590,481,331,425) | Help='' | pid=10888 | hwnd=0x0
+     parent: Window | Name='Affinity' | Class='Window' | AutoId='' | Fw='WPF' | Off=False | Rect=(-9,-9,1938,1158) | Help='' | pid=10888 | hwnd=0xC07C4
+     child: TabItem | Name='StudioPage, Title = Livelli' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1613,483,46,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Carattere' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1659,483,68,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Paragrafo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1727,483,70,35) | Help='' | pid=10888 | hwnd=0x0
+     child: TabItem | Name='StudioPage, Title = Stili di testo' | Class='TabItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(1797,483,83,35) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 39ms, righe=7, riga sotto il puntatore='Utilizza spazio prima Solo tra paragrafi'  (tutte sulla stessa Y: Utilizza spazio prima Solo tra paragrafi)
+  OCR 1,5x normal: 54ms, righe=9, riga sotto il puntatore='Utilizza spazio prima Solo tra paragrafi'  (tutte sulla stessa Y: Utilizza spazio prima Solo tra paragrafi)
+  OCR 2x normal: 75ms, righe=14, riga sotto il puntatore='Utilizza spazio prima Solo tra paragrafi'  (tutte sulla stessa Y: Utilizza spazio prima Solo tra paragrafi)
+  OCR 2x invert: 80ms, righe=14, riga sotto il puntatore='Utilizza spazio prima Solo tra paragrafi'  (tutte sulla stessa Y: Utilizza spazio prima Solo tra paragrafi)
+  OCR 3x normal: 144ms, righe=14, riga sotto il puntatore='Utilizza spazio prima Solo tra paragrafi'  (tutte sulla stessa Y: Utilizza spazio prima Solo tra paragrafi)
+##### POINT (241,19) atteso='Documento' [voce barra dei menu]
+  UIA FromPoint 10ms: Text | Name='_Documento' | Class='TextBlock' | AutoId='' | Fw='WPF' | Off=False | Rect=(203,9,78,20) | Help='' | pid=10888 | hwnd=0x0
+     parent: MenuItem | Name='Documento' | Class='MenuItem' | AutoId='' | Fw='WPF' | Off=False | Rect=(189,0,105,37) | Help='' | pid=10888 | hwnd=0x0
+  OCR 1x normal: 34ms, righe=19, riga sotto il puntatore='Documento'  (tutte sulla stessa Y: a | File | Modifica | Documento | Testo | Vettore | Pixel | Livello | Visualizza | Finestra | Guida)
+  OCR 1,5x normal: 61ms, righe=16, riga sotto il puntatore='File Modifica Documento'  (tutte sulla stessa Y: Testo | File Modifica Documento | Vettore Pixel | Livello | Visualizza | Finestra | Guida)
+  OCR 2x normal: 93ms, righe=17, riga sotto il puntatore='File Modifica Documento'  (tutte sulla stessa Y: File Modifica Documento | Testo | Vettore Pixel | Livello | Visualizza | Finestra | Guida)
+  OCR 2x invert: 82ms, righe=15, riga sotto il puntatore='File Modifica Documento'  (tutte sulla stessa Y: Vettore | File Modifica Documento | Testo | Pixel | Livello | Visualizza | Finestra | Guida)
+  OCR 3x normal: 170ms, righe=19, riga sotto il puntatore='Documento'  (tutte sulla stessa Y: File | Modifica | Documento | Testo | Vettore | Pixel | Livello | Visualizza | Finestra | Guida)
+Long hover 5s on Strumento Penna: new windows = 0
