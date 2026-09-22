@@ -11,8 +11,8 @@ namespace PuntaEAscolta.Windows.Ocr;
 /// Pre-trattamento GDI+ misurato in docs/research/ocr-windows.md e docs/research/probe-affinity.md.
 /// Primo passaggio: ingrandimento bicubico adattivo alla scala del monitor, margine del colore di sfondo,
 /// nessuna inversione, nessuna gamma, nessun livello automatico.
-/// Secondo passaggio (basso contrasto): ritaglio intorno al puntatore, 2x, scala di grigi e stiramento
-/// del contrasto fra il 1o e il 99,5o percentile della luminanza.
+/// Secondo passaggio (basso contrasto): fascia di 120 px sulla riga del puntatore, larga quanto l'immagine, 2x, scala di grigi e
+/// stiramento del contrasto fra il 1o e il 99,5o percentile della luminanza del ritaglio 400x120 attorno al puntatore.
 /// </summary>
 internal static class OcrPreprocessor
 {
@@ -56,7 +56,7 @@ internal static class OcrPreprocessor
 
     /// <summary>
     /// Secondo passaggio: fascia alta 120 px e larga quanto l'immagine, centrata sulla riga di (x, y) (coordinate dell'immagine
-    /// originale). Lo stiramento del contrasto e il colore del margine si calcolano sul ritaglio 400x120 attorno al punto, come
+    /// originale). Lo stiramento del contrasto si calcola sul ritaglio 400x120 attorno al punto, come
     /// misurato nella ricerca; la fascia intera evita le parole tagliate dai lati del ritaglio ("ta come PDF" per
     /// "Esporta come PDF"), che il chiamante non sa riconoscere perché non coincidono con i bordi della cattura.
     /// </summary>
@@ -102,6 +102,7 @@ internal static class OcrPreprocessor
 
     private static PreparedImage Render(CapturedImage image, Rectangle source, double scale, bool grayscaleStretch, uint maxDimension, ArrayPool<byte> pool, Rectangle? statsRegion = null)
     {
+        // Regione su cui si misura lo stiramento del contrasto (secondo passaggio: il ritaglio 400x120 attorno al punto).
         Rectangle stats = statsRegion ?? source;
         // Rispetto di OcrEngine.MaxImageDimension: si riduce il fattore, mai si supera il limite.
         int maxDim = maxDimension == 0 ? int.MaxValue : (int)Math.Min(maxDimension, int.MaxValue);
@@ -124,7 +125,7 @@ internal static class OcrPreprocessor
         int destHeight = scaledHeight + 2 * padY;
 
         (float gain, float offset) = grayscaleStretch ? ComputeStretch(image, stats) : (1f, 0f);
-        Color border = DominantBorderColor(image, stats);
+        Color border = DominantBorderColor(image, source);
         Color padColor = grayscaleStretch ? ToStretchedGray(border, gain, offset) : border;
 
         GCHandle handle = GCHandle.Alloc(image.Bgra, GCHandleType.Pinned);

@@ -100,6 +100,36 @@ internal static class HotkeyMap
         return false;
     }
 
+    /// <summary>
+    /// Una scorciatoia registrata con RegisterHotKey viene tolta a TUTTI i programmi finché l'app è aperta (e scatta anche
+    /// sui tasti iniettati dalla dettatura). Restituisce il motivo per cui la combinazione non va registrata, oppure null:
+    /// Esc mai (lo registra l'app solo mentre la voce parla); senza Ctrl, Alt o Win (Maiusc da solo non basta: Maiusc+A è
+    /// la A maiuscola) solo F1-F24, Pausa, Bloc Scorr e i tasti multimediali.
+    /// </summary>
+    internal static string? CheckGlobalSafety(HotkeyGesture gesture, uint vk)
+    {
+        if (vk == VkEscape)
+            return "Esc non può essere una scorciatoia fissa: ferma già la voce mentre parla (opzione \"Esc ferma la voce\")";
+        if (gesture.Ctrl || gesture.Alt || gesture.Win) return null;
+        if (IsStandaloneKey(vk)) return null;
+        return "senza Ctrl, Alt o Win sono ammessi solo i tasti da F1 a F24, Pausa, Bloc Scorr e i tasti multimediali: " +
+               "altrimenti il tasto non funzionerebbe più in nessun programma";
+    }
+
+    private const uint VkEscape = 0x1B;
+
+    /// <summary>F1-F24, Pausa, Bloc Scorr, volume e tasti multimediali: nessun programma li usa per scrivere.</summary>
+    private static bool IsStandaloneKey(uint vk) => vk is >= 0x70 and <= 0x87 or 0x13 or 0x91 or >= 0xAD and <= 0xB3;
+
+    /// <summary>Controllo completo del testo di una scorciatoia: null se va bene (o se è vuota), altrimenti il problema in italiano.</summary>
+    internal static string? Validate(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        if (!HotkeyGesture.TryParse(text, out HotkeyGesture? gesture) || gesture is null || !TryGetVirtualKey(gesture.Key, out uint vk, out _))
+            return $"scorciatoia \"{text.Trim()}\" non riconosciuta";
+        return CheckGlobalSafety(gesture, vk);
+    }
+
     internal static uint ToModifiers(HotkeyGesture gesture)
     {
         uint mods = NativeMethods.MOD_NOREPEAT;

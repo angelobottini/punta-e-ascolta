@@ -73,9 +73,11 @@ public sealed class WindowsOcrEngine : IOcrEngine, IPointOcrEngine
         RunAsync(image, static (img, maxDim, pool) => OcrPreprocessor.PrepareStandard(img, maxDim, pool), "standard", ct);
 
     /// <summary>
-    /// Secondo passaggio per testo a basso contrasto (voci disabilitate, grigio su grigio): ritaglio di circa 400x120
-    /// intorno a (x, y), 2x, scala di grigi e stiramento del contrasto. (x, y) sono in pixel dell'immagine <paramref name="image"/>
-    /// (le stesse coordinate dei rettangoli restituiti). Da usare solo quando il primo passaggio non trova nulla sulla riga.
+    /// Secondo passaggio per testo a basso contrasto (voci disabilitate, grigio su grigio): fascia alta 120 px sulla riga di (x, y)
+    /// e larga quanto l'immagine, 2x, scala di grigi e stiramento del contrasto misurato sul ritaglio 400x120 attorno al punto.
+    /// Le righe tagliate dai bordi superiore e inferiore della fascia vengono scartate. (x, y) sono in pixel dell'immagine
+    /// <paramref name="image"/> (le stesse coordinate dei rettangoli restituiti). Da usare solo quando il primo passaggio non
+    /// trova nulla sulla riga.
     /// </summary>
     public Task<OcrResult> RecognizeLowContrastAsync(CapturedImage image, double x, double y, CancellationToken ct) =>
         RunAsync(image, (img, maxDim, pool) => OcrPreprocessor.PrepareLowContrast(img, x, y, maxDim, pool), "basso contrasto", ct);
@@ -171,6 +173,11 @@ public sealed class WindowsOcrEngine : IOcrEngine, IPointOcrEngine
             }
 
             IReadOnlyList<OcrLine> lines = MapLines(winResult, prepared);
+            if (prepared.OriginalWidth > 0 && prepared.OriginalHeight > 0)
+            {
+                // Righe tagliate dai bordi della fascia del secondo passaggio (non dai bordi della cattura): frammenti da scartare.
+                lines = OcrPreprocessor.DropLinesCutByCrop(lines, prepared.Source, prepared.OriginalWidth, prepared.OriginalHeight);
+            }
             stopwatch.Stop();
 
             if (_log.IsDebugEnabled)
@@ -216,9 +223,15 @@ public sealed class WindowsOcrEngine : IOcrEngine, IPointOcrEngine
         image is { Width: > 0, Height: > 0, Bgra: not null } &&
         (long)image.Width * image.Height * 4 <= image.Bgra.Length;
 
-    /// <summary>Riporta righe e parole alle coordinate dell'immagine originale. Testo della riga = parole unite da spazi.</summary>
+    /// <summary>
+    /// Riporta righe e parole alle coordinate dell'immagine originale. Testo della riga = parole unite da spazi.
+    /// Quando il motore stima un'inclinazione del testo (<see cref="WinOcr.OcrResult.TextAngle"/>, anche 3 gradi spuri su
+    /// schermate d'interfaccia) i riquadri sono nel sistema raddrizzato: si ruotano di nuovo attorno al centro dell'immagine,
+    /// altrimenti una riga lontana dal centro risulta spostata di 10-25 px e il puntatore finisce sulla riga sbagliata.
+    /// </summary>
     private static IReadOnlyList<OcrLine> MapLines(WinOcr.OcrResult result, PreparedImage prepared)
     {
+        double angle = SafeTextAngle(result);
         var lines = new List<OcrLine>(result.Lines.Count);
         foreach (WinOcr.OcrLine line in result.Lines)
         {
@@ -232,7 +245,8 @@ public sealed class WindowsOcrEngine : IOcrEngine, IPointOcrEngine
                 }
 
                 WinFoundation.Rect rect = word.BoundingRect;
-                words.Add(new OcrWord(text, prepared.ToOriginal(rect.X, rect.Y, rect.Width, rect.Height)));
+                var (x, y) = UndoTextAngle(rect.X, rect.Y, rect.Width, rect.Height, prepared.Width, prepared.Height, angle);
+                words.Add(new OcrWord(text, prepared.ToOriginal(x, y, rect.Width, rect.Height)));
             }
 
             if (words.Count == 0)
@@ -244,6 +258,36 @@ public sealed class WindowsOcrEngine : IOcrEngine, IPointOcrEngine
         }
 
         return lines;
+    }
+
+    private static double SafeTextAngle(WinOcr.OcrResult result)
+    {
+        try
+        {
+            double? angle = result.TextAngle;
+            return angle is { } a && double.IsFinite(a) && Math.Abs(a) >= 0.01 && Math.Abs(a) <= 45 ? a : 0;
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
+    }
+
+    /// <summary>
+    /// Riporta l'angolo superiore sinistro di un riquadro dal sistema raddrizzato del motore a quello dell'immagine passata:
+    /// il centro del riquadro ruota in senso orario di <paramref name="angleDegrees"/> attorno al centro dell'immagine
+    /// (misurato: con TextAngle 3,2 la riga "FF0000" torna da y 103 a 145 su 288, cioè sulla sua riga vera).
+    /// </summary>
+    internal static (double X, double Y) UndoTextAngle(double x, double y, double width, double height, double imageWidth, double imageHeight, double angleDegrees)
+    {
+        if (angleDegrees == 0) return (x, y);
+        double rad = angleDegrees * Math.PI / 180.0;
+        double cos = Math.Cos(rad), sin = Math.Sin(rad);
+        double cx = imageWidth / 2.0, cy = imageHeight / 2.0;
+        double dx = x + width / 2.0 - cx, dy = y + height / 2.0 - cy;
+        double rx = cx + dx * cos - dy * sin;
+        double ry = cy + dx * sin + dy * cos;
+        return (rx - width / 2.0, ry - height / 2.0);
     }
 
     private static ImageRect Union(List<OcrWord> words)

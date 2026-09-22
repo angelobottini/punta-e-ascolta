@@ -96,7 +96,9 @@ internal static unsafe partial class NativeMethods
     // ---- Costanti: appunti e memoria globale ----------------------------------------------
 
     internal const uint CF_TEXT = 1;
+    internal const uint CF_OEMTEXT = 7;
     internal const uint CF_UNICODETEXT = 13;
+    internal const uint CF_LOCALE = 16;
     internal const uint GMEM_MOVEABLE = 0x0002;
     internal const uint GMEM_ZEROINIT = 0x0040;
 
@@ -311,6 +313,13 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport("user32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     internal static partial uint RegisterClipboardFormatW(string lpszFormat);
+
+    /// <summary>Formato successivo a <paramref name="format"/> (0 = primo). Restituisce 0 alla fine o in caso di errore (GetLastError).</summary>
+    [LibraryImport("user32.dll", SetLastError = true)]
+    internal static partial uint EnumClipboardFormats(uint format);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    internal static partial int GetClipboardFormatNameW(uint format, char* lpszFormatName, int cchMaxCount);
 
     // ---- kernel32 -------------------------------------------------------------------------
 

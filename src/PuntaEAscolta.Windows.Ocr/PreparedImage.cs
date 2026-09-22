@@ -24,6 +24,13 @@ internal sealed record PreparedImage(
     int OffsetX,
     int OffsetY)
 {
+    /// <summary>Regione dell'immagine originale che è stata preparata (ritaglio o immagine intera).</summary>
+    public System.Drawing.Rectangle Source { get; init; }
+
+    /// <summary>Dimensioni dell'immagine originale: servono a capire quali bordi del ritaglio tagliano il testo.</summary>
+    public int OriginalWidth { get; init; }
+    public int OriginalHeight { get; init; }
+
     /// <summary>Numero di byte utili nel vettore <see cref="Bgra"/>.</summary>
     public int ByteLength => Width * Height * 4;
 

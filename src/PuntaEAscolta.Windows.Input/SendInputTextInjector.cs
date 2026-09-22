@@ -16,6 +16,9 @@ public sealed class SendInputTextInjector : ITextInjector
     private const int BatchSize = 50;
     private const int BatchPauseMs = 5;
 
+    /// <summary>Attesa del rilascio dei modificatori prima di inviare tasti virtuali (rilascio lento dei tasti).</summary>
+    private const int VirtualKeyModifierTimeoutMs = 3000;
+
     private readonly ILog _log;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
@@ -56,7 +59,10 @@ public sealed class SendInputTextInjector : ITextInjector
 
     private void TypeText(string text, CancellationToken ct)
     {
-        WaitModifiers(ct);
+        // I caratteri Unicode arrivano uguali anche con un modificatore premuto; Invio e Tab (tasti virtuali) no:
+        // Ctrl+Invio in Word inserisce un'interruzione di pagina.
+        bool hasVirtualKeys = text.AsSpan().IndexOfAny('\n', '\r', '\t') >= 0;
+        WaitModifiers(ct, mustBeReleased: hasVirtualKeys);
 
         var batch = new INPUT[BatchSize];
         int count = 0;
@@ -106,7 +112,7 @@ public sealed class SendInputTextInjector : ITextInjector
 
     private void PressKey(ushort vk, int times, CancellationToken ct)
     {
-        WaitModifiers(ct);
+        WaitModifiers(ct, mustBeReleased: true);
 
         var batch = new INPUT[BatchSize];
         int count = 0;
@@ -119,11 +125,21 @@ public sealed class SendInputTextInjector : ITextInjector
         Flush(batch, ref count, ct, pauseAfter: false);
     }
 
-    private void WaitModifiers(CancellationToken ct)
+    /// <summary>
+    /// Subito dopo una scorciatoia i modificatori sono ancora premuti e cambierebbero il significato dei tasti.
+    /// Con <paramref name="mustBeReleased"/> (Invio, Tab, Backspace) si aspetta di più e, se restano premuti, si rinuncia:
+    /// il servizio di dettatura lo dice a voce ("Inserimento non riuscito").
+    /// </summary>
+    private void WaitModifiers(CancellationToken ct, bool mustBeReleased)
     {
-        // Subito dopo una scorciatoia i modificatori sono ancora premuti e cambierebbero il significato dei tasti.
-        if (!InputInjection.WaitForModifiersRelease(InputInjection.ModifierReleaseTimeoutMs, ct))
-            _log.Warn("Modificatori ancora premuti dopo l'attesa: il testo viene inserito comunque");
+        int timeout = mustBeReleased ? VirtualKeyModifierTimeoutMs : InputInjection.ModifierReleaseTimeoutMs;
+        if (InputInjection.WaitForModifiersRelease(timeout, ct)) return;
+        if (mustBeReleased)
+        {
+            _log.Warn("Modificatori ancora premuti dopo l'attesa: tasti non inviati");
+            throw new InvalidOperationException("Tasti Ctrl/Alt/Maiusc/Win ancora premuti: testo non inserito");
+        }
+        _log.Warn("Modificatori ancora premuti dopo l'attesa: il testo viene inserito comunque");
     }
 
     private void Flush(INPUT[] batch, ref int count, CancellationToken ct, bool pauseAfter)

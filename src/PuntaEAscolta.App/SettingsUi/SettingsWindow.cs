@@ -7,6 +7,7 @@ using PuntaEAscolta.App.Hosting;
 using PuntaEAscolta.Core.Abstractions;
 using PuntaEAscolta.Core.Settings;
 using PuntaEAscolta.Logic.Settings;
+using PuntaEAscolta.Windows.Input;
 
 namespace PuntaEAscolta.App.SettingsUi;
 
@@ -267,7 +268,8 @@ internal sealed partial class SettingsWindow : Window
             (t, v) => t.Input.AcceptInjectedEvents = v);
 
         var keys = Section(page, "Scorciatoie da tastiera");
-        Note(keys, "Esempi: Win+Shift+F9, Ctrl+F8, F8. Campo vuoto = nessuna scorciatoia. Evitare Ctrl+Alt: sulla tastiera italiana è AltGr.");
+        Note(keys, "Esempi: Win+Shift+F9, Ctrl+F8, F8. Campo vuoto = nessuna scorciatoia. Evitare Ctrl+Alt: sulla tastiera italiana è AltGr. " +
+            "Senza Ctrl, Alt o Win sono ammessi solo F1-F24, Pausa e Bloc Scorr (un altro tasto verrebbe tolto a tutti i programmi); Esc non si può usare: ferma già la voce mentre parla.");
         HotkeyField(keys, "Leggi sotto il puntatore", s.Input.HotkeyReadAtPointer, (t, v) => t.Input.HotkeyReadAtPointer = v);
         HotkeyField(keys, "Leggi la selezione", s.Input.HotkeyReadSelection, (t, v) => t.Input.HotkeyReadSelection = v);
         HotkeyField(keys, "Ferma la voce", s.Input.HotkeyStop, (t, v) => t.Input.HotkeyStop = v);
@@ -507,6 +509,9 @@ internal sealed partial class SettingsWindow : Window
                     return $"{label}: scorciatoia non valida (\"{v}\"). Esempio: Win+Shift+F9.";
                 if (gesture.Ctrl && gesture.Alt)
                     return $"{label}: evitare Ctrl+Alt, sulla tastiera italiana coincide con AltGr.";
+                // Stesso controllo della registrazione: niente Esc, niente tasti senza Ctrl/Alt/Win (salvo F1-F24 e pochi altri).
+                if (WindowsInputSource.ValidateHotkey(v) is { } problem)
+                    return $"{label}: {problem}.";
             }
             apply(s, v);
             return null;
