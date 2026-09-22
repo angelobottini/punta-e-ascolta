@@ -16,6 +16,8 @@ internal static unsafe partial class NativeMethods
 
     // ---- Costanti: messaggi ---------------------------------------------------------------
 
+    internal const uint WM_DESTROY = 0x0002;
+    internal const uint WM_QUIT = 0x0012;
     internal const uint WM_DISPLAYCHANGE = 0x007E;
     internal const uint WM_TIMER = 0x0113;
     internal const uint WM_MOUSEMOVE = 0x0200;
@@ -216,6 +218,11 @@ internal static unsafe partial class NativeMethods
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static partial bool AreDpiAwarenessContextsEqual(nint dpiContextA, nint dpiContextB);
+
+    /// <summary>Solo per programmi di prova senza manifest: l'app vera dichiara PerMonitorV2 nel manifest.</summary>
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool SetProcessDpiAwarenessContext(nint value);
 
     [LibraryImport("shcore.dll")]
     internal static partial int GetDpiForMonitor(nint hMonitor, int dpiType, out uint dpiX, out uint dpiY);
