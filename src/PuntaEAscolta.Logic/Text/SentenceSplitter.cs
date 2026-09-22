@@ -24,6 +24,20 @@ public static class SentenceSplitter
         "mr", "mrs", "ms", "st", "jr", "sr", "inc", "ltd", "co", "corp", "dept", "no", "vol", "approx",
     };
 
+    /// <summary>
+    /// Abbreviazioni che sono anche parole comuni o che chiudono spesso una frase ("circa.", "via.", "no.", "5 min.", "ecc.",
+    /// mesi e giorni): il punto chiude la frase se la parola dopo comincia con una maiuscola ("alle 15.45 circa. Vedi pag. 12").
+    /// Davanti a cifre o minuscole resta un'abbreviazione ("3 mar. 2026", "ecc. ma non importa"). Le altre voci della lista
+    /// (titoli come "sig.", "dott.", "gen."... e rimandi come "pag.", "art.") precedono un nome o un numero: non chiudono mai.
+    /// </summary>
+    private static readonly HashSet<string> AmbiguousAbbreviations = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "circa", "ca", "via", "no", "min", "max", "sec", "h", "km", "kg", "mq", "mc", "cm", "mm", "ml", "gr", "lt",
+        "ecc", "etc", "approx", "inc", "ltd", "corp", "co", "dept", "jr", "sr", "spa", "srl", "soc",
+        "gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "sett", "ott", "nov", "dic",
+        "lun", "mart", "merc", "giov", "ven", "sab", "dom", "fax",
+    };
+
     /// <summary>Restituisce la frase di <paramref name="paragraph"/> che contiene il carattere in posizione <paramref name="offset"/>, già ripulita dai caratteri di controllo.</summary>
     public static string ExtractSentence(string paragraph, int offset)
     {
@@ -150,7 +164,9 @@ public static class SentenceSplitter
         // Numero ordinale con punto "1." o elenco "a." seguiti da minuscola: non fine frase
         if (word.Length <= 2 && char.IsDigit(word[0]) && NextIsLower(text, i + 1)) return false;
 
-        if (Abbreviations.Contains(word.ToString())) return false;
+        string lookup = word.ToString();
+        if (AmbiguousAbbreviations.Contains(lookup)) return NextIsUpperLetter(text, i + 1);
+        if (Abbreviations.Contains(lookup)) return false;
 
         // Sigle maiuscole corte tipo "U.S." già gestite sopra; una parola tutta minuscola seguita da minuscola: dubbio, non chiudere
         if (NextIsLower(text, i + 1) && word.Length <= 4 && IsAllLower(word)) return false;
@@ -173,6 +189,14 @@ public static class SentenceSplitter
     {
         while (k < text.Length && (char.IsWhiteSpace(text[k]) || IsOpening(text[k]))) k++;
         return k < text.Length && (char.IsUpper(text[k]) || char.IsDigit(text[k]));
+    }
+
+    /// <summary>La parola successiva (dopo spazi e aperture di virgolette o parentesi) comincia con una lettera maiuscola.</summary>
+    private static bool NextIsUpperLetter(string text, int k)
+    {
+        while (k < text.Length && IsClosing(text[k])) k++;
+        while (k < text.Length && (char.IsWhiteSpace(text[k]) || IsOpening(text[k]))) k++;
+        return k < text.Length && char.IsLetter(text[k]) && char.IsUpper(text[k]);
     }
 
     private static bool IsOpening(char c) => c is '"' or '«' or '“' or '‘' or '(' or '[' or '‹' or '\'';

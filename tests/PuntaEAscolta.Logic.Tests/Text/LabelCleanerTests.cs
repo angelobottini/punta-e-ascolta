@@ -91,3 +91,84 @@ public class LabelCleanerTests
         Assert.Equal(expected, LabelCleaner.CleanOcrLine(line, Default));
     }
 }
+
+/// <summary>Correzioni della revisione del 22/09/2026 (docs/impl-notes/revisione.md).</summary>
+public class LabelCleanerReviewTests
+{
+    private static readonly ReadingSettings Default = new();
+
+    [Theory]
+    [InlineData("Grassetto (CTRL+G)", "Grassetto")]
+    [InlineData("Corsivo (CTRL+I)", "Corsivo")]
+    [InlineData("Barrato (Ctrl+MAIUSC+X)", "Barrato")]
+    [InlineData("Rimuovi formattazione (CTRL+barra spaziatrice)", "Rimuovi formattazione")]
+    [InlineData("Guida (F1)", "Guida")]
+    [InlineData("Bold (Ctrl + B)", "Bold")]
+    public void Clean_ShortcutInParentheses_IsRemoved(string raw, string expected)
+    {
+        Assert.Equal(expected, LabelCleaner.Clean(raw, UiElementKind.Button, Default));
+    }
+
+    [Theory]
+    [InlineData("Testo con parentesi (importante)")]
+    [InlineData("Salva (copia)")]
+    [InlineData("Disco locale (C:)")]
+    public void Clean_OrdinaryParentheses_AreKept(string raw)
+    {
+        Assert.Equal(raw, LabelCleaner.Clean(raw, UiElementKind.Button, Default));
+    }
+
+    [Fact]
+    public void Clean_ShortcutInParentheses_KeptWhenSettingDisabled()
+    {
+        var s = new ReadingSettings { StripKeyboardShortcuts = false };
+        Assert.Equal("Grassetto (CTRL+G)", LabelCleaner.Clean("Grassetto (CTRL+G)", UiElementKind.Button, s));
+    }
+
+    [Theory]
+    [InlineData("Download (elemento aggiunto)", "Download")]
+    [InlineData("Avvio dell'accesso rapido - Desktop (elemento aggiunto)", "Desktop")]
+    [InlineData("Documenti", "Documenti")]
+    public void Clean_ExplorerNavigationPaneNames(string raw, string expected)
+    {
+        Assert.Equal(expected, LabelCleaner.Clean(raw, UiElementKind.TreeItem, Default));
+    }
+
+    [Theory]
+    [InlineData("Altro")]
+    [InlineData("Alto")]
+    [InlineData("Alta")]
+    [InlineData("Altri")]
+    [InlineData("ALT")]
+    [InlineData("Super")]
+    [InlineData("SUPER 95")]
+    [InlineData("Controllo")]
+    [InlineData("Opzione")]
+    [InlineData("Comando")]
+    [InlineData("Windows")]
+    [InlineData("Options")]
+    [InlineData("Meta")]
+    [InlineData("Wine")]
+    public void IsKeyboardShortcut_OrdinaryWordsAreNotShortcuts(string text)
+    {
+        Assert.False(LabelCleaner.IsKeyboardShortcut(text));
+        Assert.Equal(text, LabelCleaner.CleanOcrLine(text, Default));
+    }
+
+    [Theory]
+    [InlineData("Alt-F4")]
+    [InlineData("Ctrl+Alt+Canc")]
+    [InlineData("Win+Shift+S")]
+    [InlineData("⌘⇧N")]
+    public void IsKeyboardShortcut_RealShortcuts(string text)
+    {
+        Assert.True(LabelCleaner.IsKeyboardShortcut(text));
+    }
+
+    [Fact]
+    public void CleanOcrLine_WordAfterLabelIsNotTakenForShortcut()
+    {
+        Assert.Equal("Allineamento Alto", LabelCleaner.CleanOcrLine("Allineamento Alto", Default));
+        Assert.Equal("Grassetto", LabelCleaner.CleanOcrLine("Grassetto (CTRL+G)", Default));
+    }
+}

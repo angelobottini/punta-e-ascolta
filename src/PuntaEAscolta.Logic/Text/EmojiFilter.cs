@@ -7,8 +7,12 @@ namespace PuntaEAscolta.Logic.Text;
 /// <summary>Rimuove emoji ed emoticon: non vanno mai pronunciate (requisito del committente). Vedi docs/DESIGN.md sez. 3.1.</summary>
 public static partial class EmojiFilter
 {
-    /// <summary>Emoticon testuali riconosciute solo se isolate (delimitate da spazi o estremi del testo).</summary>
-    [GeneratedRegex(@"(?<=^|\s)(?:[:;=8xX][-o^']?[)(DPpOo3\]\[/\\|*]|[)(D][-o^']?[:;=]|<3|</3|\^_\^|\^-\^|-_-|o_O|O_o|T_T|>_<|:-?\*|;-?\*|:'\(|:'-\()(?=$|\s|[.,!?])", RegexOptions.CultureInvariant)]
+    /// <summary>
+    /// Emoticon testuali riconosciute solo se isolate (delimitate da spazi o estremi del testo). Occhi solo ":", ";", "=":
+    /// "8", "x", "X" e "D" come occhi toglievano testo vero ("Windows XP", "8) Salva il file", "Unità D: piena", "x3").
+    /// Restano le forme inconfondibili "xD", "XD", "8-)", "B-)".
+    /// </summary>
+    [GeneratedRegex(@"(?<=^|\s)(?:[:;=][-o^']?[)(DPpOo3\]\[/\\|*]|[xX]D|8-\)|B-\)|[)(][-o^']?[:;=]|<3|</3|\^_\^|\^-\^|-_-|o_O|O_o|T_T|>_<|:-?\*|;-?\*|:'\(|:'-\()(?=$|\s|[.,!?])", RegexOptions.CultureInvariant)]
     private static partial Regex Emoticons();
 
     /// <summary>Spazi multipli e spazi prima della punteggiatura lasciati dalla rimozione.</summary>

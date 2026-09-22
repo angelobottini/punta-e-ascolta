@@ -31,17 +31,32 @@ public static partial class UiTextResolver
     [GeneratedRegex(@"^(?:[a-z]+(?:[A-Z][a-z0-9]*){1,}|[A-Za-z]+(?:_[A-Za-z0-9]+)+|[A-Z][a-z]+(?:[A-Z][a-zA-Z0-9]*){2,}|\w+(?:Class|Ctrl|Control|View|Model|ViewModel|Host|Wrapper|Panel|Pane|DC|Hwnd)\w*)$", RegexOptions.CultureInvariant)]
     private static partial Regex Identifier();
 
+    /// <summary>Identificatore tutto minuscolo e attaccato ("newdocnew", "newdocopen" di Affinity): con un HelpText si preferisce quello.</summary>
+    [GeneratedRegex(@"^[a-z][a-z0-9]{6,}$", RegexOptions.CultureInvariant)]
+    private static partial Regex LowercaseIdentifier();
+
     private const int ContainerMinWidth = 300;
     private const int ContainerMinHeight = 120;
     private const int MaxContainerNameLength = 120;
+
+    /// <summary>Valore di un campo pronunciato insieme all'etichetta quando il puntatore non è sul testo: oltre, o su più righe, è un documento.</summary>
+    private const int MaxInlineValueChars = 200;
+
+    /// <summary>Una cella che non è di un foglio di calcolo (tabella di Word) con testo lungo si legge per frasi, non per intero.</summary>
+    private const int MaxCellValueCharsBeforeSentence = 120;
+
+    /// <summary>Altezza massima in pixel di un separatore di menu travestito da MenuItem (Affinity: 6 px al 125%).</summary>
+    private const int SeparatorMaxHeight = 12;
 
     public static UiResolution? Resolve(UiElementInfo info, ReadingSettings settings)
     {
         if (info is null) return null;
 
         // 1. Contenuto di testo puntato (Word, editor, campi lunghi): la frase sotto il punto.
-        // Le celle di un foglio di calcolo possono avere anche un contesto di testo: lì conta il valore visualizzato.
-        bool cellWithValue = info.Kind is UiElementKind.DataItem && !string.IsNullOrWhiteSpace(info.Value);
+        // Le celle di un foglio di calcolo possono avere anche un contesto di testo: lì conta il valore visualizzato
+        // (Excel: Name = coordinata "C3"). Una cella di tabella di Word con un paragrafo lungo si legge invece per frasi.
+        bool cellWithValue = info.Kind is UiElementKind.DataItem && !string.IsNullOrWhiteSpace(info.Value)
+            && (LooksLikeCellReference(info.Name) || !IsLongOrMultiline(info.Value, MaxCellValueCharsBeforeSentence));
         if (!cellWithValue && info.Text is { PointerOverText: true } ctx && settings.ReadSentenceInDocuments && !info.IsPassword)
         {
             var sentence = SentenceSplitter.ExtractSentence(ctx.ParagraphText, ctx.OffsetInParagraph);
@@ -72,6 +87,23 @@ public static partial class UiTextResolver
                 return label is null ? null : new UiResolution(ReadSource.UiaName, Finish(label, settings), SpeechKind.Label, false);
             var value = FirstUsable(info.Value, info.LegacyValue);
             if (info.Text is { } t && !t.PointerOverText && value is null && t.ParagraphText.Length > 0) value = t.ParagraphText;
+
+            // Area di testo grande (pagina di Word "Contenuto pagina 1", Blocco note, corpo di un messaggio) con il puntatore
+            // fuori dal testo: né il nome della pagina né il documento intero; si passa a suggerimento e OCR.
+            bool largeArea = info.Bounds.Width >= ContainerMinWidth && info.Bounds.Height >= ContainerMinHeight;
+            bool pointerOffText = info.Text is { PointerOverText: false } || info.Text is null;
+            if (largeArea && pointerOffText && (info.Text is not null || (value is not null && IsLongOrMultiline(value, MaxInlineValueChars))))
+                return null;
+            // Valore su più righe o molto lungo (un documento, non un campo): si dice solo l'etichetta, mai il testo intero.
+            if (value is not null && IsLongOrMultiline(value, MaxInlineValueChars)) value = null;
+
+            // Esplora file: la scritta sotto l'icona è un Edit "Nome" con valore "lib.ps1" dentro la voce "lib.ps1": basta il nome del file.
+            if (value is not null && info.ParentKind is UiElementKind.ListItem or UiElementKind.TreeItem or UiElementKind.DataItem
+                && string.Equals(value, info.ParentName?.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                return new UiResolution(ReadSource.UiaValue, Finish(value, settings), SpeechKind.Label, Sensitive: false);
+            }
+
             if (label is null && value is null) return null;
             if (value is null) return new UiResolution(ReadSource.UiaName, Finish(label!, settings), SpeechKind.Label, false);
             var text = label is null ? value : $"{label}, {value}";
@@ -90,27 +122,39 @@ public static partial class UiTextResolver
 
         if (info.Kind == UiElementKind.Image)
         {
-            var name = UsableName(info) ?? FirstUsable(info.HelpText, info.FullDescription, info.LegacyDescription);
+            var name = UsableName(info) ?? FirstUsableText(info.HelpText, info.FullDescription, info.LegacyDescription);
             if (name is null || IsFileName(name)) return null;
             return new UiResolution(ReadSource.UiaName, Finish(name, settings), SpeechKind.Label, false);
         }
 
         // 5. Controlli: Name, poi etichetta associata, HelpText, FullDescription, descrizioni legacy.
         var primary = UsableName(info);
+        var source = ReadSource.UiaName;
         if (primary is not null && info.ParentKind == UiElementKind.SplitButton && IsSecondaryPart(primary) && FirstUsable(info.ParentName) is { } parentName)
             primary = $"{parentName}, {primary.ToLowerInvariant()}";
 
+        // Identificatore minuscolo attaccato con un suggerimento disponibile (Affinity "newdocnew" con HelpText "Nuova"): il suggerimento.
+        if (primary is not null && LowercaseIdentifier().IsMatch(primary) && FirstUsableText(info.HelpText, info.FullDescription) is { } description
+            && !string.Equals(description, primary, StringComparison.OrdinalIgnoreCase))
+        {
+            primary = description;
+            source = ReadSource.UiaDescription;
+        }
+
         var chosen = primary;
-        var source = ReadSource.UiaName;
         if (chosen is null)
         {
-            chosen = FirstUsable(info.LabeledByName);
+            chosen = FirstUsableText(info.LabeledByName);
             if (chosen is null)
             {
-                chosen = FirstUsable(info.HelpText, info.FullDescription, info.LegacyDescription, info.LegacyName);
+                // Anche i ripieghi possono contenere un nome di tipo .NET (separatore di Affinity: LegacyName = nome del tipo).
+                chosen = FirstUsableText(info.HelpText, info.FullDescription, info.LegacyDescription, info.LegacyName);
                 source = ReadSource.UiaDescription;
             }
         }
+        // Separatore di menu senza nome utile (alto pochi pixel): silenzio.
+        if (info.Kind == UiElementKind.MenuItem && primary is null && info.Bounds.Height is > 0 and <= SeparatorMaxHeight)
+            chosen = null;
         if (chosen is null)
         {
             if (info.Kind == UiElementKind.Text && info.Value is { } v && v.Trim().Length > 0) return new UiResolution(ReadSource.UiaValue, Finish(v, settings), SpeechKind.Label, false);
@@ -146,10 +190,8 @@ public static partial class UiTextResolver
         name = name.Trim();
 
         var m = ToStringWithTitle().Match(name);
-        if (m.Success) return FirstUsable(m.Groups["v"].Value);
-        if (ToStringBraces().IsMatch(name)) return null;
-        if (TypeName().IsMatch(name)) return null;
-        if (!name.Contains(' ') && Identifier().IsMatch(name) && name.Length > 6 && !name.Any(c => c is 'à' or 'è' or 'é' or 'ì' or 'ò' or 'ù')) return null;
+        if (m.Success) return FirstUsableText(m.Groups["v"].Value);
+        if (IsMachineText(name)) return null;
         if (name.Equals(info.ClassName, StringComparison.Ordinal) || name.Equals(info.AutomationId, StringComparison.Ordinal))
         {
             // Name uguale a ClassName/AutomationId è quasi sempre un identificatore, a meno che non sembri una parola vera.
@@ -158,6 +200,36 @@ public static partial class UiTextResolver
         if (!name.Any(char.IsLetterOrDigit)) return null;
         return name;
     }
+
+    /// <summary>Testo scritto per le macchine e non per le persone: nome di tipo .NET, ToString con graffe, identificatore di codice.</summary>
+    private static bool IsMachineText(string text)
+    {
+        if (ToStringBraces().IsMatch(text)) return true;
+        if (TypeName().IsMatch(text)) return true;
+        return !text.Contains(' ') && Identifier().IsMatch(text) && text.Length > 6 && !text.Any(c => c is 'à' or 'è' or 'é' or 'ì' or 'ò' or 'ù');
+    }
+
+    /// <summary>Primo candidato pronunciabile che non sia testo per le macchine (nomi di tipo, identificatori, ToString).</summary>
+    private static string? FirstUsableText(params string?[] candidates)
+    {
+        foreach (var c in candidates)
+        {
+            var t = FirstUsable(c);
+            if (t is null || IsMachineText(t)) continue;
+            var m = ToStringWithTitle().Match(t);
+            if (m.Success)
+            {
+                var title = FirstUsable(m.Groups["v"].Value);
+                if (title is null) continue;
+                return title;
+            }
+            return t;
+        }
+        return null;
+    }
+
+    private static bool IsLongOrMultiline(string text, int maxChars) =>
+        text.Length > maxChars || text.AsSpan().Trim().IndexOfAny('\n', '\r', '\v') >= 0;
 
     private static bool IsNaturalWord(string s) => s.Length <= 20 && s.All(char.IsLetter) && (s.All(char.IsLower) || (char.IsUpper(s[0]) && s.Skip(1).All(char.IsLower)));
 

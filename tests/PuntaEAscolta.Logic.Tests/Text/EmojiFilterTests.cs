@@ -60,3 +60,31 @@ public class EmojiFilterTests
         Assert.Equal("", EmojiFilter.Strip(null!));
     }
 }
+
+/// <summary>Correzioni della revisione del 22/09/2026: niente testo vero scambiato per emoticon.</summary>
+public class EmojiFilterReviewTests
+{
+    [Theory]
+    [InlineData("Windows XP")]
+    [InlineData("8) Salva il file")]
+    [InlineData("Unità D: piena")]
+    [InlineData("Premi X) per uscire")]
+    [InlineData("Confezione x3")]
+    [InlineData("Disco locale (D:)")]
+    [InlineData(@"Vai a D:\Documenti")]
+    public void Strip_KeepsTextThatLooksLikeEmoticons(string input)
+    {
+        Assert.Equal(input, EmojiFilter.Strip(input));
+    }
+
+    [Theory]
+    [InlineData("bello xD", "bello")]
+    [InlineData("fico 8-) davvero", "fico davvero")]
+    [InlineData("ok ;)", "ok")]
+    [InlineData("wow :O", "wow")]
+    [InlineData("(: ciao", "ciao")]
+    public void Strip_StillRemovesRealEmoticons(string input, string expected)
+    {
+        Assert.Equal(expected, EmojiFilter.Strip(input));
+    }
+}

@@ -43,10 +43,14 @@ public static class PointerTextSelector
 
         if (wholeZone)
         {
-            var ordered = segments.OrderBy(s => s.Box.Y + s.Box.Height / 2).ThenBy(s => s.Box.X).ToList();
-            var texts = MergeRows(ordered).Select(t => LabelCleaner.CleanOcrLine(t, reading)).Where(t => t.Length > 0).ToList();
-            if (texts.Count == 0) return null;
-            return new OcrSelection(ReadSource.OcrZone, string.Join(". ", texts), texts.Count);
+            if (!settings.GroupLinesIntoBlocks)
+            {
+                var ordered = segments.OrderBy(s => s.Box.Y + s.Box.Height / 2).ThenBy(s => s.Box.X).ToList();
+                var texts = MergeRows(ordered).Select(t => LabelCleaner.CleanOcrLine(t, reading)).Where(t => t.Length > 0).ToList();
+                if (texts.Count == 0) return null;
+                return new OcrSelection(ReadSource.OcrZone, string.Join(". ", texts), texts.Count);
+            }
+            return SelectWholeZoneByBlocks(segments, pointerX, pointerY, settings, reading);
         }
 
         // Riga candidata: fascia verticale allargata che contiene il puntatore; altrimenti la più vicina entro il limite.
@@ -101,6 +105,79 @@ public static class PointerTextSelector
 
         var text = LabelCleaner.CleanOcrLine(chosen.Text, reading);
         return text.Length == 0 ? null : new OcrSelection(ReadSource.OcrLine, text, 1);
+    }
+
+    /// <summary>
+    /// Lettura dell'intera zona per blocchi (colonne, cartelli, paragrafi): prima il blocco sotto il puntatore (o il più vicino),
+    /// poi gli altri in ordine di lettura (dall'alto, poi da sinistra). Ordinare solo per Y mescolava le righe di colonne diverse
+    /// ("ATTENZIONE: [riga del browser] È VIETATO [riga del browser] L'ACCESSO").
+    /// </summary>
+    private static OcrSelection? SelectWholeZoneByBlocks(List<Segment> segments, double pointerX, double pointerY, OcrSettings settings, ReadingSettings reading)
+    {
+        var blocks = new List<List<Segment>>();
+        var remaining = segments.OrderBy(s => s.Box.Y).ThenBy(s => s.Box.X).ToList();
+        while (remaining.Count > 0)
+        {
+            var block = BuildBlock(remaining, remaining[0], settings.BlockMaxGapInLineHeights);
+            foreach (var s in block) remaining.Remove(s);
+            blocks.Add(block);
+        }
+
+        double lineHeight = Math.Max(1, segments.Average(s => s.Box.Height));
+        var first = blocks.MinBy(b => DistanceTo(Bounds(b), pointerX, pointerY))!;
+        var order = new List<List<Segment>> { first };
+        order.AddRange(blocks.Where(b => !ReferenceEquals(b, first))
+                             .OrderBy(b => Math.Round(Bounds(b).Y / lineHeight))
+                             .ThenBy(b => Bounds(b).X));
+
+        var parts = new List<string>();
+        int lineCount = 0;
+        foreach (var block in order)
+        {
+            var rows = MergeRows(block.OrderBy(s => s.Box.Y + s.Box.Height / 2).ThenBy(s => s.Box.X).ToList())
+                .Select(t => LabelCleaner.CleanOcrLine(t, reading)).Where(t => t.Length > 0).ToList();
+            if (rows.Count == 0) continue;
+            lineCount += rows.Count;
+            parts.Add(JoinRows(rows));
+        }
+        if (parts.Count == 0) return null;
+        return new OcrSelection(ReadSource.OcrZone, JoinRows(parts, forceBreak: true), lineCount);
+    }
+
+    /// <summary>
+    /// Unisce righe o blocchi da pronunciare: trattino di sillabazione ricongiunto; spazio se la riga finisce già con la
+    /// punteggiatura o se la successiva continua la frase (minuscola); altrimenti ". " per dare la pausa fra righe distinte.
+    /// </summary>
+    private static string JoinRows(List<string> rows, bool forceBreak = false)
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var t in rows)
+        {
+            if (sb.Length > 0)
+            {
+                char last = sb[^1];
+                bool nextLower = t.Length > 0 && char.IsLower(t[0]);
+                if (!forceBreak && last == '-' && nextLower) sb.Length--;
+                else if (last is '.' or '!' or '?' or ':' or ';' or ',' or '…') sb.Append(' ');
+                else if (!forceBreak && nextLower) sb.Append(' ');
+                else sb.Append(". ");
+            }
+            sb.Append(t);
+        }
+        return sb.ToString();
+    }
+
+    private static ImageRect Bounds(List<Segment> block)
+    {
+        double x = block.Min(s => s.Box.X), y = block.Min(s => s.Box.Y);
+        double r = block.Max(s => s.Box.Right), b = block.Max(s => s.Box.Bottom);
+        return new ImageRect(x, y, r - x, b - y);
+    }
+
+    private static double DistanceTo(ImageRect box, double x, double y)
+    {
+        double dx = HorizontalDistance(box, x), dy = VerticalDistance(box, y);
+        return Math.Sqrt(dx * dx + dy * dy);
     }
 
     private sealed record Segment(string Text, ImageRect Box, bool IsShortcut)

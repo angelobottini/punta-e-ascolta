@@ -161,6 +161,14 @@ public sealed class TextResolver : ITextResolver
                 }
                 diag.Append(" uia:niente");
                 uiaTriedWithoutText = true;
+
+                // Barra di scorrimento (o il suo cursore) senza nome: controllo noto, meglio il silenzio che l'OCR della riga vicina
+                // (Word: "Accessibilità: conforme" della barra di stato sotto la barra orizzontale).
+                if (element.Kind == UiElementKind.ScrollBar || element.ParentKind == UiElementKind.ScrollBar)
+                {
+                    diag.Append(" barra-di-scorrimento");
+                    return null;
+                }
             }
         }
         ct.ThrowIfCancellationRequested();

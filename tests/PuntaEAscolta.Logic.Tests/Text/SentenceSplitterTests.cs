@@ -107,3 +107,40 @@ public class SentenceSplitterTests
         Assert.Empty(SentenceSplitter.SplitSentences("   \r\n"));
     }
 }
+
+/// <summary>Correzioni della revisione del 22/09/2026: abbreviazioni che sono anche parole comuni.</summary>
+public class SentenceSplitterReviewTests
+{
+    private const string WordParagraph = "La riunione del 3 ott. 2026 è stata spostata al pomeriggio, cioè alle 15.45 circa. Vedi pag. 12 e cfr. l'art. 5 del regolamento!\r";
+
+    [Fact]
+    public void Circa_FollowedByUppercase_EndsTheSentence()
+    {
+        int spostata = WordParagraph.IndexOf("spostata", StringComparison.Ordinal);
+        int regolamento = WordParagraph.IndexOf("regolamento", StringComparison.Ordinal);
+        Assert.Equal("La riunione del 3 ott. 2026 è stata spostata al pomeriggio, cioè alle 15.45 circa.", SentenceSplitter.ExtractSentence(WordParagraph, spostata));
+        Assert.Equal("Vedi pag. 12 e cfr. l'art. 5 del regolamento!", SentenceSplitter.ExtractSentence(WordParagraph, regolamento));
+    }
+
+    [Theory]
+    [InlineData("Ho detto di no. Poi sono uscito.", "Ho detto di no.")]
+    [InlineData("Vado via. Torno domani.", "Vado via.")]
+    [InlineData("Aspetta 5 min. Poi parti.", "Aspetta 5 min.")]
+    [InlineData("Mele, pere ecc. Il resto domani.", "Mele, pere ecc.")]
+    [InlineData("Ci vediamo il 10 gen. Porta i documenti.", "Ci vediamo il 10 gen.")]
+    public void AmbiguousAbbreviation_BeforeUppercase_EndsTheSentence(string text, string expected)
+    {
+        Assert.Equal(expected, SentenceSplitter.ExtractSentence(text, 2));
+    }
+
+    [Theory]
+    [InlineData("Il 3 mar. 2026 si parte per Roma.")]
+    [InlineData("Costa 1.000 euro ecc. ma non importa.")]
+    [InlineData("Il sig. Rossi e il dott. Bianchi sono qui.")]
+    [InlineData("Vedi all. A del contratto.")]
+    [InlineData("Documento n. 5 del reg. Lombardia.")]
+    public void AbbreviationBeforeDigitLowercaseOrName_DoesNotEndTheSentence(string text)
+    {
+        Assert.Equal(text, SentenceSplitter.ExtractSentence(text, 2));
+    }
+}

@@ -11,17 +11,38 @@ namespace PuntaEAscolta.Logic.Text;
 public static partial class LabelCleaner
 {
     // Modificatori come li scrive l'interfaccia e come li storpia l'OCR (Ctrl -> CtrI, Ctr1, Ctd, Cmd; Alt -> AIt, A1t; Maiusc/Shift; Win).
-    private const string Modifier = @"(?:C[tT][rR][lI1d]|C[tT][lI1]|Ctd|Ctr|Control|Strg|A[lI1][tT]|AItGr|AltGr|Ma[iíì]?usc(?:ol[eo])?|Sh[iíì]ft|Sh[iíì]f|W[iíì]n(?:dows)?|Cmd|Comando|Opzione|Option|Fn|Meta|Super|⌘|⌥|⇧|⌃)";
+    // Una parola conta come modificatore SOLO se seguita da + o -: "Altro", "Alto", "Controllo", "Opzione", "Windows", "Super 95"
+    // da soli sono testo vero. I simboli del Mac si scrivono attaccati al tasto ("⌘N").
+    private const string ModifierWord = @"(?:C[tT][rR][lI1d]|C[tT][lI1]|Ctd|Ctr|Control|Strg|A[lI1][tT]|AItGr|AltGr|Ma[iíì]?usc(?:ol[eo])?|Sh[iíì]ft|Sh[iíì]f|W[iíì]n(?:dows)?|Cmd|Comando|Opzione|Option|Fn|Meta|Super)";
+    private const string ModifierSymbol = @"[⌘⌥⇧⌃]";
+
+    /// <summary>Uno o più modificatori: parola seguita da + o -, oppure simbolo.</summary>
+    private const string Modifiers = @"(?:" + ModifierWord + @"\s*[+\-]\s*|" + ModifierSymbol + @"\s*)+";
     // Tasto finale: lettera, cifra, tasto funzione, nomi di tasti, simboli.
     private const string Key = @"(?:F[1-9]|F1[0-9]|F2[0-4]|[A-Za-z0-9]{1,2}|Spazio|Space|Invio|Enter|Return|Esc|Escape|Tab|Canc|Del(?:ete)?|Ins(?:ert)?|Backspace|Home|Fine|End|PagSu|PagGiù|PagGiu|PgUp|PgDn|Page ?Up|Page ?Down|Su|Giù|Giu|Sinistra|Destra|Left|Right|Up|Down|Freccia \w+|Num ?[0-9]|[+\-*/=,.;'\\\[\]`<>~^°§|])";
 
-    /// <summary>Scorciatoia intera: uno o più modificatori uniti da +, -, spazi, poi un tasto; oppure un tasto funzione da solo (F2, F12).</summary>
-    [GeneratedRegex(@"^\s*(?:(?:" + Modifier + @")\s*[+\-]?\s*)+(?:" + Key + @")?\s*[/\\]?\s*$|^\s*F(?:[1-9]|1[0-9]|2[0-4])\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    /// <summary>Scorciatoia intera: uno o più modificatori uniti da + o -, poi un tasto; oppure un tasto funzione da solo (F2, F12).</summary>
+    [GeneratedRegex(@"^\s*" + Modifiers + @"(?:" + Key + @")\s*[/\\]?\s*$|^\s*F(?:[1-9]|1[0-9]|2[0-4])\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex WholeShortcut();
 
     /// <summary>Scorciatoia in coda a un'etichetta: separata da tabulazione o da almeno due spazi, oppure da uno spazio se inizia con un modificatore.</summary>
-    [GeneratedRegex(@"(?:\t+|\s{2,}|\s+(?=" + Modifier + @"\s*[+\-]))\s*(?:(?:" + Modifier + @")\s*[+\-]?\s*)+(?:" + Key + @")?\s*[/\\]?\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?:\t+|\s{2,}|\s+(?=" + Modifiers + @"))\s*" + Modifiers + @"(?:" + Key + @")\s*[/\\]?\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
     private static partial Regex TrailingShortcut();
+
+    /// <summary>
+    /// Scorciatoia fra parentesi in coda, come nei pulsanti del Blocco note di Windows 11 e nei suggerimenti di Office:
+    /// "Grassetto (CTRL+G)", "Barrato (Ctrl+MAIUSC+X)", "Rimuovi formattazione (CTRL+barra spaziatrice)", "Guida (F1)".
+    /// </summary>
+    [GeneratedRegex(@"\s*\(\s*(?:" + Modifiers + @"[^()]{1,30}?|F(?:[1-9]|1[0-9]|2[0-4]))\s*\)\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex ShortcutInParens();
+
+    /// <summary>Elemento fissato nel riquadro di spostamento di Esplora file: "Download (elemento aggiunto)".</summary>
+    [GeneratedRegex(@"\s*\((?:elemento aggiunto|pinned)\)\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex PinnedSuffix();
+
+    /// <summary>Prefisso di gruppo del riquadro di spostamento di Esplora file: "Avvio dell'accesso rapido - Desktop".</summary>
+    [GeneratedRegex(@"^Avvio dell['’]accesso rapido\s*[-–]\s*(?=\S)", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex QuickAccessPrefix();
 
     /// <summary>Tasto funzione isolato in coda ("Guida  F1", "Rinomina\tF2").</summary>
     [GeneratedRegex(@"(?:\t+|\s{2,})F(?:[1-9]|1[0-9]|2[0-4])\s*$", RegexOptions.CultureInvariant)]
@@ -69,9 +90,12 @@ public static partial class LabelCleaner
 
         if (settings.StripKeyboardShortcuts)
         {
+            s = ShortcutInParens().Replace(s, "");
             s = TrailingShortcut().Replace(s, "");
             s = TrailingFunctionKey().Replace(s, "");
         }
+        s = PinnedSuffix().Replace(s, "");
+        s = QuickAccessPrefix().Replace(s, "");
         s = TrailingDots().Replace(s, "");
         s = EdgeGlyphs().Replace(s, "");
         s = MultiSpace().Replace(s.Replace('\t', ' '), " ").Trim();
@@ -90,6 +114,7 @@ public static partial class LabelCleaner
         if (settings.StripKeyboardShortcuts)
         {
             if (IsKeyboardShortcut(s)) return string.Empty;
+            s = ShortcutInParens().Replace(s, "");
             s = TrailingShortcut().Replace(s, "");
             s = TrailingFunctionKey().Replace(s, "");
             // Scorciatoia separata da un solo spazio in fondo alla riga ("Nuovo Ctrl+N"): si toglie l'ultimo token se è una scorciatoia
