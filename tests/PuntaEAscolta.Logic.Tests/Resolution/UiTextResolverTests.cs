@@ -71,6 +71,29 @@ public class UiTextResolverTests
     }
 
     [Fact]
+    public void ExcelCell_WithTextContext_StillSpeaksValue()
+    {
+        var info = El(UiElementKind.DataItem, "C3") with
+        {
+            Value = "Totale",
+            Text = new UiTextContext("Totale", 2, PointerOverText: true),
+        };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal("Totale", r!.Text);
+        Assert.Equal(ReadSource.UiaValue, r.Source);
+    }
+
+    [Fact]
+    public void Document_OnlyObjectReplacementCharacters_ReturnsNull()
+    {
+        var info = El(UiElementKind.Document, "Documento", 800, 1000) with
+        {
+            Text = new UiTextContext(new string((char)0xFFFC, 3), 1, PointerOverText: true),
+        };
+        Assert.Null(UiTextResolver.Resolve(info, Default));
+    }
+
+    [Fact]
     public void ExcelEmptyCell_SpeaksEmptyCellText()
     {
         var info = El(UiElementKind.DataItem, "D4") with { Value = "" };

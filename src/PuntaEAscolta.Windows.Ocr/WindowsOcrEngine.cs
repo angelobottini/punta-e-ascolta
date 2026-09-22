@@ -16,7 +16,7 @@ namespace PuntaEAscolta.Windows.Ocr;
 /// Le coordinate restituite sono quelle dell'immagine ORIGINALE passata dal chiamante.
 /// Non solleva eccezioni verso il chiamante, salvo <see cref="OperationCanceledException"/> quando il token viene annullato.
 /// </summary>
-public sealed class WindowsOcrEngine : IOcrEngine
+public sealed class WindowsOcrEngine : IOcrEngine, IPointOcrEngine
 {
     /// <summary>Nome con cui il motore compare in <see cref="OcrResult.EngineName"/>.</summary>
     public const string EngineName = "windows";
@@ -79,6 +79,10 @@ public sealed class WindowsOcrEngine : IOcrEngine
     /// </summary>
     public Task<OcrResult> RecognizeLowContrastAsync(CapturedImage image, double x, double y, CancellationToken ct) =>
         RunAsync(image, (img, maxDim, pool) => OcrPreprocessor.PrepareLowContrast(img, x, y, maxDim, pool), "basso contrasto", ct);
+
+    /// <inheritdoc />
+    public Task<OcrResult> RecognizeAroundPointAsync(CapturedImage image, double x, double y, CancellationToken ct) =>
+        RecognizeLowContrastAsync(image, x, y, ct);
 
     public void Dispose()
     {

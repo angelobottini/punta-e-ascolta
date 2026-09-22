@@ -40,7 +40,9 @@ public static partial class UiTextResolver
         if (info is null) return null;
 
         // 1. Contenuto di testo puntato (Word, editor, campi lunghi): la frase sotto il punto.
-        if (info.Text is { PointerOverText: true } ctx && settings.ReadSentenceInDocuments && !info.IsPassword)
+        // Le celle di un foglio di calcolo possono avere anche un contesto di testo: lì conta il valore visualizzato.
+        bool cellWithValue = info.Kind is UiElementKind.DataItem && !string.IsNullOrWhiteSpace(info.Value);
+        if (!cellWithValue && info.Text is { PointerOverText: true } ctx && settings.ReadSentenceInDocuments && !info.IsPassword)
         {
             var sentence = SentenceSplitter.ExtractSentence(ctx.ParagraphText, ctx.OffsetInParagraph);
             sentence = Finish(sentence, settings);

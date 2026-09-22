@@ -30,3 +30,17 @@ public interface IOcrEngine : IDisposable
     bool IsAvailable { get; }
     Task<OcrResult> RecognizeAsync(CapturedImage image, CancellationToken ct);
 }
+
+/// <summary>
+/// Capacità facoltativa di un motore OCR: riconoscimento mirato attorno a un punto.
+/// x e y sono in pixel dell'immagine passata (stesso sistema delle coordinate restituite).
+/// </summary>
+public interface IPointOcrEngine
+{
+    /// <summary>
+    /// Passaggio mirato attorno al punto (Windows: ritaglio circa 400x120, ingrandimento 2x, scala di grigi e stiramento
+    /// del contrasto, che recupera il testo quasi invisibile come le voci disabilitate). Da usare quando il passaggio
+    /// normale non trova nulla sulla riga del puntatore.
+    /// </summary>
+    Task<OcrResult> RecognizeAroundPointAsync(CapturedImage image, double x, double y, CancellationToken ct);
+}
