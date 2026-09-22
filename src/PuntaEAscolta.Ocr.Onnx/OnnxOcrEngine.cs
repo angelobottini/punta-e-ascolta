@@ -5,6 +5,7 @@ using PuntaEAscolta.Core;
 using PuntaEAscolta.Core.Abstractions;
 using RapidOcrNet;
 using SkiaSharp;
+using OcrResult = PuntaEAscolta.Core.Abstractions.OcrResult;
 
 namespace PuntaEAscolta.Ocr.Onnx;
 

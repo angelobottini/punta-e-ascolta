@@ -166,7 +166,8 @@ internal static class BitmapUtils
         {
             canvas.Clear(SKColors.Black);
             canvas.SetMatrix(matrix);
-            canvas.DrawBitmap(src, 0, 0, Sampling);
+            using var srcImage = SKImage.FromBitmap(src);
+            canvas.DrawImage(srcImage, 0, 0, Sampling);
         }
 
         return result;

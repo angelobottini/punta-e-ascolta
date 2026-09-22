@@ -365,8 +365,8 @@ public sealed class TextResolver : ITextResolver
         bool pendingSpace = false, pendingNewLine = false;
         foreach (var c in text)
         {
-            bool newLine = c is '\n' or '\r' or '\v' or '\f' or ' ' or ' ';
-            bool space = !newLine && (char.IsWhiteSpace(c) || char.IsControl(c) || c is '￼' or '​' or ' ');
+            bool newLine = c is '\n' or '\r' or '\v' or '\f' or '\u2028' or '\u2029';
+            bool space = !newLine && (char.IsWhiteSpace(c) || char.IsControl(c) || c is '\uFFFC' or '\u200B' or '\u00A0');
             if (newLine) { pendingNewLine = true; continue; }
             if (space) { pendingSpace = true; continue; }
             if (sb.Length > 0)

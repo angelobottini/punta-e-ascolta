@@ -178,7 +178,7 @@ internal static unsafe partial class NativeMethods
     internal static partial uint MapVirtualKeyW(uint uCode, uint uMapType);
 
     [LibraryImport("user32.dll")]
-    internal static partial short VkKeyScanW(char ch);
+    internal static partial short VkKeyScanW(ushort ch);
 
     [LibraryImport("user32.dll", SetLastError = true)]
     internal static partial uint SendInput(uint cInputs, INPUT* pInputs, int cbSize);
