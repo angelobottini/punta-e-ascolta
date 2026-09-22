@@ -21,6 +21,8 @@ internal static class UiaIds
     public const int FrameworkId = 30024;
     public const int ItemStatus = 30026;
     public const int IsTextPatternAvailable = 30040;
+    public const int ValueValue = 30045;
+    public const int ToggleToggleState = 30086;
     public const int FullDescription = 30159;
 
     // Pattern
@@ -72,12 +74,16 @@ internal static class UiaIds
     public const int SemanticZoomControl = 50039;
     public const int AppBarControl = 50040;
 
-    /// <summary>Proprietà lette in un solo giro cross-process con ElementFromPointBuildCache.</summary>
+    /// <summary>
+    /// Proprietà lette in un solo giro cross-process con ElementFromPointBuildCache. Le proprietà dei pattern vanno richieste
+    /// a parte: AddPattern mette in cache solo l'oggetto pattern, e senza ValueValue e ToggleToggleState CachedValue e
+    /// CachedToggleState lanciano E_INVALIDARG (verificato: le celle di Excel risultavano sempre vuote).
+    /// </summary>
     public static readonly int[] CachedProperties =
     [
         ControlType, Name, ClassName, FrameworkId, AutomationId, BoundingRectangle, IsEnabled, IsOffscreen,
         HelpText, FullDescription, ItemStatus, AcceleratorKey, AccessKey, IsPassword, LabeledBy, ProcessId,
-        NativeWindowHandle, IsTextPatternAvailable,
+        NativeWindowHandle, IsTextPatternAvailable, ValueValue, ToggleToggleState,
     ];
 
     /// <summary>Pattern inseriti nella cache: Value, Toggle, LegacyIAccessible, Text.</summary>

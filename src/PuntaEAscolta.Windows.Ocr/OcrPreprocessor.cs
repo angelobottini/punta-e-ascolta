@@ -54,7 +54,12 @@ internal static class OcrPreprocessor
         return Render(image, region, scale, grayscaleStretch: false, maxDimension, pool);
     }
 
-    /// <summary>Secondo passaggio: ritaglio di circa 400x120 intorno a (x, y) in coordinate dell'immagine originale.</summary>
+    /// <summary>
+    /// Secondo passaggio: fascia alta 120 px e larga quanto l'immagine, centrata sulla riga di (x, y) (coordinate dell'immagine
+    /// originale). Lo stiramento del contrasto e il colore del margine si calcolano sul ritaglio 400x120 attorno al punto, come
+    /// misurato nella ricerca; la fascia intera evita le parole tagliate dai lati del ritaglio ("ta come PDF" per
+    /// "Esporta come PDF"), che il chiamante non sa riconoscere perché non coincidono con i bordi della cattura.
+    /// </summary>
     public static PreparedImage PrepareLowContrast(CapturedImage image, double x, double y, uint maxDimension, ArrayPool<byte> pool)
     {
         if (double.IsNaN(x) || double.IsInfinity(x)) x = image.Width / 2.0;
@@ -67,12 +72,37 @@ internal static class OcrPreprocessor
         cropX = Math.Clamp(cropX, 0, image.Width - cropWidth);
         cropY = Math.Clamp(cropY, 0, image.Height - cropHeight);
 
-        var region = new Rectangle(cropX, cropY, cropWidth, cropHeight);
-        return Render(image, region, LowContrastScale, grayscaleStretch: true, maxDimension, pool);
+        var local = new Rectangle(cropX, cropY, cropWidth, cropHeight);
+        var band = new Rectangle(0, cropY, image.Width, cropHeight);
+        return Render(image, band, LowContrastScale, grayscaleStretch: true, maxDimension, pool, statsRegion: local);
     }
 
-    private static PreparedImage Render(CapturedImage image, Rectangle source, double scale, bool grayscaleStretch, uint maxDimension, ArrayPool<byte> pool)
+    /// <summary>
+    /// Toglie le righe tagliate dai bordi del ritaglio che NON sono bordi dell'immagine (fascia del secondo passaggio: bordi
+    /// superiore e inferiore). Coordinate delle righe già riportate all'immagine originale.
+    /// </summary>
+    public static IReadOnlyList<OcrLine> DropLinesCutByCrop(IReadOnlyList<OcrLine> lines, Rectangle source, int imageWidth, int imageHeight, double tolerance = 2.0)
     {
+        bool cutLeft = source.Left > 0, cutTop = source.Top > 0;
+        bool cutRight = source.Right < imageWidth, cutBottom = source.Bottom < imageHeight;
+        if (!cutLeft && !cutTop && !cutRight && !cutBottom) return lines;
+
+        var kept = new List<OcrLine>(lines.Count);
+        foreach (var line in lines)
+        {
+            var box = line.Box;
+            bool cut = (cutTop && box.Y <= source.Top + tolerance)
+                       || (cutBottom && box.Bottom >= source.Bottom - tolerance)
+                       || (cutLeft && box.X <= source.Left + tolerance)
+                       || (cutRight && box.Right >= source.Right - tolerance);
+            if (!cut) kept.Add(line);
+        }
+        return kept.Count == lines.Count ? lines : kept;
+    }
+
+    private static PreparedImage Render(CapturedImage image, Rectangle source, double scale, bool grayscaleStretch, uint maxDimension, ArrayPool<byte> pool, Rectangle? statsRegion = null)
+    {
+        Rectangle stats = statsRegion ?? source;
         // Rispetto di OcrEngine.MaxImageDimension: si riduce il fattore, mai si supera il limite.
         int maxDim = maxDimension == 0 ? int.MaxValue : (int)Math.Min(maxDimension, int.MaxValue);
         int longest = Math.Max(source.Width, source.Height);
@@ -93,8 +123,8 @@ internal static class OcrPreprocessor
         int destWidth = scaledWidth + 2 * padX;
         int destHeight = scaledHeight + 2 * padY;
 
-        (float gain, float offset) = grayscaleStretch ? ComputeStretch(image, source) : (1f, 0f);
-        Color border = DominantBorderColor(image, source);
+        (float gain, float offset) = grayscaleStretch ? ComputeStretch(image, stats) : (1f, 0f);
+        Color border = DominantBorderColor(image, stats);
         Color padColor = grayscaleStretch ? ToStretchedGray(border, gain, offset) : border;
 
         GCHandle handle = GCHandle.Alloc(image.Bgra, GCHandleType.Pinned);
@@ -124,7 +154,7 @@ internal static class OcrPreprocessor
                     attributes);
             }
 
-            return CopyOut(destination, scale, padX, padY, source.X, source.Y, pool);
+            return CopyOut(destination, scale, padX, padY, source, image.Width, image.Height, pool);
         }
         finally
         {
@@ -132,7 +162,7 @@ internal static class OcrPreprocessor
         }
     }
 
-    private static PreparedImage CopyOut(Bitmap bitmap, double scale, int padX, int padY, int offsetX, int offsetY, ArrayPool<byte> pool)
+    private static PreparedImage CopyOut(Bitmap bitmap, double scale, int padX, int padY, Rectangle source, int originalWidth, int originalHeight, ArrayPool<byte> pool)
     {
         var rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         BitmapData data = bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -153,7 +183,12 @@ internal static class OcrPreprocessor
                 }
             }
 
-            return new PreparedImage(buffer, bitmap.Width, bitmap.Height, scale, padX, padY, offsetX, offsetY);
+            return new PreparedImage(buffer, bitmap.Width, bitmap.Height, scale, padX, padY, source.X, source.Y)
+            {
+                Source = source,
+                OriginalWidth = originalWidth,
+                OriginalHeight = originalHeight,
+            };
         }
         finally
         {

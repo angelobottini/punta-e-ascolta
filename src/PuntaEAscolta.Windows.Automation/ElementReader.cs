@@ -65,8 +65,7 @@ internal sealed partial class ElementReader
             var (snap, name, parent) = Normalize(hitSnap);
             parent ??= GetParent(snap.Element);
 
-            string? value = ElementSnapshot.Safe(
-                () => (snap.Element.GetCachedPattern(UiaIds.ValuePattern) as UIA.IUIAutomationValuePattern)?.CachedValue, null);
+            string? value = ReadValue(snap.Element);
             var toggle = ReadToggle(snap.Element);
 
             // LegacyIAccessible solo come ripiego quando manca il nome: sulle app Office raddoppia il costo (probe-office).
@@ -225,11 +224,30 @@ internal sealed partial class ElementReader
         return p is null ? null : ElementSnapshot.Read(p);
     }
 
+    /// <summary>
+    /// Valore (ValuePattern) dalla cache; se la cache non lo contiene (elemento letto con un'altra richiesta, provider che
+    /// rifiuta) si chiede il valore corrente, un solo giro in più e solo se il pattern esiste.
+    /// </summary>
+    private static string? ReadValue(UIA.IUIAutomationElement element)
+    {
+        var pattern = ElementSnapshot.Safe(() => element.GetCachedPattern(UiaIds.ValuePattern) as UIA.IUIAutomationValuePattern, null);
+        if (pattern is null) return null;
+        try
+        {
+            return pattern.CachedValue;
+        }
+        catch (Exception)
+        {
+            return ElementSnapshot.Safe(() => pattern.CurrentValue, null);
+        }
+    }
+
     private static UiToggleState ReadToggle(UIA.IUIAutomationElement element)
     {
         var toggle = ElementSnapshot.Safe(() => element.GetCachedPattern(UiaIds.TogglePattern) as UIA.IUIAutomationTogglePattern, null);
         if (toggle is null) return UiToggleState.None;
-        var state = ElementSnapshot.Safe(() => (UIA.ToggleState?)toggle.CachedToggleState, null);
+        var state = ElementSnapshot.Safe(() => (UIA.ToggleState?)toggle.CachedToggleState, null)
+                    ?? ElementSnapshot.Safe(() => (UIA.ToggleState?)toggle.CurrentToggleState, null);
         return state switch
         {
             UIA.ToggleState.ToggleState_Off => UiToggleState.Off,

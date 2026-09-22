@@ -204,3 +204,125 @@ public class UiTextResolverTests
         Assert.StartsWith("Questo è un testo", text);
     }
 }
+
+/// <summary>Correzioni della revisione e delle prove dal vivo del 22/09/2026 (docs/impl-notes/revisione.md).</summary>
+public class UiTextResolverReviewTests
+{
+    private static readonly ReadingSettings Default = new();
+    private static UiElementInfo El(UiElementKind kind, string? name, int w = 100, int h = 24) => new() { Kind = kind, Name = name, Bounds = new ScreenRect(0, 0, w, h) };
+
+    private const string Body = "Ciao Marco, ti scrivo per la riunione di domani.\nHo preparato i documenti.\n\nA presto, Matteo.";
+
+    [Fact]
+    public void WordEmptyPageArea_PageNameIsNotSpoken()
+    {
+        // Word: Edit "Contenuto pagina 1" con TextPattern; puntatore sotto l'ultimo paragrafo o sul margine grigio.
+        var info = El(UiElementKind.Edit, "Contenuto pagina 1", 816, 1056) with { Text = new UiTextContext(string.Empty, 0, PointerOverText: false) };
+        Assert.Null(UiTextResolver.Resolve(info, Default));
+    }
+
+    [Fact]
+    public void LargeMultilineEdit_PointerOffText_NeverReadsWholeDocument()
+    {
+        var withPattern = El(UiElementKind.Edit, "Messaggio", 600, 300) with { Value = Body, Text = new UiTextContext(string.Empty, 0, PointerOverText: false) };
+        Assert.Null(UiTextResolver.Resolve(withPattern, Default));
+        var withoutPattern = withPattern with { Text = null };
+        Assert.Null(UiTextResolver.Resolve(withoutPattern, Default));
+    }
+
+    [Fact]
+    public void SmallEdit_WithMultilineValue_SpeaksOnlyTheLabel()
+    {
+        var info = El(UiElementKind.Edit, "Note", 200, 40) with { Value = Body };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal("Note", r!.Text);
+        Assert.Equal(ReadSource.UiaName, r.Source);
+    }
+
+    [Fact]
+    public void SmallEdit_PointerOffText_StillSpeaksLabelAndShortValue()
+    {
+        var info = El(UiElementKind.Edit, "Cerca", 250, 30) with { Value = "gatti", Text = new UiTextContext(string.Empty, 0, PointerOverText: false) };
+        Assert.Equal("Cerca, gatti", UiTextResolver.Resolve(info, Default)!.Text);
+    }
+
+    [Fact]
+    public void ExplorerFileNameLabel_SpeaksOnlyTheFileName()
+    {
+        var info = El(UiElementKind.Edit, "Nome", 90, 36) with { Value = "lib.ps1", ParentKind = UiElementKind.ListItem, ParentName = "lib.ps1" };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal("lib.ps1", r!.Text);
+        Assert.Equal(ReadSource.UiaValue, r.Source);
+    }
+
+    [Fact]
+    public void ExplorerDetailsColumn_SpeaksColumnAndValue()
+    {
+        var info = El(UiElementKind.Edit, "Ultima modifica", 140, 22) with { Value = "22/09/2026 20:12", ParentKind = UiElementKind.ListItem, ParentName = "lib.ps1" };
+        Assert.Equal("Ultima modifica, 22/09/2026 20:12", UiTextResolver.Resolve(info, Default)!.Text);
+    }
+
+    [Fact]
+    public void ComboBox_SpeaksLabelAndValue()
+    {
+        var info = El(UiElementKind.ComboBox, "Dimensione carattere", 60, 24) with { Value = "12" };
+        Assert.Equal("Dimensione carattere, 12", UiTextResolver.Resolve(info, Default)!.Text);
+    }
+
+    [Fact]
+    public void ExcelActiveCell_PointerAwayFromText_SpeaksValue()
+    {
+        var info = El(UiElementKind.DataItem, "A1", 80, 20) with { Value = "Nome", Text = new UiTextContext(string.Empty, 0, PointerOverText: false) };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal("Nome", r!.Text);
+        Assert.Equal(ReadSource.UiaValue, r.Source);
+    }
+
+    [Fact]
+    public void WordTableCell_WithLongParagraph_ReadsSentenceNotWholeCell()
+    {
+        string cell = "Prima frase della cella con parecchie parole per superare il limite. Seconda frase, quella sotto il puntatore, anche lei piuttosto lunga.";
+        int offset = cell.IndexOf("Seconda", StringComparison.Ordinal) + 3;
+        var info = El(UiElementKind.DataItem, null, 400, 60) with { Value = cell, Text = new UiTextContext(cell, offset, PointerOverText: true) };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal(ReadSource.UiaSentence, r!.Source);
+        Assert.StartsWith("Seconda frase", r.Text);
+    }
+
+    [Fact]
+    public void AffinityMenuSeparator_TypeNameInLegacyName_IsSilent()
+    {
+        var thin = El(UiElementKind.MenuItem, null, 478, 6) with { LegacyName = "Serif.Affinity.Workspaces.WorkspaceMenuSeparator" };
+        Assert.Null(UiTextResolver.Resolve(thin, Default));
+        var tall = El(UiElementKind.MenuItem, null, 478, 30) with { LegacyName = "Serif.Affinity.Workspaces.WorkspaceMenuSeparator", HelpText = "Serif.Affinity.Workspaces.WorkspaceMenuSeparator" };
+        Assert.Null(UiTextResolver.Resolve(tall, Default));
+    }
+
+    [Fact]
+    public void LegacyName_WithRealText_IsStillUsedAsFallback()
+    {
+        var info = El(UiElementKind.Button, null) with { LegacyName = "Pennello" };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal("Pennello", r!.Text);
+        Assert.Equal(ReadSource.UiaDescription, r.Source);
+    }
+
+    [Fact]
+    public void LowercaseIdentifierName_PrefersHelpText()
+    {
+        var info = El(UiElementKind.Button, "newdocnew", 40, 40) with { HelpText = "Nuova" };
+        var r = UiTextResolver.Resolve(info, Default);
+        Assert.Equal("Nuova", r!.Text);
+        Assert.Equal(ReadSource.UiaDescription, r.Source);
+        Assert.Equal("Apri", UiTextResolver.Resolve(El(UiElementKind.Button, "newdocopen", 40, 40) with { HelpText = "Apri" }, Default)!.Text);
+    }
+
+    [Fact]
+    public void NormalName_IsNotReplacedByHelpText()
+    {
+        var info = El(UiElementKind.Button, "Salva") with { HelpText = "Salva il documento" };
+        Assert.Equal("Salva", UiTextResolver.Resolve(info, Default)!.Text);
+        var word = El(UiElementKind.Button, "stampa") with { HelpText = "Stampa il documento" };
+        Assert.Equal("stampa", UiTextResolver.Resolve(word, Default)!.Text);
+    }
+}

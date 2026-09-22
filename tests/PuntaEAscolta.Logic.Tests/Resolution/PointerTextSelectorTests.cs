@@ -190,4 +190,57 @@ public class PointerTextSelectorTests
     {
         Assert.Null(PointerTextSelector.Select(OcrResult.Empty("windows"), 10, 10, Default, false));
     }
+
+    /// <summary>Prova dal vivo 6: cartello in una finestra davanti alla pagina di un browser, righe a Y intercalate.</summary>
+    private static OcrResult SignInFrontOfBrowser() => new(new[]
+    {
+        Line(100, 100, 40, 12, "ATTENZIONE:"),
+        Line(100, 150, 40, 12, "È", "VIETATO"),
+        Line(100, 200, 40, 12, "L'ACCESSO"),
+        Line(600, 95, 14, 4, "Prima", "riga", "del", "browser"),
+        Line(600, 112, 14, 4, "Seconda", "riga", "del", "browser"),
+        Line(600, 129, 14, 4, "Terza", "riga", "del", "browser"),
+    }, "windows", 50);
+
+    [Fact]
+    public void WholeZone_ColumnsAreNotInterleaved_PointerBlockFirst()
+    {
+        var r = PointerTextSelector.Select(SignInFrontOfBrowser(), 150, 170, Default, wholeZone: true);
+        Assert.Equal(ReadSource.OcrZone, r!.Source);
+        Assert.Equal(6, r.LineCount);
+        Assert.StartsWith("ATTENZIONE: È VIETATO. L'ACCESSO", r.Text);
+        Assert.EndsWith("Prima riga del browser. Seconda riga del browser. Terza riga del browser", r.Text);
+    }
+
+    [Fact]
+    public void WholeZone_PointerOnOtherColumn_ReadsThatColumnFirst()
+    {
+        var r = PointerTextSelector.Select(SignInFrontOfBrowser(), 650, 118, Default, wholeZone: true);
+        Assert.StartsWith("Prima riga del browser. Seconda riga del browser. Terza riga del browser. ATTENZIONE:", r!.Text);
+    }
+
+    [Fact]
+    public void WholeZone_WrappedParagraphLinesAreJoinedWithoutPause()
+    {
+        const double h = 14;
+        var result = new OcrResult(new[]
+        {
+            Line(10, 10, h, 4, "Questa", "è", "una", "frase"),
+            Line(10, 27, h, 4, "che", "va", "a", "capo."),
+        }, "windows", 30);
+        var r = PointerTextSelector.Select(result, 30, 16, Default, wholeZone: true);
+        Assert.Equal("Questa è una frase che va a capo.", r!.Text);
+    }
+
+    [Fact]
+    public void MenuRow_LabelLikeModifierWord_IsNotTakenForShortcut()
+    {
+        // "Allineamento      Alto": prima "Alto" era scambiato per la scorciatoia Alt+o e si leggeva l'etichetta a sinistra.
+        const double h = 12;
+        var words = new[] { new OcrWord("Allineamento", new ImageRect(10, 100, 110, h)), new OcrWord("Alto", new ImageRect(300, 100, 40, h)) };
+        var result = new OcrResult(new[] { new OcrLine("Allineamento Alto", new ImageRect(10, 100, 330, h), words) }, "windows", 10);
+        Assert.Equal("Alto", PointerTextSelector.Select(result, 320, 106, Default, false)!.Text);
+        var single = new OcrResult(new[] { new OcrLine("Altro", new ImageRect(10, 100, 50, h), new[] { new OcrWord("Altro", new ImageRect(10, 100, 50, h)) }) }, "windows", 10);
+        Assert.Equal("Altro", PointerTextSelector.Select(single, 30, 106, Default, false)!.Text);
+    }
 }

@@ -641,4 +641,22 @@ public class TextResolverTests
     {
         Assert.Equal(expected, TextResolver.IsSmallElement(new ScreenRect(0, 0, w, h), dpi));
     }
+
+    [Theory]
+    [InlineData(UiElementKind.ScrollBar, UiElementKind.Pane)]
+    [InlineData(UiElementKind.Unknown, UiElementKind.ScrollBar)]
+    public async Task ScrollBarWithoutName_IsSilent_NoOcrOfNeighbourLine(UiElementKind kind, UiElementKind parent)
+    {
+        // Prova dal vivo: puntatore sulla barra di scorrimento orizzontale di Word, l'OCR leggeva la barra di stato sotto.
+        var rig = new Rig();
+        rig.Ui.Element = (_, _) => Result(new UiElementInfo { Kind = kind, ParentKind = parent, Bounds = new ScreenRect(300, 490, 1400, 17), ProcessName = "WINWORD" });
+        rig.Primary.Returns(AtPointer("Accessibilità: conforme"));
+
+        var outcome = await rig.Resolve();
+
+        Assert.False(outcome.HasText);
+        Assert.Contains("barra-di-scorrimento", outcome.Diagnostics);
+        Assert.False(rig.Calls.Contains("win"));
+        Assert.False(rig.Calls.Contains("suggerimento"));
+    }
 }
