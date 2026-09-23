@@ -1,9 +1,13 @@
 bin/
 obj/
 artifacts/
-publish/
+/publish/
 *.user
 .vs/
-settings.json
-cache/
-logs/
+# Dati prodotti dall'app quando gira dalla radice del repository (impostazioni, cache audio, registri).
+# Le regole sono ancorate alla radice: su Windows git non distingue maiuscole e minuscole e "cache/" escludeva anche
+# la cartella di codice src/PuntaEAscolta.Speech/Cache.
+/settings.json
+/settings.json.*
+/cache/
+/logs/

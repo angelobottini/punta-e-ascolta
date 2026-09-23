@@ -343,7 +343,9 @@ internal sealed class TrayController : ISettingsHost, IDisposable
         _pauseItem = new Forms.ToolStripMenuItem("Pausa", null, (_, _) => Safe("Pausa", TogglePause));
         var settingsItem = new Forms.ToolStripMenuItem("Impostazioni...", null, (_, _) => Safe("Impostazioni", ShowSettings));
         settingsItem.Font = new System.Drawing.Font(settingsItem.Font, System.Drawing.FontStyle.Bold);
-        var selectionItem = new Forms.ToolStripMenuItem("Leggi la selezione", null, (_, _) => Safe("Leggi la selezione", ReadSelectionFromMenu));
+        // Come la scorciatoia: senza testo selezionato legge ciò che è sotto il puntatore (qui, dove era il menu).
+        var selectionItem = new Forms.ToolStripMenuItem("Leggi la selezione o ciò che è sotto il puntatore", null,
+            (_, _) => Safe("Leggi la selezione", ReadSelectionFromMenu));
         var logsItem = new Forms.ToolStripMenuItem("Apri cartella dei log", null, (_, _) => Safe("Apri cartella dei log", OpenLogFolder));
         var exitItem = new Forms.ToolStripMenuItem("Esci", null, (_, _) => Safe("Esci", Exit));
 
@@ -412,7 +414,8 @@ internal sealed class TrayController : ISettingsHost, IDisposable
 
     /// <summary>
     /// "Leggi la selezione" dal menu: il clic sull'icona ha attivato la barra delle applicazioni, quindi si riporta in
-    /// primo piano la finestra dove era il testo selezionato e poi si chiede la lettura come con la scorciatoia.
+    /// primo piano la finestra dove era il testo selezionato e poi si chiede la lettura come con la scorciatoia (senza
+    /// selezione il risolutore passa a ciò che è sotto il puntatore, cioè dove era la voce del menu).
     /// </summary>
     private async void ReadSelectionFromMenu()
     {
