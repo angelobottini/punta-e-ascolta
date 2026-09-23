@@ -9,39 +9,77 @@ Funziona in qualsiasi programma: menu, pulsanti, celle di Excel, frasi di Word, 
 Come si usa
 -----------
 1. Porta il puntatore sopra una voce di menu, un pulsante, una frase o un cartello in una foto.
-2. Premi la ROTELLINA del mouse (clic centrale). L'app legge il testo.
-3. Per interrompere la voce premi di nuovo la rotellina, oppure Esc.
-4. Se premi di nuovo la rotellina mentre l'app sta ancora cercando il testo (prima che parli), la lettura si annulla
+2. Premi la ROTELLINA del mouse (clic centrale), oppure i tasti Ctrl+Maiusc+Spazio. L'app legge il testo.
+3. Per interrompere la voce premi di nuovo la rotellina (o Ctrl+Maiusc+Spazio), oppure Esc.
+4. Se premi di nuovo mentre l'app sta ancora cercando il testo (prima che parli), la lettura si annulla
    e l'app non dice niente. Anche Esc la annulla. Se invece sposti il puntatore su un'altra cosa e premi, legge la cosa nuova.
 5. L'app legge solo la finestra che sta sotto il puntatore, non le finestre che stanno dietro.
 
+Scorciatoie di serie:
+- Ctrl+Maiusc+Spazio = leggi ciò che è sotto il puntatore. Funziona anche con un menu aperto: il menu resta aperto.
+- Win+Maiusc+F9 = leggi il testo selezionato. Se non c'è niente di selezionato, legge ciò che è sotto il puntatore.
+Si cambiano in Impostazioni > Attivazione.
+
 Altre funzioni:
 - Testo selezionato: seleziona il testo e premi la rotellina dentro la selezione, oppure Win+Maiusc+F9.
+  Premi i tasti e poi lasciali subito: l'app aspetta che siano rilasciati (fino a 3 secondi) prima di copiare il testo.
 - Dettatura (se attivata dall'assistente): premi la scorciatoia (predefinita Win+Maiusc+D), parla, premi di nuovo.
   L'app rilegge quello che ha capito e poi lo scrive nel programma aperto.
+
+Portatile senza mouse (solo touchpad)
+-------------------------------------
+Sul touchpad non c'è la rotellina. Due possibilità:
+1. Usa i tasti Ctrl+Maiusc+Spazio (leggi sotto il puntatore).
+2. Fai diventare il tocco con tre dita un "clic centrale":
+   Impostazioni di Windows > Bluetooth e dispositivi > Touchpad > Tocchi (oppure "Gesti con tre dita")
+   > per il tocco con tre dita scegli "Pulsante centrale del mouse".
+   Nelle impostazioni dell'app (scheda Attivazione) lascia attiva la casella "Accetta i clic generati da software":
+   per l'app il tocco a tre dita è un clic generato da software. Se la casella è spenta, il registro lo segnala.
 
 Avvio
 -----
 Fai doppio clic su PuntaEAscolta.exe. Compare un'icona vicino all'orologio.
-Con il tasto destro sull'icona: Pausa/Riprendi, Impostazioni, Leggi la selezione, Apri cartella dei log, Esci.
+Con il tasto destro sull'icona: Pausa/Riprendi, Impostazioni, Leggi la selezione o ciò che è sotto il puntatore,
+Apri cartella dei log, Esci.
 Se vuoi che parta da sola con Windows: Impostazioni > Generale > "Avvia con Windows".
 
 Prima configurazione (per l'assistente)
 ---------------------------------------
 1. Apri Impostazioni dall'icona vicino all'orologio.
 2. Scheda Voce: incolla la chiave API di ElevenLabs, premi "Verifica" e poi "Salva chiave".
-   Scegli la voce dall'elenco e premi "Prova voce". Senza chiave, o senza internet, l'app usa la voce di Windows.
-3. Scheda Attivazione: controlla che il pulsante del mouse sia quello desiderato (predefinito: rotellina).
+   Scegli la voce dall'elenco (oppure scrivi il suo ID nel campo "ID della voce"), premi "Salva" e poi "Prova voce ElevenLabs".
+   Senza chiave, o senza internet, l'app usa la voce di Windows.
+3. Scheda Attivazione: controlla il pulsante del mouse (predefinito: rotellina) e le scorciatoie.
 4. Scheda Dettatura: attivala se serve e scegli il microfono delle cuffie.
 5. Le impostazioni sono nel file settings.json accanto al programma. La chiave API è cifrata e vale solo su questo PC
    e per questo utente di Windows: se copi la cartella su un altro PC va reinserita.
 6. Se all'avvio il file settings.json era bloccato (per esempio da OneDrive o dall'antivirus), la finestra Impostazioni
    lo dice e non lascia salvare, per non cancellare le impostazioni vere. Chiudi l'app (Esci) e riaprila.
 
+Chiave ElevenLabs con permessi limitati
+---------------------------------------
+Sul sito di ElevenLabs una chiave può avere solo alcuni permessi. Una chiave che funziona in un altro programma
+può non bastare qui, o bastare solo in parte.
+- Per leggere serve almeno il permesso "Sintesi vocale" (Text to Speech).
+- Per vedere l'elenco delle voci serve anche "Voci: lettura" (Voices: Read).
+- Per vedere i crediti rimasti serve anche "Utente: lettura" (User: Read). Senza, l'app funziona lo stesso.
+Premi "Verifica": il messaggio dice che cosa manca. Esempi:
+- "Chiave valida. Non ha il permesso di leggere i dati dell'abbonamento (user_read): i crediti non si possono mostrare."
+  Va bene così: l'app legge lo stesso.
+- "Non ha il permesso di elencare le voci (voices_read): scrivere l'ID della voce qui sotto."
+  Sul sito di ElevenLabs apri Voices, scegli la voce, copia il suo ID e incollalo nel campo "ID della voce". Poi "Salva".
+- "Non ha il permesso di sintesi vocale (text_to_speech)": con questa chiave ElevenLabs non può leggere.
+  Sul sito attiva "Text to Speech" per la chiave, oppure creane una nuova.
+- "ElevenLabs ha rifiutato la chiave": la chiave è sbagliata o incompleta. Copiala di nuovo per intero.
+"Salva chiave" salva la chiave anche senza "Verifica". Spazi, virgolette e caratteri invisibili copiati per errore
+vengono tolti da soli.
+
 Cartelle
 --------
+- PuntaEAscolta-win-arm64: per PC con processore Snapdragon (ARM). Su questi PC usa SEMPRE questa cartella:
+  la cartella win-x64 funziona solo in emulazione, è più lenta e Windows può staccare il controllo del mouse.
 - PuntaEAscolta-win-x64: per PC con processore Intel o AMD.
-- PuntaEAscolta-win-arm64: per PC con processore Snapdragon (ARM).
+Per sapere che processore hai: Impostazioni di Windows > Sistema > Informazioni > Processore.
 Ogni cartella è indipendente e portatile: si può copiare su una chiavetta.
 
 Limiti noti
@@ -50,9 +88,12 @@ Limiti noti
 - Il testo molto piccolo o quasi invisibile può essere letto male dal riconoscimento ottico.
 - Mentre l'app è attiva, la rotellina non fa più lo scorrimento automatico o la panoramica negli altri programmi.
   Si può scegliere un altro pulsante nelle Impostazioni.
+- Mentre l'app è attiva, Ctrl+Maiusc+Spazio non arriva agli altri programmi (per esempio in Word non inserisce più
+  lo spazio unificatore). Se serve, cambia la scorciatoia in Impostazioni > Attivazione.
 - All'avvio Windows potrebbe chiedere conferma perché il programma non è firmato: scegliere "Esegui comunque".
 
 Assistenza
 ----------
 Nella scheda Diagnostica delle Impostazioni si trovano gli ultimi messaggi del registro e l'ultimo esito di lettura.
 La cartella dei log si apre dal menu dell'icona vicino all'orologio.
+Nel registro ogni lettura comincia con una riga "Attivazione (...)": dice se è partita dal clic o da una scorciatoia.

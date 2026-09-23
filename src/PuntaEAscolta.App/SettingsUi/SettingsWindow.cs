@@ -538,7 +538,7 @@ internal sealed partial class SettingsWindow : Window
 
     private TextBox HotkeyField(Panel parent, string label, string value, Action<AppSettings, string> apply, string? help = null)
     {
-        var box = new TextBox { Text = value ?? "", Width = 200, HorizontalAlignment = HorizontalAlignment.Left };
+        var box = new TextBox { Text = value ?? "", Width = 200, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center };
         Row(parent, label, box, help);
         _collectors.Add(s =>
         {
