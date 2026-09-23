@@ -199,10 +199,13 @@ internal sealed class FakeClipboard : IClipboardSelectionReader
 
     public string? Text { get; set; }
 
+    /// <summary>Se impostato sostituisce <see cref="Text"/> (per simulare un ripiego lento o che fallisce).</summary>
+    public Func<CancellationToken, Task<string?>>? Behaviour { get; set; }
+
     public Task<string?> TryCopySelectionAsync(CancellationToken ct)
     {
         _log.Add("appunti");
-        return Task.FromResult(Text);
+        return Behaviour?.Invoke(ct) ?? Task.FromResult(Text);
     }
 }
 

@@ -489,37 +489,51 @@ internal static class CommandLineRunner
             return 1;
         }
 
-        string key = (Console.In.ReadLine() ?? "").Trim();
-        if (key.Length == 0)
+        string raw = Console.In.ReadLine() ?? "";
+        if (raw.Trim().Length == 0)
         {
             CliJson.Print(CliJson.Error(name, "Nessuna chiave ricevuta sullo standard input."));
             return 1;
         }
-        if (key.Length > 256 || key.Any(char.IsWhiteSpace) || key.Any(char.IsControl))
+        // Toglie BOM (Get-Content su un file UTF-8), spazi invisibili, virgolette ed etichetta "xi-api-key:".
+        if (!ElevenLabsKey.TrySanitize(raw, out string key, out string? keyError))
         {
-            CliJson.Print(CliJson.Error(name, "La chiave ricevuta non ha un formato valido (spazi, caratteri di controllo o troppo lunga)."));
+            CliJson.Print(CliJson.Error(name, (keyError ?? "La chiave ricevuta non ha un formato valido.") + " La chiave non è stata salvata."));
             return 1;
         }
 
         var store = AppServices.OpenSettings(log);
         bool? verified = null;
         string? verifyNote = null;
+        string[]? missingPermissions = null;
+        bool? speechTested = null;
         if (a.Verify)
         {
             using var http = AppServices.CreateHttpClient();
+            ElevenLabsKeyCheck? check = null;
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                verified = await new ElevenLabsAccountClient(http).ValidateKeyAsync(key, cts.Token).ConfigureAwait(false);
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                // Con una voce già scelta si prova anche una lettura minuscola ("Prova"): conferma il permesso Text to Speech.
+                string? voiceId = string.IsNullOrWhiteSpace(store.Current.Speech.ElevenLabsVoiceId) ? null : store.Current.Speech.ElevenLabsVoiceId;
+                check = await new ElevenLabsAccountClient(http).CheckKeyAsync(key, voiceId, cts.Token).ConfigureAwait(false);
+                verified = check.Valid;
+                missingPermissions = check.MissingPermissions.ToArray();
+                speechTested = check.TtsTested;
+                verifyNote = check.Message;
             }
-            catch (Exception ex) when (ex is SpeechProviderException or OperationCanceledException or HttpRequestException)
+            catch (SpeechProviderException ex)
+            {
+                verifyNote = $"Verifica non possibile ({ElevenLabsMessages.Explain(ex)}): la chiave viene salvata comunque.";
+            }
+            catch (Exception ex) when (ex is OperationCanceledException or HttpRequestException)
             {
                 verifyNote = $"Verifica non possibile ({ex.Message}): la chiave viene salvata comunque.";
             }
 
             if (verified == false)
             {
-                CliJson.Print(CliJson.Error(name, "ElevenLabs ha rifiutato la chiave: non è stata salvata."));
+                CliJson.Print(CliJson.Error(name, $"{check?.Message} La chiave non è stata salvata."));
                 return 1;
             }
         }
@@ -536,6 +550,8 @@ internal static class CommandLineRunner
             ok = true,
             saved = true,
             verified,
+            missingPermissions,
+            speechTested,
             note = verifyNote,
             settingsFile = store.FilePath,
             voiceConfigured = !string.IsNullOrWhiteSpace(copy.Speech.ElevenLabsVoiceId),

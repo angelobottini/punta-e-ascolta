@@ -39,9 +39,41 @@ public class HotkeySafetyTests
     [InlineData("Ctrl+F8")]
     [InlineData("Alt+Q")]
     [InlineData("Win+Invio")]
+    [InlineData("Ctrl+Shift+Space")]
+    [InlineData("Ctrl+Maiusc+Spazio")]
+    [InlineData("ctrl + shift + space")]
+    [InlineData("Ctrl+Shift+0")]
     public void Validate_AcceptsSafeHotkeys(string text)
     {
         Assert.Null(WindowsInputSource.ValidateHotkey(text));
+    }
+
+    [Fact]
+    public void DefaultReadAtPointerHotkey_IsValid_AndMapsToCtrlShiftSpace()
+    {
+        // Prove dal vivo del 23/09/2026: portatile con il solo touchpad, serve una scorciatoia di serie per il puntatore.
+        string text = new PuntaEAscolta.Core.Settings.InputSettings().HotkeyReadAtPointer;
+        Assert.Null(WindowsInputSource.ValidateHotkey(text));
+
+        Assert.True(HotkeyGesture.TryParse(text, out var gesture));
+        Assert.True(HotkeyMap.TryGetVirtualKey(gesture!.Key, out uint vk, out string canonical));
+        Assert.Equal(0x20u, vk);
+        Assert.Equal("Space", canonical);
+        uint mods = HotkeyMap.ToModifiers(gesture);
+        Assert.Equal(PuntaEAscolta.Windows.Input.Interop.NativeMethods.MOD_CONTROL | PuntaEAscolta.Windows.Input.Interop.NativeMethods.MOD_SHIFT
+                     | PuntaEAscolta.Windows.Input.Interop.NativeMethods.MOD_NOREPEAT, mods);
+    }
+
+    [Theory]
+    [InlineData("Space")]
+    [InlineData("space")]
+    [InlineData("Spazio")]
+    [InlineData("SPAZIO")]
+    public void SpaceKey_IsRecognisedInEnglishAndItalian(string key)
+    {
+        Assert.True(HotkeyMap.TryGetVirtualKey(key, out uint vk, out string canonical));
+        Assert.Equal(0x20u, vk);
+        Assert.Equal("Space", canonical);
     }
 
     [Fact]
@@ -57,6 +89,67 @@ public class HotkeySafetyTests
     {
         Assert.NotNull(HotkeyMap.CheckGlobalSafety(new HotkeyGesture(true, false, false, true, "Esc"), 0x1B));
         Assert.Null(HotkeyMap.CheckGlobalSafety(new HotkeyGesture(false, false, false, false, "F8"), 0x77));
+    }
+}
+
+/// <summary>
+/// Prove dal vivo del 23/09/2026: i tasti della scorciatoia restavano premuti più di un secondo e il Ctrl+C della selezione
+/// non partiva mai. L'attesa è di 3 s e la fase "appunti" del risolutore deve durare di più.
+/// </summary>
+public class ClipboardTimeoutBudgetTests
+{
+    /// <summary>Margine per l'avvio del thread STA, la fotografia degli appunti e la lettura del testo copiato.</summary>
+    private const int MarginMs = 500;
+
+    [Fact]
+    public void ModifierWait_IsAtLeastThreeSeconds()
+    {
+        Assert.True(PuntaEAscolta.Windows.Input.Interop.InputInjection.ModifierReleaseTimeoutMs >= 3000);
+    }
+
+    [Fact]
+    public void WorstCaseBeforeTheCopy_StaysBelowTheResolverClipboardTimeout()
+    {
+        int worst = ClipboardSelectionReader.WorstCaseBeforeCopyMs;
+        Assert.Equal(2 * ClipboardSelectionReader.OpenRetries * ClipboardSelectionReader.OpenRetryDelayMs
+                     + PuntaEAscolta.Windows.Input.Interop.InputInjection.ModifierReleaseTimeoutMs + ClipboardSelectionReader.CopyTimeoutMs, worst);
+        Assert.True(worst + MarginMs <= PuntaEAscolta.Logic.Reading.TextResolver.DefaultClipboardTimeoutMs,
+            $"caso peggiore {worst} ms + margine {MarginMs} ms, fase appunti {PuntaEAscolta.Logic.Reading.TextResolver.DefaultClipboardTimeoutMs} ms");
+    }
+}
+
+/// <summary>Clic dell'attivatore generati da software e ignorati: avviso nel registro al massimo una volta al minuto.</summary>
+public class InjectedClickNoticeTests
+{
+    [Fact]
+    public void Notice_IsRateLimitedToOncePerMinute()
+    {
+        long last = long.MinValue;
+        long interval = WindowsInputSource.InjectedIgnoredNoticeIntervalMs;
+        Assert.Equal(60_000, interval);
+
+        Assert.True(WindowsInputSource.ShouldNotify(1_000, ref last, interval));
+        Assert.Equal(1_000, last);
+        Assert.False(WindowsInputSource.ShouldNotify(2_000, ref last, interval));
+        Assert.False(WindowsInputSource.ShouldNotify(60_999, ref last, interval));
+        Assert.Equal(1_000, last);
+        Assert.True(WindowsInputSource.ShouldNotify(61_000, ref last, interval));
+        Assert.Equal(61_000, last);
+    }
+
+    [Fact]
+    public void Notice_FirstOneIsAlwaysAllowed_EvenAtTickZero()
+    {
+        long last = long.MinValue;
+        Assert.True(WindowsInputSource.ShouldNotify(0, ref last, 60_000));
+    }
+
+    [Fact]
+    public void Notice_TellsWhatToEnable()
+    {
+        Assert.Contains("generato da software", WindowsInputSource.InjectedIgnoredMessage);
+        Assert.Contains("tre dita", WindowsInputSource.InjectedIgnoredMessage);
+        Assert.Contains("'Accetta i clic generati da software'", WindowsInputSource.InjectedIgnoredMessage);
     }
 }
 

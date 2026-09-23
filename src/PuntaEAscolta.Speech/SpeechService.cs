@@ -329,7 +329,8 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
                 SpeechProviderReason reason = buffer.Fault is SpeechProviderException spe ? spe.Reason
                     : buffer.Fault is not null ? SpeechProviderReason.Network
                     : SpeechProviderReason.Server;
-                RecordCloudFailure(pending, reason, $"ElevenLabs non ha inviato audio ({reason})");
+                RecordCloudFailure(pending, reason, $"ElevenLabs non ha inviato audio ({reason})",
+                    missingPermission: (buffer.Fault as SpeechProviderException)?.MissingPermission);
                 buffer.Dispose();
                 return null;
             }
@@ -345,7 +346,10 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
         catch (SpeechProviderException ex)
         {
             DisposeQuietly(buffer, audio);
-            RecordCloudFailure(pending, ex.Reason, $"ElevenLabs non disponibile per questa lettura ({ex.Reason})", warn: false);
+            string what = ex.Reason == SpeechProviderReason.MissingPermission && ex.MissingPermission is { } permission
+                ? $"ElevenLabs non disponibile per questa lettura ({ex.Reason}: {permission})"
+                : $"ElevenLabs non disponibile per questa lettura ({ex.Reason})";
+            RecordCloudFailure(pending, ex.Reason, what, warn: false, missingPermission: ex.MissingPermission);
             return null;
         }
         catch (Exception ex)
@@ -356,14 +360,14 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
         }
     }
 
-    private void RecordCloudFailure(PendingChunk pending, SpeechProviderReason reason, string what, bool warn = true)
+    private void RecordCloudFailure(PendingChunk pending, SpeechProviderReason reason, string what, bool warn = true, string? missingPermission = null)
     {
         if (pending.Detached)
         {
             if (_log.IsDebugEnabled) _log.Debug($"Voce: richiesta in sottofondo non riuscita: {what}.");
             return;
         }
-        _breaker.RecordFailure(reason);
+        _breaker.RecordFailure(reason, missingPermission);
         string message = $"Voce: {what}, uso la voce locale.";
         if (warn) _log.Warn(message);
         else _log.Info(message);
@@ -499,7 +503,7 @@ public sealed class SpeechService : ISpeechServiceWithOutcome
         if (buffer.Fault is { } fault)
         {
             SpeechProviderReason reason = fault is SpeechProviderException spe ? spe.Reason : SpeechProviderReason.Network;
-            _breaker.RecordFailure(reason);
+            _breaker.RecordFailure(reason, (fault as SpeechProviderException)?.MissingPermission);
             _log.Warn($"Voce: flusso ElevenLabs interrotto ({reason}); l'audio non entra in cache.");
             buffer.Dispose();
             return;

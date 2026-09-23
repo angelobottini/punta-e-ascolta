@@ -48,6 +48,35 @@ public sealed record ElevenLabsSubscription(
         NextCharacterCountResetUnix is > 0 ? DateTimeOffset.FromUnixTimeSeconds(NextCharacterCountResetUnix.Value) : null;
 }
 
+/// <summary>
+/// Esito di <see cref="ElevenLabsAccountClient.CheckKeyAsync"/>.
+/// <see cref="Valid"/>: il server ha riconosciuto la chiave (anche se le mancano dei permessi). <see cref="Subscription"/> e
+/// <see cref="Voices"/> sono null se il permesso manca o la chiamata non è riuscita. <see cref="MissingPermissions"/>: permessi
+/// mancanti (user_read, voices_read, text_to_speech...). <see cref="TtsTested"/>: true se la prova di lettura è riuscita,
+/// false se è fallita (motivo in <see cref="TtsFailure"/>), null se non è stata fatta (nessun ID di voce).
+/// <see cref="Message"/>: spiegazione in italiano per l'assistente, senza la chiave.
+/// </summary>
+public sealed record ElevenLabsKeyCheck(
+    bool Valid,
+    ElevenLabsSubscription? Subscription,
+    IReadOnlyList<ElevenLabsVoice>? Voices,
+    IReadOnlyList<string> MissingPermissions,
+    bool? TtsTested,
+    string Message)
+{
+    /// <summary>Motivo del fallimento della prova di lettura; null se riuscita o non fatta.</summary>
+    public SpeechProviderReason? TtsFailure { get; init; }
+
+    /// <summary>
+    /// Le frasi del messaggio dopo "Chiave valida." (permessi mancanti, voci non disponibili, esito della prova di lettura),
+    /// per chi vuole comporre un testo proprio (la finestra impostazioni ci aggiunge i crediti). Vuota se la chiave non è valida.
+    /// </summary>
+    public IReadOnlyList<string> Notes { get; init; } = Array.Empty<string>();
+
+    /// <summary>Vero se manca il permesso di sintesi: con questa chiave ElevenLabs non può leggere.</summary>
+    public bool CannotSpeak => MissingPermissions.Any(p => string.Equals(p, ElevenLabsMessages.TextToSpeech, StringComparison.OrdinalIgnoreCase));
+}
+
 /// <summary>Modello di sintesi disponibile (GET /v1/models), già filtrato su quelli che fanno Text to Speech.</summary>
 public sealed record ElevenLabsModel(
     string ModelId,

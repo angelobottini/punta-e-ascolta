@@ -73,6 +73,42 @@ public sealed class ReadOrchestratorTests : IDisposable
     }
 
     [Fact]
+    public async Task EveryActivation_IsLoggedAtInfo_WithOriginAndPoint_ButNeverTheText()
+    {
+        // Prove dal vivo del 23/09/2026: senza il log dettagliato non si vedeva che cosa avviava le letture.
+        _resolver.Handler = (_, _) => Task.FromResult(FakeResolver.Text("Testo riservato del documento."));
+        var o = Create();
+
+        o.HandleInput(Hotkey(HotkeyAction.ReadSelection, 1000));
+        await Idle(o);
+        o.HandleInput(Hotkey(HotkeyAction.ReadAtPointer, 5000));
+        await Idle(o);
+        o.HandleInput(Down(9000));
+        o.HandleInput(Up(9080));
+        await Idle(o);
+
+        var info = _log.Entries.Where(e => e.Level == "INFO").Select(e => e.Message).ToList();
+        Assert.Contains("Attivazione (scorciatoia ReadSelection) a 400,300: lettura Selection", info);
+        Assert.Contains("Attivazione (scorciatoia ReadAtPointer) a 400,300: lettura AtPointer", info);
+        Assert.Contains("Attivazione (clic) a 400,300: lettura AtPointer", info);
+        Assert.DoesNotContain(_log.Entries, e => e.Message.Contains("riservato", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task ActivationWhileSpeaking_IsLoggedAtInfo_AsStop()
+    {
+        _speech.BlockUntilStopped = true;
+        var o = Create();
+
+        o.HandleInput(Down(1000));
+        Assert.True(await _speech.WaitStartedAsync());
+        o.HandleInput(Down(3000, new ScreenPoint(10, 20)));
+        await Idle(o);
+
+        Assert.Contains(_log.Entries, e => e.Level == "INFO" && e.Message == "Attivazione (clic) a 10,20 mentre la voce parla: stop");
+    }
+
+    [Fact]
     public async Task LabelOutcome_KeepsKindAndLanguage()
     {
         _resolver.Handler = (_, _) => Task.FromResult(FakeResolver.Text("Save As", SpeechKind.Label, "en"));

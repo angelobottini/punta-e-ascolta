@@ -1,5 +1,7 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace PuntaEAscolta.Speech.ElevenLabs;
@@ -23,7 +25,8 @@ public sealed class ElevenLabsAccountClient
 
     /// <summary>
     /// Tutte le voci dell'account: GET /v2/voices con paginazione (page_size 100, next_page_token); se la v2 non risponde
-    /// come previsto si ripiega su GET /v1/voices (senza paginazione). Ordinate per nome.
+    /// come previsto si ripiega su GET /v1/voices (senza paginazione). Ordinate per nome. Se alla chiave manca il permesso
+    /// voices_read non si prova la v1 (servirebbe lo stesso permesso): SpeechProviderException con MissingPermission.
     /// </summary>
     public async Task<IReadOnlyList<ElevenLabsVoice>> GetVoicesAsync(string apiKey, CancellationToken ct)
     {
@@ -46,20 +49,181 @@ public sealed class ElevenLabsAccountClient
     }
 
     /// <summary>
-    /// Vero se la chiave è accettata, falso se il server la rifiuta (401). Gli altri problemi (rete, server) vengono
-    /// sollevati come SpeechProviderException, così la finestra può distinguere "chiave sbagliata" da "rete assente".
+    /// Vero se la chiave è accettata (anche se le mancano dei permessi), falso se il server la rifiuta (401). Gli altri
+    /// problemi (rete, server) vengono sollevati come SpeechProviderException, così la finestra può distinguere
+    /// "chiave sbagliata" da "rete assente". Costruito su <see cref="CheckKeyAsync"/> senza la prova di lettura.
     /// </summary>
     public async Task<bool> ValidateKeyAsync(string apiKey, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(apiKey)) return false;
+        var check = await CheckKeyAsync(apiKey, voiceId: null, ct).ConfigureAwait(false);
+        return check.Valid;
+    }
+
+    /// <summary>Testo, modello e formato della prova di lettura: 5 caratteri, il modello più economico, il PCM più piccolo.</summary>
+    internal const string ProbeText = "Prova";
+    internal const string ProbeModel = "eleven_flash_v2_5";
+    internal const string ProbeOutputFormat = "pcm_16000";
+
+    /// <summary>
+    /// Controllo completo della chiave, pensato per le chiavi con permessi limitati (ElevenLabs permette di concedere a una
+    /// chiave solo alcune funzioni; una chiave "solo Text to Speech" riceve 401 missing_permissions su abbonamento e voci):
+    /// <list type="number">
+    /// <item>GET /v1/user/subscription: se manca user_read lo si annota e si prosegue; chiave rifiutata = non valida, fine.
+    /// Rete, tempo o server: eccezione, come <see cref="ValidateKeyAsync"/>.</item>
+    /// <item>GET /v2/voices (ripiego /v1/voices): se manca voices_read lo si annota e si prosegue, l'elenco resta null.</item>
+    /// <item>Se c'è un ID di voce, una richiesta di sintesi minuscola ("Prova", modello Flash, pcm_16000) di cui si leggono
+    /// i primi byte: conferma che la chiave sa davvero far leggere (permesso text_to_speech) e che la voce esiste.</item>
+    /// </list>
+    /// Il messaggio, in italiano, non contiene mai la chiave (i messaggi del server passano da Redact).
+    /// </summary>
+    public async Task<ElevenLabsKeyCheck> CheckKeyAsync(string apiKey, string? voiceId, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            return new ElevenLabsKeyCheck(false, null, null, Array.Empty<string>(), null, "Nessuna chiave da verificare.");
+        }
+
+        var missing = new List<string>();
+        var notes = new List<string>();
+
+        // 1. Abbonamento: dice se la chiave è accettata. Rete e server: eccezione per il chiamante.
+        ElevenLabsSubscription? subscription = null;
         try
         {
-            await GetSubscriptionAsync(apiKey, ct).ConfigureAwait(false);
-            return true;
+            subscription = await GetSubscriptionAsync(apiKey, ct).ConfigureAwait(false);
         }
         catch (SpeechProviderException ex) when (ex.Reason == SpeechProviderReason.InvalidKey)
         {
-            return false;
+            return Rejected(ex);
+        }
+        catch (SpeechProviderException ex) when (ex.Reason == SpeechProviderReason.MissingPermission)
+        {
+            AddMissing(missing, ex.MissingPermission ?? ElevenLabsMessages.UserRead);
+        }
+
+        // 2. Voci.
+        IReadOnlyList<ElevenLabsVoice>? voices = null;
+        try
+        {
+            voices = await GetVoicesAsync(apiKey, ct).ConfigureAwait(false);
+        }
+        catch (SpeechProviderException ex) when (ex.Reason == SpeechProviderReason.InvalidKey)
+        {
+            return Rejected(ex);
+        }
+        catch (SpeechProviderException ex) when (ex.Reason == SpeechProviderReason.MissingPermission)
+        {
+            AddMissing(missing, ex.MissingPermission ?? ElevenLabsMessages.VoicesRead);
+        }
+        catch (SpeechProviderException ex)
+        {
+            notes.Add($"Elenco delle voci non disponibile: {ElevenLabsMessages.Explain(ex)}.");
+        }
+
+        // 3. Prova di lettura, solo se si sa quale voce usare.
+        bool? ttsTested = null;
+        SpeechProviderReason? ttsFailure = null;
+        string? voice = string.IsNullOrWhiteSpace(voiceId) ? null : voiceId.Trim();
+        if (voice is not null)
+        {
+            try
+            {
+                await ProbeTextToSpeechAsync(apiKey, voice, ct).ConfigureAwait(false);
+                ttsTested = true;
+            }
+            catch (SpeechProviderException ex) when (ex.Reason == SpeechProviderReason.InvalidKey)
+            {
+                return Rejected(ex);
+            }
+            catch (SpeechProviderException ex)
+            {
+                ttsTested = false;
+                ttsFailure = ex.Reason;
+                if (ex.Reason == SpeechProviderReason.MissingPermission)
+                    AddMissing(missing, ex.MissingPermission ?? ElevenLabsMessages.TextToSpeech);
+                else
+                    notes.Add($"Prova di lettura non riuscita: {ElevenLabsMessages.Explain(ex)}.");
+            }
+        }
+
+        var sentences = new List<string>();
+        sentences.AddRange(missing.Select(ElevenLabsMessages.DescribeMissingPermission));
+        sentences.AddRange(notes);
+        if (ttsTested == true) sentences.Add("Prova di lettura riuscita.");
+        else if (ttsTested is null) sentences.Add("Lettura non provata: manca l'ID della voce.");
+
+        string message = sentences.Count == 0 ? "Chiave valida." : "Chiave valida. " + string.Join(" ", sentences);
+        return new ElevenLabsKeyCheck(true, subscription, voices, missing, ttsTested, message)
+        {
+            TtsFailure = ttsFailure,
+            Notes = sentences,
+        };
+
+        static ElevenLabsKeyCheck Rejected(SpeechProviderException ex) =>
+            new(false, null, null, Array.Empty<string>(), null, ElevenLabsMessages.Explain(ex) + ".");
+
+        static void AddMissing(List<string> list, string permission)
+        {
+            if (!list.Contains(permission, StringComparer.OrdinalIgnoreCase)) list.Add(permission);
+        }
+    }
+
+    /// <summary>
+    /// Sintesi minuscola (<see cref="ProbeText"/>) con la voce indicata: riesce se arriva almeno un byte di audio. Gli errori
+    /// del server diventano SpeechProviderException (messaggio senza chiave).
+    /// </summary>
+    private async Task ProbeTextToSpeechAsync(string apiKey, string voiceId, CancellationToken ct)
+    {
+        string url = $"{ElevenLabsSynthesizer.BaseUrl}/v1/text-to-speech/{Uri.EscapeDataString(voiceId)}/stream?output_format={ProbeOutputFormat}";
+        var body = new TtsRequestBody { Text = ProbeText, ModelId = ProbeModel };
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, url);
+        request.Headers.TryAddWithoutValidation("xi-api-key", apiKey);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("audio/*"));
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
+        request.Content = new StringContent(JsonSerializer.Serialize(body, ElevenLabsJson.Options), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw ElevenLabsErrors.FromTransport(ex);
+        }
+
+        using (response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = ElevenLabsErrors.Redact(await ElevenLabsErrors.ReadAsync(response, ct).ConfigureAwait(false), apiKey);
+                throw ElevenLabsErrors.ToException(error);
+            }
+            int read;
+            try
+            {
+                await using var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+                var buffer = new byte[512];
+                read = await stream.ReadAsync(buffer, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw ElevenLabsErrors.FromTransport(ex);
+            }
+            if (read <= 0)
+            {
+                throw new SpeechProviderException(SpeechProviderReason.Server, "ElevenLabs: nessun audio ricevuto nella prova di lettura.");
+            }
         }
     }
 

@@ -22,12 +22,17 @@ internal sealed partial class SettingsWindow
 
     private sealed record VoiceChoice(string Id, string Name);
 
+    /// <summary>ID di voce ElevenLabs: lettere, cifre, trattino basso e trattino (di solito 20 caratteri alfanumerici).</summary>
+    private const int MaxVoiceIdLength = 64;
+
     private PasswordBox? _keyBox;
     private TextBlock? _keyStateText;
     private TextBlock? _accountText;
     private TextBlock? _cloudStateText;
     private TextBlock? _cacheSizeText;
     private ComboBox? _elevenVoiceCombo;
+    private TextBox? _voiceIdBox;
+    private VoiceChoice _savedVoice = new("", "");
     private ComboBox? _sentenceModelCombo;
     private ComboBox? _labelModelCombo;
     private readonly List<Button> _accountButtons = new();
@@ -64,9 +69,12 @@ internal sealed partial class SettingsWindow
         UpdateKeyState();
 
         _keyBox = new PasswordBox { Width = 320, HorizontalAlignment = HorizontalAlignment.Left };
-        Row(eleven, "Chiave API (incollare qui)", _keyBox, "La chiave viene cifrata con DPAPI: vale solo per questo utente di Windows su questo PC.");
+        Row(eleven, "Chiave API (incollare qui)", _keyBox,
+            "La chiave viene cifrata con DPAPI: vale solo per questo utente di Windows su questo PC. \"Salva chiave\" la salva anche " +
+            "senza \"Verifica\"; spazi, virgolette e caratteri invisibili copiati per errore vengono tolti. La chiave deve avere almeno " +
+            "il permesso \"Text to Speech\" (sintesi vocale); per l'elenco delle voci anche \"Voices: Read\" (voci, lettura).");
         var keyButtons = ButtonRow(eleven);
-        _accountButtons.Add(AddAsyncButton(keyButtons, "Verifica", VerifyAccountAsync));
+        _accountButtons.Add(AddAsyncButton(keyButtons, "Verifica", () => VerifyAccountAsync(probeSpeech: true)));
         AddButton(keyButtons, "Salva chiave", SaveKey);
         AddButton(keyButtons, "Rimuovi chiave", RemoveKey);
 
@@ -74,25 +82,37 @@ internal sealed partial class SettingsWindow
         eleven.Children.Add(_accountText);
 
         _elevenVoiceCombo = new ComboBox { MinWidth = 320, HorizontalAlignment = HorizontalAlignment.Left };
-        var currentVoice = new VoiceChoice(sp.ElevenLabsVoiceId ?? "", sp.ElevenLabsVoiceName ?? "");
+        _savedVoice = new VoiceChoice((sp.ElevenLabsVoiceId ?? "").Trim(), sp.ElevenLabsVoiceName ?? "");
         FillCombo(_elevenVoiceCombo, new[]
         {
-            string.IsNullOrWhiteSpace(currentVoice.Id)
-                ? (currentVoice, "(nessuna voce scelta: premere Verifica per l'elenco)")
-                : (currentVoice, string.IsNullOrWhiteSpace(currentVoice.Name) ? currentVoice.Id : currentVoice.Name),
-        }, currentVoice);
-        Row(eleven, "Voce ElevenLabs", _elevenVoiceCombo);
+            string.IsNullOrWhiteSpace(_savedVoice.Id)
+                ? (_savedVoice, "(nessuna voce scelta: premere Verifica per l'elenco)")
+                : (_savedVoice, string.IsNullOrWhiteSpace(_savedVoice.Name) ? _savedVoice.Id : _savedVoice.Name),
+        }, _savedVoice);
+        Row(eleven, "Voce ElevenLabs (dall'elenco)", _elevenVoiceCombo);
+
+        // Campo per l'ID: serve quando l'elenco non si carica (chiave senza il permesso di leggere le voci). Scegliendo una
+        // voce dall'elenco si riempie da solo; è il campo che si salva.
+        _voiceIdBox = new TextBox { Text = _savedVoice.Id, Width = 320, HorizontalAlignment = HorizontalAlignment.Left };
+        Row(eleven, "ID della voce", _voiceIdBox,
+            "Si riempie scegliendo una voce dall'elenco. Se l'elenco non si carica, scrivere qui l'ID della voce copiato dal sito di " +
+            "ElevenLabs (Voices, poi la voce, poi \"Copy voice ID\").");
+        _elevenVoiceCombo.SelectionChanged += (_, _) =>
+        {
+            if (_elevenVoiceCombo.SelectedItem is ComboBoxItem { Tag: VoiceChoice v } && !string.IsNullOrWhiteSpace(v.Id) && _voiceIdBox.Text.Trim() != v.Id)
+                _voiceIdBox.Text = v.Id;
+        };
         _collectors.Add(t =>
         {
-            if (_elevenVoiceCombo.SelectedItem is ComboBoxItem { Tag: VoiceChoice v })
-            {
-                t.Speech.ElevenLabsVoiceId = v.Id;
-                t.Speech.ElevenLabsVoiceName = v.Name;
-            }
+            string id = _voiceIdBox.Text.Trim();
+            if (id.Length > 0 && !IsValidVoiceId(id))
+                return "ID della voce: sono ammessi solo lettere, numeri, trattino basso e trattino (es. 21m00Tcm4TlvDq8ikWAM).";
+            t.Speech.ElevenLabsVoiceId = id;
+            t.Speech.ElevenLabsVoiceName = VoiceNameFor(id);
             return null;
         });
         var voiceButtons = ButtonRow(eleven);
-        _accountButtons.Add(AddAsyncButton(voiceButtons, "Aggiorna elenco voci", VerifyAccountAsync));
+        _accountButtons.Add(AddAsyncButton(voiceButtons, "Aggiorna elenco voci", () => VerifyAccountAsync(probeSpeech: false)));
         AddAsyncButton(voiceButtons, "Prova voce ElevenLabs", () => TestVoiceAsync(cloud: true));
 
         _sentenceModelCombo = ModelCombo(eleven, "Modello per frasi e testi", sp.ElevenLabsSentenceModel, allowEmpty: false,
@@ -139,11 +159,30 @@ internal sealed partial class SettingsWindow
     private void StartInitialLoads()
     {
         _ = UpdateCacheSizeAsync();
-        // Con una chiave già salvata si caricano subito crediti e voci (senza bloccare la finestra).
+        // Con una chiave già salvata si caricano subito crediti e voci (senza bloccare la finestra). Niente prova di lettura:
+        // costerebbe qualche carattere a ogni apertura della finestra.
         if (CommandLine.CommandLineRunner.ReadApiKey(_store.Current, _services.Protector).Key is not null)
         {
-            _ = VerifyAccountAsync();
+            _ = VerifyAccountAsync(probeSpeech: false);
         }
+    }
+
+    private static bool IsValidVoiceId(string id) =>
+        id.Length <= MaxVoiceIdLength && id.All(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '-');
+
+    /// <summary>Nome da salvare con l'ID: quello della voce scelta dall'elenco, altrimenti quello salvato se l'ID è lo stesso.</summary>
+    private string VoiceNameFor(string id)
+    {
+        if (id.Length == 0) return "";
+        if (_elevenVoiceCombo?.SelectedItem is ComboBoxItem { Tag: VoiceChoice v } && v.Id == id && !string.IsNullOrWhiteSpace(v.Name)) return v.Name;
+        return id == _savedVoice.Id ? _savedVoice.Name : "";
+    }
+
+    /// <summary>ID della voce da usare per la prova di lettura della verifica: quello del campo, se valido.</summary>
+    private string? VoiceIdForCheck()
+    {
+        string id = _voiceIdBox?.Text.Trim() ?? "";
+        return id.Length > 0 && IsValidVoiceId(id) ? id : null;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -228,28 +267,49 @@ internal sealed partial class SettingsWindow
         var until = _services.Speech.CloudSuspendedUntil;
         string text;
         if (!_services.ElevenLabs.IsConfigured)
-            text = "ElevenLabs non configurato (servono la chiave e una voce): si usa la voce di Windows.";
+            text = "ElevenLabs non configurato (servono la chiave e l'ID di una voce): si usa la voce di Windows.";
         else if (until is null)
             text = "ElevenLabs configurato e disponibile.";
         else if (until.Value == DateTimeOffset.MaxValue)
-            text = "ElevenLabs sospeso: la chiave è stata rifiutata. Si riprova dopo il prossimo salvataggio delle impostazioni.";
+            text = "ElevenLabs sospeso: la chiave è stata rifiutata oppure non ha il permesso di sintesi vocale (vedere il registro). " +
+                   "Si riprova dopo il prossimo salvataggio delle impostazioni.";
         else
             text = $"ElevenLabs sospeso fino alle {until.Value.ToLocalTime():HH:mm:ss} per errori ripetuti (rete, server o crediti).";
         _cloudStateText.Text = text;
     }
 
-    /// <summary>Chiave per le chiamate all'account: quella digitata, altrimenti quella salvata.</summary>
-    private string? KeyForAccount()
+    /// <summary>
+    /// Chiave per le chiamate all'account: quella digitata (ripulita con <see cref="ElevenLabsKey.TrySanitize"/>), altrimenti
+    /// quella salvata. Error se quella digitata non è utilizzabile; Typed vero se viene dal campo.
+    /// </summary>
+    private (string? Key, string? Error, bool Typed) KeyForAccount()
     {
-        string typed = _keyBox?.Password.Trim() ?? "";
-        if (typed.Length > 0) return typed;
-        return CommandLine.CommandLineRunner.ReadApiKey(_store.Current, _services.Protector).Key;
+        string typed = _keyBox?.Password ?? "";
+        if (typed.Length > 0)
+        {
+            return ElevenLabsKey.TrySanitize(typed, out string key, out string? error) ? (key, null, true) : (null, error, true);
+        }
+        return (CommandLine.CommandLineRunner.ReadApiKey(_store.Current, _services.Protector).Key, null, false);
     }
 
-    private async Task VerifyAccountAsync()
+    /// <summary>
+    /// Verifica della chiave (<see cref="ElevenLabsAccountClient.CheckKeyAsync"/>): dice se la chiave è valida, quali permessi
+    /// mancano, i crediti (se si possono leggere) e riempie l'elenco delle voci (se si può leggere).
+    /// </summary>
+    /// <param name="probeSpeech">
+    /// Con un ID di voce fa anche una piccola prova di lettura ("Prova", pochi caratteri): solo dal pulsante Verifica, non
+    /// all'apertura della finestra né da "Aggiorna elenco voci".
+    /// </param>
+    private async Task VerifyAccountAsync(bool probeSpeech)
     {
         if (_accountText is null) return;
-        string? key = KeyForAccount();
+        var (key, keyError, typed) = KeyForAccount();
+        if (keyError is not null)
+        {
+            _accountText.Text = keyError;
+            _accountText.Foreground = Brushes.Firebrick;
+            return;
+        }
         if (key is null)
         {
             _accountText.Text = "Incollare la chiave nel campo qui sopra, oppure salvarne una.";
@@ -261,38 +321,36 @@ internal sealed partial class SettingsWindow
         _accountText.Foreground = SystemColors.ControlTextBrush;
         _accountText.Text = "Verifica in corso...";
         var ct = NewOperationToken(TimeSpan.FromSeconds(30));
+        string saveHint = typed ? " Premere \"Salva chiave\" per salvarla: si può salvare anche se la verifica segnala dei problemi." : "";
         try
         {
             var client = new ElevenLabsAccountClient(_services.Http);
-            bool valid = await client.ValidateKeyAsync(key, ct);
-            if (!valid)
+            var check = await client.CheckKeyAsync(key, probeSpeech ? VoiceIdForCheck() : null, ct);
+            if (!check.Valid)
             {
-                _accountText.Text = "ElevenLabs ha rifiutato la chiave. Controllare di averla copiata per intero.";
+                _accountText.Text = check.Message + saveHint;
                 _accountText.Foreground = Brushes.Firebrick;
                 return;
             }
 
-            var subscription = await client.GetSubscriptionAsync(key, ct);
-            string reset = subscription.NextReset is { } r ? $", si rinnova il {r.ToLocalTime().ToString("d MMMM yyyy", Italian)}" : "";
-            _accountText.Text = string.Format(Italian,
-                "Chiave valida. Piano {0} ({1}). Caratteri usati {2:N0} su {3:N0}, residui {4:N0}{5}.",
-                subscription.Tier, subscription.Status, subscription.CharacterCount, subscription.CharacterLimit,
-                subscription.CharactersRemaining, reset);
-            _accountText.Foreground = Brushes.DarkGreen;
-
-            var voices = await client.GetVoicesAsync(key, ct);
-            if (_elevenVoiceCombo is not null)
+            var text = new List<string> { "Chiave valida." };
+            if (check.Subscription is { } subscription)
             {
-                var current = _elevenVoiceCombo.SelectedItem is ComboBoxItem { Tag: VoiceChoice v } ? v : new VoiceChoice("", "");
-                var items = voices.Select(voice => (new VoiceChoice(voice.VoiceId, voice.Name), voice.DisplayName)).ToList();
-                var selected = items.Select(i => i.Item1).FirstOrDefault(v => v.Id == current.Id);
-                if (selected is null)
-                {
-                    items.Insert(0, (current, string.IsNullOrWhiteSpace(current.Id) ? "(nessuna voce scelta)" : current.Name + " (non trovata nell'account)"));
-                    selected = current;
-                }
-                FillCombo(_elevenVoiceCombo, items, selected);
+                string reset = subscription.NextReset is { } r ? $", si rinnova il {r.ToLocalTime().ToString("d MMMM yyyy", Italian)}" : "";
+                text.Add(string.Format(Italian,
+                    "Piano {0} ({1}). Caratteri usati {2:N0} su {3:N0}, residui {4:N0}{5}.",
+                    subscription.Tier, subscription.Status, subscription.CharacterCount, subscription.CharacterLimit,
+                    subscription.CharactersRemaining, reset));
             }
+            if (check.Voices is { } voices) text.Add($"{voices.Count} voci nell'account.");
+            // "Lettura non provata" si dice solo dopo il pulsante Verifica (all'apertura e con "Aggiorna elenco voci" non si prova).
+            text.AddRange(check.Notes.Where(n => probeSpeech || !n.StartsWith("Lettura non provata", StringComparison.Ordinal))
+                .Select(n => n.Replace("l'ID della voce va scritto a mano", "scrivere l'ID della voce qui sotto", StringComparison.Ordinal)));
+            bool problem = check.CannotSpeak || check.TtsTested == false;
+            _accountText.Text = string.Join(" ", text) + (check.MissingPermissions.Count > 0 || problem ? saveHint : "");
+            _accountText.Foreground = problem ? Brushes.Firebrick : Brushes.DarkGreen;
+
+            FillVoiceList(check.Voices);
 
             try
             {
@@ -303,19 +361,23 @@ internal sealed partial class SettingsWindow
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                _log.Warn($"Elenco dei modelli ElevenLabs non disponibile: {ex.Message}");
+                // La chiave non è mai nei messaggi (Redact); con i permessi limitati è normale che manchi models_read.
+                _log.Info($"Elenco dei modelli ElevenLabs non disponibile: {ex.Message}");
             }
-
-            _accountText.Text += $" {voices.Count} voci nell'account.";
         }
         catch (OperationCanceledException)
         {
             _accountText.Text = "Verifica interrotta (tempo scaduto o finestra chiusa).";
             _accountText.Foreground = Brushes.Firebrick;
         }
+        catch (SpeechProviderException ex)
+        {
+            _accountText.Text = "Verifica non riuscita: " + ElevenLabsMessages.Explain(ex) + "." + saveHint;
+            _accountText.Foreground = Brushes.Firebrick;
+        }
         catch (Exception ex)
         {
-            _accountText.Text = "Verifica non riuscita: " + ex.Message;
+            _accountText.Text = "Verifica non riuscita: " + ex.Message + saveHint;
             _accountText.Foreground = Brushes.Firebrick;
         }
         finally
@@ -325,27 +387,52 @@ internal sealed partial class SettingsWindow
         }
     }
 
+    /// <summary>
+    /// Riempie l'elenco delle voci tenendo scelta quella dell'ID scritto nel campo (non quella scelta prima nell'elenco: l'ID
+    /// scritto a mano vince). Senza elenco (permesso voices_read mancante) resta solo la voce del campo.
+    /// </summary>
+    private void FillVoiceList(IReadOnlyList<ElevenLabsVoice>? voices)
+    {
+        if (_elevenVoiceCombo is null) return;
+        string wantedId = _voiceIdBox?.Text.Trim() ?? "";
+        var wanted = new VoiceChoice(wantedId, VoiceNameFor(wantedId));
+        var items = (voices ?? Array.Empty<ElevenLabsVoice>())
+            .Select(voice => (new VoiceChoice(voice.VoiceId, voice.Name), voice.DisplayName))
+            .ToList();
+        var selected = items.Select(i => i.Item1).FirstOrDefault(v => v.Id == wanted.Id);
+        if (selected is null)
+        {
+            string label = string.IsNullOrWhiteSpace(wanted.Id)
+                ? (voices is null ? "(elenco non disponibile: scrivere l'ID della voce qui sotto)" : "(nessuna voce scelta)")
+                : (string.IsNullOrWhiteSpace(wanted.Name) ? wanted.Id : wanted.Name)
+                  + (voices is null ? " (ID scritto a mano)" : " (non trovata nell'account)");
+            items.Insert(0, (wanted, label));
+            selected = wanted;
+        }
+        FillCombo(_elevenVoiceCombo, items, selected);
+    }
+
     private void SaveKey()
     {
-        string typed = _keyBox?.Password.Trim() ?? "";
+        string typed = _keyBox?.Password ?? "";
         if (typed.Length == 0)
         {
             ShowStatus("Incollare prima la chiave nel campo \"Chiave API\".", error: true);
             return;
         }
-        if (typed.Length > 256 || typed.Any(char.IsWhiteSpace) || typed.Any(char.IsControl))
+        if (!ElevenLabsKey.TrySanitize(typed, out string key, out string? error))
         {
-            ShowStatus("La chiave incollata contiene spazi o caratteri non validi.", error: true);
+            ShowStatus(error ?? "La chiave incollata non è valida.", error: true);
             return;
         }
 
         try
         {
-            string protectedKey = _services.Protector.Protect(typed);
+            string protectedKey = _services.Protector.Protect(key);
             _store.Update(s => s.Speech.ElevenLabsProtectedApiKey = protectedKey);
             _keyBox?.Clear();
             _log.Info("Chiave ElevenLabs salvata dalla finestra impostazioni");
-            ShowStatus("Chiave salvata (cifrata). Scegliere la voce e premere Salva per le altre modifiche.", error: false);
+            ShowStatus("Chiave salvata (cifrata). Scegliere la voce dall'elenco o scriverne l'ID, poi premere Salva per le altre modifiche.", error: false);
         }
         catch (Exception ex)
         {
@@ -387,8 +474,16 @@ internal sealed partial class SettingsWindow
 
         if (cloud)
         {
-            string typed = _keyBox?.Password.Trim() ?? "";
-            if (typed.Length > 0) draft.Speech.ElevenLabsProtectedApiKey = _services.Protector.Protect(typed);
+            string typed = _keyBox?.Password ?? "";
+            if (typed.Length > 0)
+            {
+                if (!ElevenLabsKey.TrySanitize(typed, out string key, out string? keyError))
+                {
+                    ShowStatus("Prova non riuscita: " + keyError, error: true);
+                    return;
+                }
+                draft.Speech.ElevenLabsProtectedApiKey = _services.Protector.Protect(key);
+            }
         }
 
         var scoped = new ScopedSettingsStore(_store, draft);
@@ -400,7 +495,7 @@ internal sealed partial class SettingsWindow
         {
             if (cloud && !synthesizer.IsConfigured)
             {
-                ShowStatus("Per provare ElevenLabs servono la chiave (incollata o salvata) e una voce scelta dall'elenco.", error: true);
+                ShowStatus("Per provare ElevenLabs servono la chiave (incollata o salvata) e una voce: sceglierla dall'elenco o scriverne l'ID.", error: true);
                 return;
             }
 
@@ -418,7 +513,16 @@ internal sealed partial class SettingsWindow
         }
         catch (SpeechProviderException ex)
         {
-            ShowStatus("Prova non riuscita: " + ex.Message, error: true);
+            // Motivo vero in italiano: permesso mancante, voce non trovata, crediti, rete... (mai la chiave nel messaggio).
+            ShowStatus("Prova non riuscita: " + ElevenLabsMessages.Explain(ex) + ".", error: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            ShowStatus("Prova non riuscita: rete non disponibile o ElevenLabs non raggiungibile (" + ex.Message + ").", error: true);
+        }
+        catch (IOException ex)
+        {
+            ShowStatus("Prova non riuscita: collegamento con ElevenLabs interrotto (" + ex.Message + ").", error: true);
         }
         catch (Exception ex)
         {

@@ -66,7 +66,8 @@ public static class ElevenLabsKey
             text = text.Trim().Trim(s_quotes).Trim();
             if (text.StartsWith(Label, StringComparison.OrdinalIgnoreCase))
             {
-                string rest = text[Label.Length..].TrimStart();
+                // Anche nella forma JSON: "xi-api-key": "sk_..." (la virgoletta di chiusura dell'etichetta resta qui).
+                string rest = text[Label.Length..].TrimStart().TrimStart(s_quotes).TrimStart();
                 if (rest.StartsWith(':') || rest.StartsWith('=')) text = rest[1..];
             }
             if (text == before) break;

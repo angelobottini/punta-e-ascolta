@@ -213,10 +213,14 @@ internal static class SelfTest
             {
                 try
                 {
+                    // Senza prova di lettura: l'autodiagnosi non spende crediti (la prova si fa con Verifica nelle impostazioni).
                     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-                    bool valid = await new ElevenLabsAccountClient(services.Http).ValidateKeyAsync(key, cts.Token).ConfigureAwait(false);
-                    check = new { valid };
-                    if (!valid) warnings.Add("La chiave ElevenLabs è stata rifiutata: si userà la voce di Windows.");
+                    var result = await new ElevenLabsAccountClient(services.Http).CheckKeyAsync(key, voiceId: null, cts.Token).ConfigureAwait(false);
+                    check = new { valid = result.Valid, missingPermissions = result.MissingPermissions, message = result.Message };
+                    if (!result.Valid) warnings.Add("La chiave ElevenLabs è stata rifiutata: si userà la voce di Windows.");
+                    else if (result.MissingPermissions.Count > 0)
+                        warnings.Add("Alla chiave ElevenLabs mancano dei permessi: " + string.Join(", ", result.MissingPermissions) +
+                                     ". Per leggere serve almeno \"Text to Speech\" (provarlo con Verifica nelle impostazioni).");
                 }
                 catch (Exception ex) when (ex is not OutOfMemoryException)
                 {

@@ -4,7 +4,8 @@ namespace PuntaEAscolta.Speech.Playback;
 
 /// <summary>
 /// Interruttore automatico del fornitore cloud. Regole:
-/// chiave rifiutata (InvalidKey) → cloud sospeso finché le impostazioni non cambiano;
+/// chiave rifiutata (InvalidKey) o senza il permesso di sintesi (MissingPermission) → cloud sospeso finché le impostazioni
+/// non cambiano (ogni richiesta fallirebbe uguale);
 /// crediti esauriti (QuotaExceeded) → sospeso 30 minuti;
 /// 3 errori consecutivi di rete, tempo o server (anche Configuration, che si ripete uguale a ogni richiesta) →
 /// sospeso 60 s; se la prima prova dopo la sospensione fallisce di nuovo → 5 minuti, e così via finché una richiesta riesce;
@@ -67,7 +68,8 @@ internal sealed class CloudCircuitBreaker
         }
     }
 
-    public void RecordFailure(SpeechProviderReason reason)
+    /// <param name="missingPermission">Con <see cref="SpeechProviderReason.MissingPermission"/>: il permesso che manca, se noto (solo per il registro).</param>
+    public void RecordFailure(SpeechProviderReason reason, string? missingPermission = null)
     {
         lock (_sync)
         {
@@ -78,6 +80,16 @@ internal sealed class CloudCircuitBreaker
                     if (!_untilSettingsChange)
                     {
                         _log.Warn("Voce: chiave ElevenLabs rifiutata; uso la voce di Windows finché le impostazioni non cambiano.");
+                    }
+                    _untilSettingsChange = true;
+                    break;
+
+                case SpeechProviderReason.MissingPermission:
+                    if (!_untilSettingsChange)
+                    {
+                        string which = string.IsNullOrWhiteSpace(missingPermission) ? "di sintesi vocale (text_to_speech)" : missingPermission.Trim();
+                        _log.Warn($"Voce: la chiave ElevenLabs non ha il permesso {which}; uso la voce di Windows finché le impostazioni non cambiano. " +
+                                  "Sul sito di ElevenLabs attivare \"Text to Speech\" nei permessi della chiave.");
                     }
                     _untilSettingsChange = true;
                     break;

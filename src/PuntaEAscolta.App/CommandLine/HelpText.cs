@@ -15,7 +15,8 @@ Comandi
         --zone    legge tutta la zona attorno al punto (come la pressione prolungata)
         --speak   pronuncia anche il testo trovato
   --read-selection [--speak]
-        Legge il testo selezionato nell'app in primo piano (accessibilità, poi appunti).
+        Legge il testo selezionato nell'app in primo piano (accessibilità, poi appunti); se non c'è niente
+        di selezionato legge ciò che è sotto il puntatore, come la scorciatoia.
         Con --attendi 3000 si hanno 3 secondi per portare in primo piano la finestra giusta.
   --ocr-file <immagine.png> --point X,Y [--engine windows|onnx|entrambi] [--scale 1.25]
         OCR di un'immagine salvata: stampa tutte le righe riconosciute e la scelta attorno al punto
@@ -30,7 +31,10 @@ Comandi
         accessibilità sotto il puntatore, chiave ElevenLabs. Esito JSON; codice 1 se qualcosa di essenziale non va.
   --set-key [--verifica]
         Legge la chiave API di ElevenLabs dallo standard input, la cifra (DPAPI, solo questo utente e questo PC)
-        e la salva in settings.json. Con --verifica la controlla prima presso ElevenLabs.
+        e la salva in settings.json. Spazi, virgolette, caratteri invisibili e l'etichetta "xi-api-key:"
+        vengono tolti. Con --verifica la controlla prima presso ElevenLabs: una chiave rifiutata non si salva;
+        una chiave valida ma con permessi limitati si salva e l'esito dice quali permessi mancano (con una
+        voce già scelta prova anche una lettura di 5 caratteri).
         Esempio (PowerShell):  Get-Content chiave.txt | .\PuntaEAscolta.exe --set-key --verifica
         Con l'app in esecuzione rifiuta (codice 1): chiuderla prima con --exit, poi riaprirla.
   --help

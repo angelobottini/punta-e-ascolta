@@ -573,6 +573,8 @@ public class TextResolverTests
         Assert.Equal(ReadSource.Selection, outcome.Source);
         Assert.Equal("Selezione lontana.", outcome.Text);
         Assert.False(rig.Calls.Contains("appunti"));
+        Assert.False(rig.Calls.Contains("elemento"));
+        Assert.DoesNotContain("-> puntatore", outcome.Diagnostics);
     }
 
     [Fact]
@@ -590,7 +592,7 @@ public class TextResolverTests
     }
 
     [Fact]
-    public async Task SelectionRequest_WithoutClipboardReader_IsNothing()
+    public async Task SelectionRequest_WithoutClipboardReaderAndNothingUnderPointer_IsNothing()
     {
         var rig = new Rig(withClipboard: false);
 
@@ -598,6 +600,93 @@ public class TextResolverTests
 
         Assert.False(outcome.HasText);
         Assert.Contains("appunti:assenti", outcome.Diagnostics);
+        Assert.Contains("selezione:nessuna -> puntatore", outcome.Diagnostics);
+    }
+
+    // Prove dal vivo del 23/09/2026: con il solo touchpad l'unica scorciatoia era "leggi la selezione" e le etichette dei menu
+    // non si leggevano mai. Senza selezione la scorciatoia legge ciò che è sotto il puntatore.
+
+    [Fact]
+    public async Task SelectionRequest_WithoutSelection_ReadsTheElementUnderThePointer()
+    {
+        var rig = new Rig();
+        rig.Ui.Element = (_, _) => Result(new UiElementInfo { Kind = UiElementKind.MenuItem, Name = "Salva con nome", Bounds = new ScreenRect(980, 490, 160, 24), ProcessName = "notepad" });
+
+        var outcome = await rig.Resolve(ReadRequestKind.Selection);
+
+        Assert.Equal(ReadSource.UiaName, outcome.Source);
+        Assert.Equal("Salva con nome", outcome.Text);
+        Assert.Equal(SpeechKind.Label, outcome.SpeechKind);
+        Assert.False(outcome.Sensitive);
+        // La selezione non si chiede due volte; gli appunti vengono prima del puntatore.
+        Assert.Equal(new[] { "selezione", "appunti", "elemento" }, rig.Calls.Snapshot());
+        Assert.Contains("selezione:nessuna -> puntatore", outcome.Diagnostics);
+    }
+
+    [Fact]
+    public async Task SelectionRequest_WithoutClipboardReader_ReadsAtPointer()
+    {
+        var rig = new Rig(withClipboard: false);
+        rig.Ui.Element = (_, _) => Result(new UiElementInfo { Kind = UiElementKind.Button, Name = "Apri", Bounds = new ScreenRect(980, 490, 60, 24) });
+
+        var outcome = await rig.Resolve(ReadRequestKind.Selection);
+
+        Assert.Equal("Apri", outcome.Text);
+        Assert.Contains("appunti:assenti selezione:nessuna -> puntatore", outcome.Diagnostics);
+    }
+
+    [Fact]
+    public async Task SelectionRequest_WithoutSelection_FallsBackToOcrUnderThePointer()
+    {
+        var rig = new Rig();
+        rig.Primary.Returns(AtPointer("Livelli"), FarAway("Altro"));
+
+        var outcome = await rig.Resolve(ReadRequestKind.Selection);
+
+        Assert.Equal(ReadSource.OcrLine, outcome.Source);
+        Assert.Equal("Livelli", outcome.Text);
+        Assert.Equal(1, rig.Calls.Count("selezione"));
+    }
+
+    [Fact]
+    public async Task SelectionRequest_ClipboardTimeout_FallsBackToPointer()
+    {
+        // Ripiego sugli appunti che non risponde (modificatori tenuti premuti, app bloccata): scaduto il suo tempo si passa
+        // al puntatore invece di non dire niente.
+        var rig = new Rig();
+        rig.Resolver.ClipboardTimeout = TimeSpan.FromMilliseconds(50);
+        var never = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        rig.Clipboard.Behaviour = _ => never.Task; // ignora anche l'annullamento
+        rig.Ui.Element = (_, _) => Result(new UiElementInfo { Kind = UiElementKind.Button, Name = "Chiudi", Bounds = new ScreenRect(980, 490, 60, 24) });
+
+        var outcome = await rig.Resolve(ReadRequestKind.Selection);
+
+        Assert.Equal("Chiudi", outcome.Text);
+        Assert.Contains("appunti:tempo-scaduto", outcome.Diagnostics);
+        Assert.Contains("selezione:nessuna -> puntatore", outcome.Diagnostics);
+    }
+
+    [Fact]
+    public async Task SelectionRequest_CancelledDuringClipboard_DoesNotReadThePointer()
+    {
+        var rig = new Rig();
+        using var cts = new CancellationTokenSource();
+        rig.Clipboard.Behaviour = _ =>
+        {
+            cts.Cancel();
+            return Task.FromResult<string?>(null);
+        };
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => rig.Resolve(ReadRequestKind.Selection, cts.Token));
+        Assert.False(rig.Calls.Contains("elemento"));
+    }
+
+    [Fact]
+    public void ClipboardTimeout_DefaultLeavesRoomForThreeSecondsOfHeldKeys()
+    {
+        var rig = new Rig();
+        Assert.Equal(TimeSpan.FromMilliseconds(TextResolver.DefaultClipboardTimeoutMs), rig.Resolver.ClipboardTimeout);
+        Assert.Equal(4500, TextResolver.DefaultClipboardTimeoutMs);
     }
 
     [Fact]

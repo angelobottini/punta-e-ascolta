@@ -409,6 +409,30 @@ public sealed class SpeechServiceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task Key_without_text_to_speech_permission_suspends_cloud_until_settings_change_and_says_why()
+    {
+        // Chiave valida ma limitata (prove dal vivo del 23/09/2026): 401 missing_permissions. Il server ripete la chiave nel
+        // messaggio: non deve arrivare nel registro.
+        using var h = Harness.WithElevenLabs((_, _, _) => Task.FromResult(FakeHttpHandler.Json(HttpStatusCode.Unauthorized,
+            "{\"detail\":{\"status\":\"missing_permissions\",\"message\":\"The API key you used (" + TestKeys.ApiKey +
+            ") is missing the permission text_to_speech to execute this operation.\"}}")));
+        var request = new SpeechRequest("Incolla", SpeechKind.Label, "it");
+
+        await h.Service.SpeakAsync(request, CancellationToken.None).Bounded();
+        await h.Service.SpeakAsync(request, CancellationToken.None).Bounded();
+
+        Assert.Equal(1, h.Http!.Count); // come una chiave rifiutata: nessun altro tentativo in linea
+        Assert.Equal(DateTimeOffset.MaxValue, h.Service.CloudSuspendedUntil);
+        Assert.Equal(["locale:Incolla", "locale:Incolla"], h.PlayedTexts);
+        Assert.Contains(h.Log.Entries, e => e.StartsWith("WARN ", StringComparison.Ordinal) && e.Contains("non ha il permesso text_to_speech", StringComparison.Ordinal));
+        Assert.False(h.Log.Contains(TestKeys.ApiKey));
+
+        h.Settings.Save(h.Settings.Current);
+        await h.Service.SpeakAsync(request, CancellationToken.None).Bounded();
+        Assert.Equal(2, h.Http.Count);
+    }
+
+    [Fact]
     public async Task Quota_exceeded_suspends_cloud_for_30_minutes()
     {
         var time = new ManualTimeProvider();
