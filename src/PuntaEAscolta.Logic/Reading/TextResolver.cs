@@ -393,10 +393,18 @@ public sealed class TextResolver : ITextResolver
             return null;
         }
 
+        // Nei menu si legge solo la voce puntata: niente blocchi di righe vicine.
+        var ocrSettings = settings.Ocr;
+        if (!wholeZone && IsMenuKind(elementKind) && ocrSettings.GroupLinesIntoBlocks)
+        {
+            ocrSettings = WithoutBlocks(ocrSettings);
+            diag.Append(" menu:una-riga");
+        }
+
         // Primo motore, passaggio normale.
         var firstResult = await RecognizeAsync(first, image, desired, px, py, diag, ct).ConfigureAwait(false);
         int firstLines = firstResult?.Lines.Count ?? 0;
-        var best = Select(firstResult, px, py, settings, wholeZone, clipTo);
+        var best = Select(firstResult, px, py, ocrSettings, wholeZone, clipTo);
         ct.ThrowIfCancellationRequested();
 
         // Passaggio mirato attorno al punto: solo se il passaggio normale è riuscito ma non ha trovato nulla vicino al puntatore.
@@ -412,7 +420,7 @@ public sealed class TextResolver : ITextResolver
                 if (DiscardCutText && desired is { } d) pointResult = DropCutText(pointResult, image, d, px, py, diag);
                 diag.Append(" righe=").Append(pointResult.Lines.Count);
                 firstLines = Math.Max(firstLines, pointResult.Lines.Count);
-                best = Select(pointResult, px, py, settings, wholeZone, clipTo);
+                best = Select(pointResult, px, py, ocrSettings, wholeZone, clipTo);
                 if (best is not null) diag.Append(" scelto=mirato");
             }
             ct.ThrowIfCancellationRequested();
@@ -444,7 +452,7 @@ public sealed class TextResolver : ITextResolver
             {
                 fallbackResult = await RecognizeAsync(fallback!, image, desired, px, py, diag, ct).ConfigureAwait(false);
             }
-            var fromFallback = Select(fallbackResult, px, py, settings, wholeZone, clipTo);
+            var fromFallback = Select(fallbackResult, px, py, ocrSettings, wholeZone, clipTo);
             if (fromFallback is not null)
             {
                 best = fromFallback;
@@ -476,12 +484,32 @@ public sealed class TextResolver : ITextResolver
         return result;
     }
 
-    private OcrSelection? Select(OcrResult? result, double px, double py, AppSettings settings, bool wholeZone, ImageRect? clipTo)
+    private OcrSelection? Select(OcrResult? result, double px, double py, OcrSettings ocrSettings, bool wholeZone, ImageRect? clipTo)
     {
         if (result is null || result.Lines.Count == 0) return null;
-        var selection = Safe("PointerTextSelector", () => SelectOcrText(result, px, py, settings.Ocr, wholeZone, clipTo));
+        var selection = Safe("PointerTextSelector", () => SelectOcrText(result, px, py, ocrSettings, wholeZone, clipTo));
         return selection is null || string.IsNullOrWhiteSpace(selection.Text) ? null : selection;
     }
+
+    /// <summary>
+    /// Menu (DESIGN.md: "si legge solo la voce puntata"). Serve quando l'accessibilità dà il menu intero ma non la voce:
+    /// succede con i menu WinForms di .NET Framework (prove del 23/09/2026: voci senza rettangolo, lette "Apri Salva con nome"
+    /// perché due voci vicine finivano nello stesso blocco OCR).
+    /// </summary>
+    private static bool IsMenuKind(UiElementKind? kind) =>
+        kind is UiElementKind.Menu or UiElementKind.MenuBar or UiElementKind.MenuItem;
+
+    /// <summary>Copia delle impostazioni OCR con il raggruppamento in blocchi spento.</summary>
+    private static OcrSettings WithoutBlocks(OcrSettings s) => new()
+    {
+        Mode = s.Mode,
+        ZoneWidth = s.ZoneWidth,
+        ZoneHeight = s.ZoneHeight,
+        MaxLineDistanceInLineHeights = s.MaxLineDistanceInLineHeights,
+        GroupLinesIntoBlocks = false,
+        BlockMaxGapInLineHeights = s.BlockMaxGapInLineHeights,
+        WindowsOcrLanguage = s.WindowsOcrLanguage,
+    };
 
     /// <summary>Un motore che restituisce Lines null o righe null non deve far cadere la lettura.</summary>
     private static OcrResult Normalize(OcrResult result)

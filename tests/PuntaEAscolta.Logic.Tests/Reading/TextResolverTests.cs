@@ -456,6 +456,42 @@ public class TextResolverTests
         Assert.Null(seen);
     }
 
+    /// <summary>
+    /// Prove del 23/09/2026: menu WinForms di .NET Framework, l'accessibilità dà il menu intero e non la voce; le voci vicine
+    /// finivano nello stesso blocco OCR ("Apri Salva con nome"). Nei menu si legge solo la voce puntata.
+    /// </summary>
+    [Fact]
+    public async Task MenuWithoutItems_OcrReadsOnlyThePointedItem()
+    {
+        var rig = new Rig();
+        rig.Ui.Element = (_, _) => Result(new UiElementInfo { Kind = UiElementKind.Menu, Bounds = new ScreenRect(900, 400, 282, 200) });
+        rig.Resolver.ResolveUiElement = (_, _) => null;
+        // Tre voci a 24 px l'una dall'altra (8 px di spazio con righe alte 16): fuori da un menu farebbero un blocco.
+        rig.Primary.Returns(Ocr.Line("Nuovo", 420, 124), Ocr.Line("Apri", 420, 148), AtPointer("Salva con nome"));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal(ReadSource.OcrLine, outcome.Source);
+        Assert.Equal("Salva con nome", outcome.Text);
+        Assert.Contains("menu:una-riga", outcome.Diagnostics);
+        Assert.True(rig.S.Ocr.GroupLinesIntoBlocks, "le impostazioni salvate non cambiano");
+    }
+
+    [Fact]
+    public async Task SameLinesOutsideAMenu_StillFormABlock()
+    {
+        var rig = new Rig();
+        rig.Ui.Element = (_, _) => Result(new UiElementInfo { Kind = UiElementKind.Pane, Bounds = new ScreenRect(900, 400, 282, 200) });
+        rig.Resolver.ResolveUiElement = (_, _) => null;
+        rig.Primary.Returns(Ocr.Line("Nuovo", 420, 124), Ocr.Line("Apri", 420, 148), AtPointer("Salva con nome"));
+
+        var outcome = await rig.Resolve();
+
+        Assert.Equal(ReadSource.OcrBlock, outcome.Source);
+        Assert.Contains("Salva con nome", outcome.Text);
+        Assert.DoesNotContain("menu:una-riga", outcome.Diagnostics);
+    }
+
     [Fact]
     public async Task OcrOnlyProcess_SkipsAccessibilityDecision()
     {
