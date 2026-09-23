@@ -216,7 +216,11 @@ internal static class SelfTest
                     // Senza prova di lettura: l'autodiagnosi non spende crediti (la prova si fa con Verifica nelle impostazioni).
                     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
                     var result = await new ElevenLabsAccountClient(services.Http).CheckKeyAsync(key, voiceId: null, cts.Token).ConfigureAwait(false);
-                    check = new { valid = result.Valid, missingPermissions = result.MissingPermissions, message = result.Message };
+                    // La prova di lettura è saltata di proposito: "manca l'ID della voce" qui sarebbe falso, si toglie.
+                    string message = result.Valid
+                        ? string.Join(" ", result.Notes.Where(n => n != ElevenLabsMessages.SpeechNotTested).Prepend("Chiave valida."))
+                        : result.Message;
+                    check = new { valid = result.Valid, missingPermissions = result.MissingPermissions, message };
                     if (!result.Valid) warnings.Add("La chiave ElevenLabs è stata rifiutata: si userà la voce di Windows.");
                     else if (result.MissingPermissions.Count > 0)
                         warnings.Add("Alla chiave ElevenLabs mancano dei permessi: " + string.Join(", ", result.MissingPermissions) +

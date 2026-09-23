@@ -118,6 +118,38 @@ public class ClipboardTimeoutBudgetTests
     }
 }
 
+/// <summary>
+/// "Leggi la selezione" senza selezione passa al puntatore, quindi si preme anche senza aver selezionato niente: con un
+/// terminale in primo piano il Ctrl+C simulato interromperebbe il programma in esecuzione, e non si invia.
+/// </summary>
+public class ClipboardTerminalGuardTests
+{
+    [Theory]
+    [InlineData("ConsoleWindowClass")]              // console di Windows (conhost)
+    [InlineData("CASCADIA_HOSTING_WINDOW_CLASS")]   // Windows Terminal
+    [InlineData("PseudoConsoleWindow")]
+    [InlineData("VirtualConsoleClass")]             // ConEmu
+    [InlineData("mintty")]                          // Git Bash
+    [InlineData("consolewindowclass")]              // i nomi di classe non distinguono maiuscole e minuscole
+    public void Terminals_GetNoCtrlC(string className)
+    {
+        Assert.True(ClipboardSelectionReader.IsTerminalWindowClass(className));
+    }
+
+    [Theory]
+    [InlineData("OpusApp")]            // Word
+    [InlineData("XLMAIN")]             // Excel
+    [InlineData("Notepad")]
+    [InlineData("Chrome_WidgetWin_1")] // browser, VS Code
+    [InlineData("WindowsForms10.Window.8.app.0.2bf8098_r6_ad1")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void OtherWindows_GetTheCtrlC(string? className)
+    {
+        Assert.False(ClipboardSelectionReader.IsTerminalWindowClass(className));
+    }
+}
+
 /// <summary>Clic dell'attivatore generati da software e ignorati: avviso nel registro al massimo una volta al minuto.</summary>
 public class InjectedClickNoticeTests
 {

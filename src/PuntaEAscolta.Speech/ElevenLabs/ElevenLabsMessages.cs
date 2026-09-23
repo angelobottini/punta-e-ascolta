@@ -10,6 +10,12 @@ public static class ElevenLabsMessages
     public const string VoicesRead = "voices_read";
     public const string TextToSpeech = "text_to_speech";
 
+    /// <summary>
+    /// Nota della verifica quando non si è fatta la prova di lettura perché non è arrivato un ID di voce. Chi salta la prova
+    /// di proposito (autodiagnosi, apertura della finestra, "Aggiorna elenco voci") la toglie: lì non manca niente.
+    /// </summary>
+    public const string SpeechNotTested = "Lettura non provata: manca l'ID della voce.";
+
     /// <summary>Frase completa per un permesso che manca alla chiave, es. "Non ha il permesso di elencare le voci (voices_read): ...".</summary>
     public static string DescribeMissingPermission(string permission)
     {

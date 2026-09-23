@@ -247,6 +247,12 @@ internal static unsafe partial class NativeMethods
     [LibraryImport("dwmapi.dll")]
     internal static partial int DwmGetWindowAttribute(nint hwnd, int dwAttribute, out RECT pvAttribute, int cbAttribute);
 
+    [LibraryImport("user32.dll")]
+    internal static partial nint GetForegroundWindow();
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    internal static partial int GetClassNameW(nint hWnd, char* lpClassName, int nMaxCount);
+
     // ---- user32: notifiche di sistema -----------------------------------------------------
 
     [LibraryImport("user32.dll", SetLastError = true)]

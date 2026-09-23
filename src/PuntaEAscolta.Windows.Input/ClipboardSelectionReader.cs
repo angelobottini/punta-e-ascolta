@@ -98,9 +98,43 @@ public sealed class ClipboardSelectionReader : IClipboardSelectionReader
 
     // ---- interno (thread STA) ---------------------------------------------------------------
 
+    /// <summary>
+    /// Classi delle finestre dei terminali (console di Windows, Windows Terminal, ConEmu, mintty di Git Bash). Lì Ctrl+C
+    /// senza testo selezionato non copia: interrompe il programma che sta girando. Da quando "leggi la selezione" senza
+    /// selezione legge ciò che è sotto il puntatore, la scorciatoia si preme anche senza aver selezionato niente: con un
+    /// terminale in primo piano il Ctrl+C non si invia. La selezione di un terminale si legge già con l'accessibilità.
+    /// </summary>
+    internal static bool IsTerminalWindowClass(string? className) =>
+        !string.IsNullOrEmpty(className) && s_terminalClasses.Contains(className);
+
+    /// <summary>I nomi delle classi di finestra in Windows non distinguono maiuscole e minuscole.</summary>
+    private static readonly HashSet<string> s_terminalClasses = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "ConsoleWindowClass", "CASCADIA_HOSTING_WINDOW_CLASS", "PseudoConsoleWindow", "VirtualConsoleClass", "mintty",
+    };
+
+    private static unsafe string? ForegroundWindowClass()
+    {
+        nint hwnd = GetForegroundWindow();
+        if (hwnd == 0) return null;
+        char* buffer = stackalloc char[256];
+        int length = GetClassNameW(hwnd, buffer, 256);
+        return length > 0 ? new string(buffer, 0, length) : null;
+    }
+
+    /// <summary>Vero, con una riga nel registro, se in primo piano c'è un terminale: il Ctrl+C non va inviato.</summary>
+    private bool ForegroundIsTerminal()
+    {
+        string? className = ForegroundWindowClass();
+        if (!IsTerminalWindowClass(className)) return false;
+        _log.Info($"In primo piano c'è un terminale ({className}): Ctrl+C non inviato, interromperebbe il programma in esecuzione");
+        return true;
+    }
+
     private void CopySelection(CancellationToken ct, TaskCompletionSource<string?> result)
     {
         ct.ThrowIfCancellationRequested();
+        if (ForegroundIsTerminal()) return;
 
         // 1. Fotografia degli appunti: vuoti, oppure solo formati testuali che si sanno rimettere tali e quali.
         if (!TryOpenClipboard(OpenRetries, OpenRetryDelayMs, ct))
@@ -135,6 +169,8 @@ public sealed class ClipboardSelectionReader : IClipboardSelectionReader
             _log.Debug("Appunti cambiati durante l'attesa dei modificatori: lettura della selezione saltata");
             return;
         }
+        // Il primo piano può essere cambiato durante l'attesa (fino a 3 s).
+        if (ForegroundIsTerminal()) return;
 
         Span<INPUT> ctrlC =
         [

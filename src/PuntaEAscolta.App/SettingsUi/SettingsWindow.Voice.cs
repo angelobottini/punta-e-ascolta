@@ -344,7 +344,7 @@ internal sealed partial class SettingsWindow
             }
             if (check.Voices is { } voices) text.Add($"{voices.Count} voci nell'account.");
             // "Lettura non provata" si dice solo dopo il pulsante Verifica (all'apertura e con "Aggiorna elenco voci" non si prova).
-            text.AddRange(check.Notes.Where(n => probeSpeech || !n.StartsWith("Lettura non provata", StringComparison.Ordinal))
+            text.AddRange(check.Notes.Where(n => probeSpeech || n != ElevenLabsMessages.SpeechNotTested)
                 .Select(n => n.Replace("l'ID della voce va scritto a mano", "scrivere l'ID della voce qui sotto", StringComparison.Ordinal)));
             bool problem = check.CannotSpeak || check.TtsTested == false;
             _accountText.Text = string.Join(" ", text) + (check.MissingPermissions.Count > 0 || problem ? saveHint : "");

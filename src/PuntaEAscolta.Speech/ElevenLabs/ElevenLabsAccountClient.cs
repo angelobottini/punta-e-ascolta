@@ -151,7 +151,7 @@ public sealed class ElevenLabsAccountClient
         sentences.AddRange(missing.Select(ElevenLabsMessages.DescribeMissingPermission));
         sentences.AddRange(notes);
         if (ttsTested == true) sentences.Add("Prova di lettura riuscita.");
-        else if (ttsTested is null) sentences.Add("Lettura non provata: manca l'ID della voce.");
+        else if (ttsTested is null) sentences.Add(ElevenLabsMessages.SpeechNotTested);
 
         string message = sentences.Count == 0 ? "Chiave valida." : "Chiave valida. " + string.Join(" ", sentences);
         return new ElevenLabsKeyCheck(true, subscription, voices, missing, ttsTested, message)
