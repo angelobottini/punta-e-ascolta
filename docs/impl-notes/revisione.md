@@ -122,3 +122,62 @@ Pubblicazione: `tools\publish.ps1 -SkipTests` (cartella intermedia privata `buil
 - **ONNX**: fino a 300-400 ms di CPU dopo uno stop se l'annullamento arriva durante l'inferenza di rilevamento.
 - **Impostazioni bloccate all'avvio**: la finestra prova a ricaricarle aspettando fino a 850 ms sul thread dell'interfaccia; se non ci riesce, per salvare bisogna chiudere e riaprire l'app.
 - Durante il lavoro è comparso il commit 4fd6744 ("Rifinitura: OCR limitato alla finestra...") con il codice, i test e le note di questo giro, non fatto da chi ha applicato le correzioni; questa sezione è nella copia di lavoro, non committata.
+
+## Prove di Angelo (23/09/2026)
+
+Prove di Angelo sul portatile Snapdragon (solo touchpad, niente mouse esterno).
+
+### Problemi segnalati e cause
+
+| Problema | Causa |
+|---|---|
+| "Legge solo il testo selezionato (Word, Blocco note); le etichette dei menu e il resto non si leggono mai" | Senza rotellina e con "leggi sotto il puntatore" senza scorciatoia (vuota di serie), l'unico comando possibile era "leggi la selezione" (Angelo l'aveva messa su Ctrl+Maiusc+0), che per costruzione legge solo la selezione. Nel log ogni attivazione era "Attivazione (scorciatoia): Selection". In più il ripiego sugli appunti non partiva mai ("Modificatori ancora premuti dopo l'attesa: Ctrl+C non inviato"): i tasti restavano premuti più di 1 s, il limite di allora |
+| "Non riconosce la chiave ElevenLabs, che in un'altra app funziona" | "Verifica" chiamava `GET /v1/user/subscription`, che richiede il permesso `user_read`. Una chiave limitata a Text to Speech riceve 401 `missing_permissions` e `ElevenLabsErrors.Map` trattava ogni 401 come chiave sbagliata: la finestra diceva "ElevenLabs ha rifiutato la chiave" e la chiave non è mai stata salvata (`settings.json` senza chiave) |
+| (dal log) "hook rimosso da Windows" due volte | Cartella `win-x64` usata sul PC ARM64 (emulazione): su Snapdragon va usata `win-arm64`. La riga però non basta come prova: compare anche quando un programma sposta il puntatore con `SetCursorPos` (vedi sotto) |
+
+### Correzioni dello sviluppo (commit 314ae6f, 5e26e4f, 76acfda, cdbaf51)
+
+- Scorciatoia di serie per "leggi sotto il puntatore": **Ctrl+Maiusc+Spazio** (Ctrl e Maiusc non chiudono un menu aperto).
+- "Leggi la selezione": selezione, poi appunti, poi **se non c'è niente di selezionato legge sotto il puntatore** (diagnostica `selezione:nessuna -> puntatore`).
+- Attesa del rilascio dei tasti 1 -> 3 s; fase "appunti" 2 -> 4,5 s (regola verificata da un test: 3660 ms + 500 di margine sotto 4500).
+- "Accetta i clic generati da software" attivo di serie (tocco a tre dita come clic centrale); se è spento, avviso nel registro al massimo una volta al minuto.
+- Ogni attivazione nel registro a livello Info, mai il testo.
+- ElevenLabs: nuovo motivo `MissingPermission` (401/403 `missing_permissions`, nome del permesso dal messaggio); "Verifica" dice che cosa manca (crediti, elenco voci, prova di lettura di 5 caratteri solo dal pulsante Verifica); campo "ID della voce" per le chiavi senza `voices_read`; pulizia della chiave incollata (spazi invisibili, virgolette, "xi-api-key:"); senza il permesso di sintesi il cloud resta sospeso fino al cambio delle impostazioni, come con una chiave rifiutata.
+
+### Revisione: difetti trovati e corretti
+
+| Voce | Gravità | Problema | Esito | Test |
+|---|---|---|---|---|
+| R1 | media | Da quando "leggi la selezione" senza selezione legge sotto il puntatore, la scorciatoia si preme anche senza aver selezionato niente. Con un terminale in primo piano il ripiego sugli appunti mandava Ctrl+C: nella console e in Windows Terminal, senza selezione, Ctrl+C **interrompe il programma in esecuzione** | **Corretto**: `ClipboardSelectionReader` non manda il Ctrl+C se la finestra in primo piano è un terminale (`ConsoleWindowClass`, `CASCADIA_HOSTING_WINDOW_CLASS`, `PseudoConsoleWindow`, `VirtualConsoleClass`, `mintty`). Controllo all'inizio e di nuovo subito prima del Ctrl+C; riga Info "In primo piano c'è un terminale (...): Ctrl+C non inviato"; il risolutore passa al puntatore | `ClipboardTerminalGuardTests` (13 casi); prova simulata (f) |
+| R2 | media-bassa | Menu dove l'accessibilità dà il menu intero e non la voce (menu WinForms di .NET Framework: "FileDropDown" senza figli con rettangolo). L'OCR univa due voci vicine in un blocco: letto "Apri Salva con nome" invece di "Salva con nome". Requisito: "si legge solo la voce puntata" | **Corretto**: con un elemento `Menu`, `MenuBar` o `MenuItem` l'OCR sceglie una riga sola (`GroupLinesIntoBlocks` spento solo per quella lettura; diagnostica `menu:una-riga`) | `MenuWithoutItems_OcrReadsOnlyThePointedItem`, `SameLinesOutsideAMenu_StillFormABlock`; prova simulata (b) |
+| R3 | bassa | `--selftest` (che salta di proposito la prova di lettura per non spendere crediti) scriveva nel campo `message` "Lettura non provata: manca l'ID della voce" anche con la voce impostata | **Corretto**: frase in una costante (`ElevenLabsMessages.SpeechNotTested`); l'autodiagnosi e la finestra (apertura, "Aggiorna elenco voci") la tolgono | compilazione; `--selftest` riuscito |
+
+Controllati senza difetti: valori predefiniti e controllo delle scorciatoie, ordine selezione -> appunti -> puntatore (niente seconda richiesta della selezione, stop durante gli appunti), regola dei tempi degli appunti, limite di frequenza dell'avviso sui clic iniettati (solo dal thread dell'hook, nessun log nella callback), mappatura degli errori ElevenLabs (il permesso mancante non passa mai per formato rifiutato; nessuna prova sulla v1 delle voci senza `voices_read`), interruttore con `MissingPermission`, pulizia della chiave (mai nei messaggi), campo "ID della voce" (valida lettere, cifre, `_` e `-`; il nome si tiene solo se l'ID è lo stesso).
+
+Esito: compilazione con **0 avvisi**; **708 test** (Logic 400, Speech 187, Windows 121; 608 prima di queste prove, 693 dopo lo sviluppo, 15 in più dalla revisione) verdi in 3 esecuzioni consecutive; `--selftest` dalla cartella di compilazione riuscito, senza problemi né avvisi.
+
+### Prova simulata (build ARM64 nella cartella privata di compilazione)
+
+`settings.json` con solo `DebugLog: true` e volume 0,15 (tutti gli altri valori di serie, quindi Ctrl+Maiusc+Spazio, Win+Maiusc+F9 e clic iniettati accettati). Finestra di prova propria (WinForms in un processo PowerShell, DPI per monitor, sempre in primo piano), tasti e clic con `SendInput` non firmati; prima di ogni invio controllo che la finestra sotto il puntatore e quella in primo piano siano della prova. Al primo tentativo il PC era bloccato (la finestra del blocco schermo copriva tutto): la prova si è fermata senza inviare niente ed è stata ripetuta dopo lo sblocco.
+
+| Passo | Esito |
+|---|---|
+| (a) Puntatore su un'etichetta, Ctrl+Maiusc+Spazio | "Attivazione (scorciatoia ReadAtPointer) a 500,308: lettura AtPointer", letto "Benvenuto nella finestra di prova" (UiaName, 290-317 ms) |
+| (b) Menu File aperto, puntatore su "Salva con nome...", Ctrl+Maiusc+Spazio | Il menu resta aperto (si chiude solo al clic successivo, motivo AppClicked). Prima di R2 letto "Apri Salva con nome" (OcrBlock); dopo R2 letto "Salva con nome" (OcrLine, `menu:una-riga`, 220 ms) |
+| (c) Puntatore su un pulsante, niente selezionato, Win+Maiusc+F9 | `selezione:no appunti:no selezione:nessuna -> puntatore`, letto "Conferma l'ordine" (495 ms); Ctrl+C senza copia, appunti invariati; pulsante non premuto; niente menu Start |
+| (d) Clic centrale simulato su un'etichetta | "Attivazione (clic) a 479,388", letto "Seconda etichetta da leggere" (40-48 ms); la finestra non ha ricevuto né la pressione né il rilascio del pulsante centrale |
+| (e) Casella con selezione non esposta all'accessibilità, Win+Maiusc+F9 e poi Ctrl+Maiusc tenuti 1,5 s | Ctrl+C arrivato 25 ms dopo il rilascio dell'ultimo tasto (Maiusc), senza Maiusc premuto; letto "questa frase selezionata va letta" (ClipboardSelection, 1737 ms). F9 non arriva alla finestra |
+| (f) In più: console `conhost` propria in primo piano, niente selezionato, Win+Maiusc+F9 | "In primo piano c'è un terminale (ConsoleWindowClass): Ctrl+C non inviato", letta la riga sotto il puntatore (UiaSentence); il programma nella console è rimasto in esecuzione |
+
+Chiusura: `--exit` riuscito, finestre di prova chiuse, nessun processo rimasto. In ogni giro è comparsa una volta "Hook del mouse reinstallato (hook rimosso da Windows)": falso allarme causato dagli spostamenti del puntatore con `SetCursorPos` della prova, che non passano dall'hook.
+
+### Rischi residui
+
+- **Chiavi ElevenLabs limitate provate solo con risposte simulate**: nessuna chiave vera limitata a disposizione. Da provare con la chiave di Angelo: Verifica, Salva chiave, ID della voce, Prova voce, lettura vera.
+- **Nessuna migrazione delle impostazioni**: le cartelle di prova di Angelo hanno `HotkeyReadAtPointer` vuota e `AcceptInjectedEvents` falso e li terrebbero se si copiano i file nuovi sopra. `tools\publish.ps1` svuota le cartelle (anche `settings.json`), quindi una nuova pubblicazione parte dai valori di serie. Intanto la sua scorciatoia della selezione (Ctrl+Maiusc+0), senza niente di selezionato, legge già sotto il puntatore.
+- **Ctrl+Maiusc+Spazio tolta agli altri programmi** mentre l'app è aperta: Word (spazio unificatore, scritto nel LEGGIMI), Excel (seleziona il foglio), VS Code.
+- **Terminale integrato di VS Code** non riconosciuto come terminale (finestra `Chrome_WidgetWin_1`): lì la scorciatoia della selezione senza selezione può ancora mandare Ctrl+C.
+- **Dettatura con una chiave senza `speech_to_text`**: il 401 `missing_permissions` della trascrizione compare ancora come `InvalidKey` nel registro della dettatura (a voce dice comunque "non riuscito").
+- **"Leggi la selezione" dal menu dell'icona** senza niente di selezionato legge ciò che è sotto il punto dove era il menu (scritto nel LEGGIMI).
+- **Riga "hook rimosso da Windows"**: il controllo la scrive anche per spostamenti del puntatore fatti da un programma; non basta a dire che la cartella x64 abbia perso l'hook.
+- Durante il lavoro sono comparsi i commit cdbaf51, bb4bcd2 e 3d034c4 (a nome di Angelo, non fatti da chi ha fatto la revisione) con la documentazione dello sviluppo e le correzioni R1-R3; questa sezione e le ultime righe di `windows-input.md` e `PuntaEAscolta.Logic.md` sono nella copia di lavoro, non committate.
