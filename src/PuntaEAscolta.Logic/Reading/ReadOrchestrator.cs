@@ -232,7 +232,7 @@ public sealed class ReadOrchestrator : IReadOrchestrator
             case HotkeyAction.ReadSelection:
                 if (IsHotkeyBounce(hotkey)) return;
                 var kind = hotkey.Action == HotkeyAction.ReadSelection ? ReadRequestKind.Selection : ReadRequestKind.AtPointer;
-                Trigger(kind, hotkey.Point, "scorciatoia");
+                Trigger(kind, hotkey.Point, "scorciatoia " + hotkey.Action);
                 break;
 
             case HotkeyAction.Stop:
@@ -271,18 +271,21 @@ public sealed class ReadOrchestrator : IReadOrchestrator
     /// Attivazione di lettura: se la voce sta parlando, o se una lettura sta ancora cercando il testo, ferma tutto e basta
     /// (secondo clic = stop); durante la ricerca, con il puntatore spostato di più di <see cref="PendingReadMoveThresholdPx"/>,
     /// avvia invece una lettura nuova nel punto nuovo. Altrimenti avvia una lettura nuova.
+    /// Ogni attivazione va nel registro a livello Info con l'origine ("clic", "pressione lunga", "scorciatoia ReadSelection"...)
+    /// e il punto, mai con il testo: anche senza il log dettagliato si vede che cosa ha avviato (o fermato) una lettura.
     /// </summary>
     private void Trigger(ReadRequestKind kind, ScreenPoint point, string origin)
     {
+        string where = $"Attivazione ({origin}) a {point.X},{point.Y}";
         // Durante la registrazione della dettatura la voce finirebbe nel microfono: l'attivazione si ignora.
         if (IsDictationRecording())
         {
-            _log.Info($"Attivazione ({origin}) ignorata: dettatura in registrazione");
+            _log.Info($"{where} ignorata: dettatura in registrazione");
             return;
         }
         if (IsSpeakingNow())
         {
-            _log.Info($"Attivazione ({origin}) mentre la voce parla: stop");
+            _log.Info($"{where} mentre la voce parla: stop");
             StopAll();
             return;
         }
@@ -290,15 +293,15 @@ public sealed class ReadOrchestrator : IReadOrchestrator
         {
             if (PendingRead() is { } pending && IsNewPointerRead(pending, kind, point))
             {
-                _log.Info($"Attivazione ({origin}) durante la ricerca del testo con il puntatore spostato: lettura nuova");
+                _log.Info($"{where} durante la ricerca del testo con il puntatore spostato: lettura nuova ({kind})");
                 StartRead(new ReadRequest(kind, point));
                 return;
             }
-            _log.Info($"Attivazione ({origin}) durante la ricerca del testo: lettura annullata");
+            _log.Info($"{where} durante la ricerca del testo: lettura annullata");
             StopAll();
             return;
         }
-        _log.Debug($"Attivazione ({origin}): {kind} a {point.X},{point.Y}");
+        _log.Info($"{where}: lettura {kind}");
         StartRead(new ReadRequest(kind, point));
     }
 

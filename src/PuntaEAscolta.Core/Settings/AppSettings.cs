@@ -33,8 +33,12 @@ public sealed class InputSettings
     /// <summary>Pulsante del mouse che avvia la lettura. Predefinito: clic della rotellina.</summary>
     public TriggerButton MouseTrigger { get; set; } = TriggerButton.Middle;
 
-    /// <summary>Accetta anche i clic generati da software (ausili di puntamento, emulatori). Predefinito: no.</summary>
-    public bool AcceptInjectedEvents { get; set; } = false;
+    /// <summary>
+    /// Accetta anche i clic generati da software. Predefinito: sì. Il tocco a tre dita del touchpad impostato da Windows come
+    /// "pulsante centrale del mouse", gli ausili di puntamento e i programmi di assistenza remota arrivano come clic generati
+    /// da software; i clic che genera l'app stessa restano comunque ignorati (firma in dwExtraInfo).
+    /// </summary>
+    public bool AcceptInjectedEvents { get; set; } = true;
 
     /// <summary>Se attiva, la pressione prolungata legge tutta la zona attorno al puntatore invece del solo elemento.</summary>
     public bool LongPressEnabled { get; set; } = false;
@@ -43,8 +47,13 @@ public sealed class InputSettings
     /// <summary>Anti-rimbalzo: i clic entro questo intervallo dal precedente vengono ignorati (clic involontari doppi).</summary>
     public int DebounceMs { get; set; } = 350;
 
-    /// <summary>Scorciatoie da tastiera globali, in forma "Win+Shift+A". Stringa vuota = nessuna. Evitare Ctrl+Alt (è AltGr sulla tastiera italiana).</summary>
-    public string HotkeyReadAtPointer { get; set; } = "";
+    /// <summary>
+    /// Scorciatoie da tastiera globali, in forma "Win+Shift+A". Stringa vuota = nessuna. Evitare Ctrl+Alt (è AltGr sulla
+    /// tastiera italiana). "Leggi sotto il puntatore" ha una scorciatoia di serie (Ctrl+Maiusc+Spazio) perché sui portatili
+    /// con il solo touchpad non c'è la rotellina: Ctrl e Maiusc non chiudono un menu aperto (Alt e Win sì).
+    /// "Leggi la selezione", se non c'è niente di selezionato, legge ciò che è sotto il puntatore.
+    /// </summary>
+    public string HotkeyReadAtPointer { get; set; } = "Ctrl+Shift+Space";
     public string HotkeyReadSelection { get; set; } = "Win+Shift+F9";
     public string HotkeyStop { get; set; } = "";
     public string HotkeyTogglePause { get; set; } = "";

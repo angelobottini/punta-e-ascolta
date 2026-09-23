@@ -294,19 +294,24 @@ internal sealed partial class SettingsWindow : Window
             (TriggerButton.X2, "Pulsante laterale avanti"),
             (TriggerButton.None, "Nessuno (solo scorciatoie da tastiera)"),
         }, s.Input.MouseTrigger, (t, v) => t.Input.MouseTrigger = v,
-            "Un secondo clic mentre la voce parla la ferma.");
+            "Un secondo clic mentre la voce parla la ferma. Portatile senza mouse: in Impostazioni di Windows > Bluetooth e dispositivi > " +
+            "Touchpad > Tocchi (o Gesti con tre dita) scegliere \"Pulsante centrale del mouse\" per il tocco a tre dita, " +
+            "oppure usare la scorciatoia \"Leggi sotto il puntatore\" (Ctrl+Maiusc+Spazio).");
         Check(mouse, "Pressione prolungata: legge tutta la zona attorno al puntatore", s.Input.LongPressEnabled, (t, v) => t.Input.LongPressEnabled = v);
         IntField(mouse, "Durata della pressione prolungata (ms)", s.Input.LongPressMs, 300, 3000, (t, v) => t.Input.LongPressMs = v);
         IntField(mouse, "Anti-rimbalzo (ms)", s.Input.DebounceMs, 0, 2000, (t, v) => t.Input.DebounceMs = v,
             "I clic arrivati entro questo tempo dal precedente vengono ignorati (clic doppi involontari).");
-        Check(mouse, "Accetta i clic generati da software (ausili di puntamento, emulatori di mouse)", s.Input.AcceptInjectedEvents,
-            (t, v) => t.Input.AcceptInjectedEvents = v);
+        Check(mouse, "Accetta i clic generati da software (tocco a tre dita del touchpad, ausili di puntamento, assistenza remota)",
+            s.Input.AcceptInjectedEvents, (t, v) => t.Input.AcceptInjectedEvents = v,
+            "Consigliato. I clic generati da Punta e Ascolta stesso vengono comunque ignorati.");
 
         var keys = Section(page, "Scorciatoie da tastiera");
-        Note(keys, "Esempi: Win+Shift+F9, Ctrl+F8, F8. Campo vuoto = nessuna scorciatoia. Evitare Ctrl+Alt: sulla tastiera italiana è AltGr. " +
+        Note(keys, "Esempi: Ctrl+Shift+Space (o Ctrl+Maiusc+Spazio), Win+Shift+F9, Ctrl+F8, F8. Campo vuoto = nessuna scorciatoia. Evitare Ctrl+Alt: sulla tastiera italiana è AltGr. " +
             "Senza Ctrl, Alt o Win sono ammessi solo F1-F24, Pausa e Bloc Scorr (un altro tasto verrebbe tolto a tutti i programmi); Esc non si può usare: ferma già la voce mentre parla.");
-        HotkeyField(keys, "Leggi sotto il puntatore", s.Input.HotkeyReadAtPointer, (t, v) => t.Input.HotkeyReadAtPointer = v);
-        HotkeyField(keys, "Leggi la selezione", s.Input.HotkeyReadSelection, (t, v) => t.Input.HotkeyReadSelection = v);
+        HotkeyField(keys, "Leggi sotto il puntatore", s.Input.HotkeyReadAtPointer, (t, v) => t.Input.HotkeyReadAtPointer = v,
+            "Predefinita: Ctrl+Maiusc+Spazio. Ctrl e Maiusc non chiudono un menu aperto: si può leggere la voce del menu puntata.");
+        HotkeyField(keys, "Leggi la selezione o ciò che è sotto il puntatore", s.Input.HotkeyReadSelection, (t, v) => t.Input.HotkeyReadSelection = v,
+            "Legge il testo selezionato; se non c'è niente di selezionato legge ciò che è sotto il puntatore.");
         HotkeyField(keys, "Ferma la voce", s.Input.HotkeyStop, (t, v) => t.Input.HotkeyStop = v);
         HotkeyField(keys, "Pausa e ripresa", s.Input.HotkeyTogglePause, (t, v) => t.Input.HotkeyTogglePause = v);
         Check(keys, "Esc ferma la voce (solo mentre parla)", s.Input.EscStopsSpeech, (t, v) => t.Input.EscStopsSpeech = v);

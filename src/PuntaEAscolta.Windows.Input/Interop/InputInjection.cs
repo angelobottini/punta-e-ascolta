@@ -12,8 +12,13 @@ internal static unsafe class InputInjection
     /// <summary>"PEA1": firma dei nostri SendInput.</summary>
     internal const nuint Tag = 0x50454131;
 
-    /// <summary>Tempo massimo di attesa perché l'utente rilasci i modificatori prima di inviare tasti.</summary>
-    internal const int ModifierReleaseTimeoutMs = 1000;
+    /// <summary>
+    /// Tempo massimo di attesa perché l'utente rilasci i modificatori prima di inviare tasti. 3 s (era 1 s): nelle prove dal
+    /// vivo i tasti della scorciatoia restavano premuti più di un secondo e il Ctrl+C della selezione non partiva mai.
+    /// La fase "appunti" del risolutore (TextResolver.DefaultClipboardTimeoutMs) deve durare di più: vedi
+    /// <see cref="ClipboardSelectionReader.WorstCaseBeforeCopyMs"/>.
+    /// </summary>
+    internal const int ModifierReleaseTimeoutMs = 3000;
 
     internal static int InputSize => sizeof(INPUT);
 

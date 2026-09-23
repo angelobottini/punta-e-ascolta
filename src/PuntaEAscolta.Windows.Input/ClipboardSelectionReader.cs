@@ -15,10 +15,18 @@ namespace PuntaEAscolta.Windows.Input;
 /// </summary>
 public sealed class ClipboardSelectionReader : IClipboardSelectionReader
 {
-    private const int OpenRetries = 12;
-    private const int OpenRetryDelayMs = 15;
-    private const int CopyTimeoutMs = 300;
+    internal const int OpenRetries = 12;
+    internal const int OpenRetryDelayMs = 15;
+    internal const int CopyTimeoutMs = 300;
     private const int PollIntervalMs = 10;
+
+    /// <summary>
+    /// Caso peggiore dal momento della richiesta alla lettura del testo copiato: due aperture degli appunti con tutti i
+    /// tentativi, attesa del rilascio dei modificatori e attesa della copia. Deve restare, con un margine, sotto il tempo
+    /// massimo della fase "appunti" del risolutore (TextResolver.DefaultClipboardTimeoutMs, 4500 ms): lo verifica
+    /// ClipboardTimeoutBudgetTests.
+    /// </summary>
+    internal const int WorstCaseBeforeCopyMs = 2 * OpenRetries * OpenRetryDelayMs + InputInjection.ModifierReleaseTimeoutMs + CopyTimeoutMs;
 
     /// <summary>Dopo il Ctrl+C, per quanto si aspetta ancora la copia dell'app per poter ripristinare gli appunti.</summary>
     private const int LateCopyWindowMs = 1500;
@@ -115,10 +123,10 @@ public sealed class ClipboardSelectionReader : IClipboardSelectionReader
         if (snapshot is null) return;
 
         // 2. Ctrl+C firmato, solo a modificatori rilasciati: con Maiusc o Alt ancora premuti l'app riceverebbe un altro
-        //    comando (Ctrl+Maiusc+C, Ctrl+Alt+C) e potrebbe modificare il documento.
+        //    comando (Ctrl+Maiusc+C, Ctrl+Alt+C) e potrebbe modificare il documento. Si aspetta fino a 3 s.
         if (!InputInjection.WaitForModifiersRelease(InputInjection.ModifierReleaseTimeoutMs, ct))
         {
-            _log.Info("Modificatori ancora premuti dopo l'attesa: Ctrl+C non inviato");
+            _log.Info($"Modificatori ancora premuti dopo {InputInjection.ModifierReleaseTimeoutMs} ms: Ctrl+C non inviato (rilasciare prima i tasti della scorciatoia)");
             return;
         }
         ct.ThrowIfCancellationRequested();

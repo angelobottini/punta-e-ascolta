@@ -38,7 +38,10 @@ public interface IInputSource : IDisposable
     IReadOnlyList<string> LastProblems { get; }
 }
 
-/// <summary>Scorciatoia da tastiera in forma testuale, es. "Win+Shift+A", "Ctrl+F9", "F8". Stringa vuota = nessuna.</summary>
+/// <summary>
+/// Scorciatoia da tastiera in forma testuale, es. "Win+Shift+A", "Ctrl+F9", "F8", "Ctrl+Shift+Space" (anche in italiano:
+/// "Ctrl+Maiusc+Spazio"). Stringa vuota = nessuna. Il nome del tasto resta com'è scritto: lo traduce lo strato Windows.
+/// </summary>
 public sealed record HotkeyGesture(bool Ctrl, bool Alt, bool Shift, bool Win, string Key)
 {
     public static bool TryParse(string? text, out HotkeyGesture? gesture)

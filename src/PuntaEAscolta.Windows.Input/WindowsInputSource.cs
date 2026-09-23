@@ -27,6 +27,7 @@ public sealed class WindowsInputSource : IInputSource
     private const uint WM_APP_REHOOK = WM_APP + 3;
     private const uint WM_APP_SLOWCALLBACK = WM_APP + 4;
     private const uint WM_APP_SHUTDOWN = WM_APP + 5;
+    private const uint WM_APP_INJECTEDIGNORED = WM_APP + 6;
 
     // ---- identificatori delle scorciatoie ----------------------------------------------------
 
@@ -50,6 +51,13 @@ public sealed class WindowsInputSource : IInputSource
     private const int SlowCallbackMs = 20;
     private const int ThreadJoinTimeoutMs = 3_000;
     private const int ApplyTimeoutMs = 3_000;
+
+    /// <summary>Al massimo un avviso ogni 60 s per i clic dell'attivatore ignorati perché generati da software.</summary>
+    internal const long InjectedIgnoredNoticeIntervalMs = 60_000;
+
+    internal const string InjectedIgnoredMessage =
+        "Clic del pulsante di attivazione ignorato perché generato da software (es. tocco a tre dita del touchpad): " +
+        "attivare 'Accetta i clic generati da software'";
 
     /// <summary>Le callback native sono statiche: una sola istanza viva per processo.</summary>
     private static WindowsInputSource? s_instance;
@@ -88,6 +96,7 @@ public sealed class WindowsInputSource : IInputSource
     private int _dictationMask;
     private bool _escapeRegistered;
     private bool _escapeEnabledBySettings = true;
+    private long _lastInjectedIgnoredNoticeMs = long.MinValue;
 
     // Stato letto dalla callback e scritto da altri thread: snapshot immutabili o volatile.
     private volatile HookConfig _config = HookConfig.Disabled;
@@ -429,6 +438,10 @@ public sealed class WindowsInputSource : IInputSource
                 LogOffThread(LogLevel.Warn, $"La callback dell'hook del mouse ha impiegato {(long)wParam} ms (limite {SlowCallbackMs} ms)");
                 return true;
 
+            case WM_APP_INJECTEDIGNORED:
+                LogOffThread(LogLevel.Info, InjectedIgnoredMessage);
+                return true;
+
             case WM_APP_SHUTDOWN:
                 PostQuitMessage(0);
                 return true;
@@ -548,6 +561,17 @@ public sealed class WindowsInputSource : IInputSource
 
     private static long PackPoint(int x, int y) => ((long)x << 32) | (uint)y;
 
+    /// <summary>
+    /// Limite di frequenza per un avviso: vero (e <paramref name="lastMs"/> aggiornato) se dall'ultimo avviso sono passati
+    /// almeno <paramref name="intervalMs"/> ms, o se non ce n'è ancora stato uno (<see cref="long.MinValue"/>).
+    /// </summary>
+    internal static bool ShouldNotify(long nowMs, ref long lastMs, long intervalMs)
+    {
+        if (lastMs != long.MinValue && nowMs - lastMs < intervalMs) return false;
+        lastMs = nowMs;
+        return true;
+    }
+
     [UnmanagedCallersOnly]
     private static unsafe nint MouseProc(int nCode, nuint wParam, nint lParam)
     {
@@ -610,7 +634,18 @@ public sealed class WindowsInputSource : IInputSource
             if (_paused) return false;
             if (data.dwExtraInfo == InputInjection.Tag) return false;   // generato da noi
             HookConfig cfg = _config;
-            if ((data.flags & LLMHF_INJECTED) != 0 && !cfg.AcceptInjected) return false;
+            if ((data.flags & LLMHF_INJECTED) != 0 && !cfg.AcceptInjected)
+            {
+                // Clic del nostro pulsante generato da software (tocco a tre dita del touchpad, assistenza remota): lo si
+                // lascia passare e lo si segnala nel registro, al massimo una volta al minuto. Qui niente log: solo un
+                // messaggio alla finestra dell'InputThread, che scrive nel registro da un thread del pool.
+                if ((button == cfg.ReadButton || button == cfg.DictationButton)
+                    && ShouldNotify(now, ref _lastInjectedIgnoredNoticeMs, InjectedIgnoredNoticeIntervalMs) && _hwnd != 0)
+                {
+                    PostMessageW(_hwnd, WM_APP_INJECTEDIGNORED, 0, 0);
+                }
+                return false;
+            }
 
             if (button == cfg.ReadButton)
             {

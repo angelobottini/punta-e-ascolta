@@ -13,6 +13,7 @@ namespace PuntaEAscolta.Logic.Reading;
 /// <summary>
 /// Decide che cosa leggere per una richiesta, senza parlare (flusso di DESIGN.md 2.1):
 /// 1. selezione sotto il puntatore, 2. elemento di accessibilità, 3. suggerimento visibile, 4. OCR della zona.
+/// La richiesta della selezione cerca qualunque selezione, poi gli appunti, e senza selezione passa al flusso del puntatore.
 /// Ogni fase è protetta singolarmente da eccezioni, tempo massimo e annullamento: un guasto fa passare alla fase successiva.
 /// Non attiva finestre, non tocca il focus, non registra il testo se non a livello Debug.
 /// </summary>
@@ -37,6 +38,14 @@ public sealed class TextResolver : ITextResolver
     /// restare sotto questo valore, così una fase scaduta ha già liberato il thread UIA prima che parta la successiva.
     /// </summary>
     public const int DefaultUiaTimeoutMs = 1500;
+
+    /// <summary>
+    /// Tempo massimo predefinito per il ripiego sugli appunti. Regola da rispettare (la verifica ClipboardTimeoutBudgetTests):
+    /// attesa del rilascio dei modificatori (3000 ms, InputInjection.ModifierReleaseTimeoutMs) + attesa della copia (300 ms)
+    /// + aperture degli appunti con i nuovi tentativi + margine devono restare sotto questo valore, altrimenti chi tiene
+    /// premuti i tasti della scorciatoia un po' più a lungo vedrebbe scadere la fase prima del Ctrl+C.
+    /// </summary>
+    public const int DefaultClipboardTimeoutMs = 4500;
 
     /// <summary>Dimensioni (al 100%) sotto le quali un elemento UIA senza testo delimita l'OCR al suo rettangolo.</summary>
     public const int SmallElementWidth = 300;
@@ -80,8 +89,8 @@ public sealed class TextResolver : ITextResolver
     /// <summary>Tempo massimo per ogni riconoscimento OCR.</summary>
     internal TimeSpan OcrTimeout { get; set; } = TimeSpan.FromMilliseconds(3000);
 
-    /// <summary>Tempo massimo per il ripiego sugli appunti.</summary>
-    internal TimeSpan ClipboardTimeout { get; set; } = TimeSpan.FromMilliseconds(2000);
+    /// <summary>Tempo massimo per il ripiego sugli appunti (vedi <see cref="DefaultClipboardTimeoutMs"/>).</summary>
+    internal TimeSpan ClipboardTimeout { get; set; } = TimeSpan.FromMilliseconds(DefaultClipboardTimeoutMs);
 
     /// <summary>Scarta le parole OCR tagliate dal bordo della zona catturata (frammenti come "mento" per "Documento").</summary>
     internal bool DiscardCutText { get; set; } = true;
@@ -115,7 +124,7 @@ public sealed class TextResolver : ITextResolver
             ct.ThrowIfCancellationRequested();
             var candidate = request.Kind switch
             {
-                ReadRequestKind.Selection => await ResolveSelectionRequestAsync(settings, diag, ct).ConfigureAwait(false),
+                ReadRequestKind.Selection => await ResolveSelectionRequestAsync(request.Point, settings, diag, ct).ConfigureAwait(false),
                 ReadRequestKind.ZoneAroundPointer => await OcrZoneAsync(request.Point, settings, wholeZone: true, element: null, clipToElement: false, diag, ct).ConfigureAwait(false),
                 _ => await ResolveAtPointerAsync(request.Point, settings, diag, ct).ConfigureAwait(false),
             };
@@ -149,10 +158,14 @@ public sealed class TextResolver : ITextResolver
     // Flussi
     // ---------------------------------------------------------------------------------------------
 
-    private async Task<Candidate?> ResolveAtPointerAsync(ScreenPoint point, AppSettings settings, StringBuilder diag, CancellationToken ct)
+    /// <param name="selectionAlreadyChecked">
+    /// Vero quando arriva dalla richiesta della selezione, che l'ha già cercata senza trovarla: non si chiede di nuovo.
+    /// </param>
+    private async Task<Candidate?> ResolveAtPointerAsync(ScreenPoint point, AppSettings settings, StringBuilder diag, CancellationToken ct,
+        bool selectionAlreadyChecked = false)
     {
         // 1. Selezione: si legge solo se il puntatore è dentro uno dei rettangoli del testo selezionato.
-        if (settings.Reading.ReadSelectionWhenPointerInside)
+        if (settings.Reading.ReadSelectionWhenPointerInside && !selectionAlreadyChecked)
         {
             var selection = await GuardAsync("selezione", t => _ui.GetSelectionAsync(t), UiaTimeout, diag, ct).ConfigureAwait(false);
             if (selection is not null && !string.IsNullOrWhiteSpace(selection.Text)
@@ -227,7 +240,13 @@ public sealed class TextResolver : ITextResolver
         return await OcrZoneAsync(point, settings, wholeZone: false, element, clipToElement: uiaTriedWithoutText, diag, ct).ConfigureAwait(false);
     }
 
-    private async Task<Candidate?> ResolveSelectionRequestAsync(AppSettings settings, StringBuilder diag, CancellationToken ct)
+    /// <summary>
+    /// "Leggi la selezione": qualunque selezione (accessibilità), poi il ripiego sugli appunti; se non c'è niente di
+    /// selezionato (selezione vuota e appunti vuoti o rifiutati) legge ciò che è sotto il puntatore, come "leggi sotto il
+    /// puntatore". Così una sola scorciatoia fa "leggi ciò che ho selezionato, altrimenti ciò che indico" (prove dal vivo del
+    /// 23/09/2026: con il solo touchpad questa era l'unica scorciatoia e le etichette dei menu non si leggevano mai).
+    /// </summary>
+    private async Task<Candidate?> ResolveSelectionRequestAsync(ScreenPoint point, AppSettings settings, StringBuilder diag, CancellationToken ct)
     {
         var selection = await GuardAsync("selezione", t => _ui.GetSelectionAsync(t), UiaTimeout, diag, ct).ConfigureAwait(false);
         if (selection is not null && !string.IsNullOrWhiteSpace(selection.Text))
@@ -240,15 +259,20 @@ public sealed class TextResolver : ITextResolver
         if (_clipboard is null)
         {
             diag.Append(" appunti:assenti");
-            return null;
         }
-        var copied = await GuardAsync("appunti", t => _clipboard.TryCopySelectionAsync(t), ClipboardTimeout, diag, ct).ConfigureAwait(false);
-        if (!string.IsNullOrWhiteSpace(copied))
+        else
         {
-            diag.Append(" -> ClipboardSelection");
-            return new Candidate(ReadSource.ClipboardSelection, copied, SpeechKind.Sentence, Sensitive: true);
+            var copied = await GuardAsync("appunti", t => _clipboard.TryCopySelectionAsync(t), ClipboardTimeout, diag, ct).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(copied))
+            {
+                diag.Append(" -> ClipboardSelection");
+                return new Candidate(ReadSource.ClipboardSelection, copied, SpeechKind.Sentence, Sensitive: true);
+            }
+            ct.ThrowIfCancellationRequested();
         }
-        return null;
+
+        diag.Append(" selezione:nessuna -> puntatore");
+        return await ResolveAtPointerAsync(point, settings, diag, ct, selectionAlreadyChecked: true).ConfigureAwait(false);
     }
 
     private async Task<Candidate?> OcrTooltipAsync(ScreenRect bounds, ScreenPoint anchor, AppSettings settings, StringBuilder diag, CancellationToken ct)
