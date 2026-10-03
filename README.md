@@ -3,7 +3,8 @@
 Punta e Ascolta legge a voce ciò che si trova sotto il puntatore del mouse, solo quando glielo chiedi.
 Funziona in qualsiasi programma di Windows: menu, pulsanti, celle di Excel, frasi di Word, testo dentro le fotografie.
 
-Questo è il manuale breve. La guida completa è in [docs/LEGGIMI.txt](docs/LEGGIMI.txt).
+Questo è il manuale breve; c'è anche in versione da stampare: [docs/Manuale.pdf](docs/Manuale.pdf).
+La guida completa è in [docs/LEGGIMI.txt](docs/LEGGIMI.txt).
 
 ## Avvio
 
